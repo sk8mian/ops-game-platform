@@ -140,6 +140,25 @@
       S.coupons = S.coupons || []; S.coupons.unshift(cp); save(); return { ok: true, coupon: cp };
     },
     useCoupon(id) { load(); const cp = (S.coupons || []).find(c => c.id === id); if (!cp || cp.used) return false; cp.used = Date.now(); log('核销到店券 ' + id); save(); return true; },
+    /* 平台口令：演示在前端比对，正式版服务端按天下发与校验 */
+    redeemCode(code) {
+      load(); const P = C.platformCode; code = String(code || '').trim();
+      if (!code) return { ok: false, msg: '请先输入口令' };
+      if ((S.day.stats.codeRedeems || 0) >= P.dailyCap) return { ok: false, msg: '今日口令已输入过' };
+      if (!P.codes.some(c => c.toLowerCase() === code.toLowerCase())) return { ok: false, msg: '口令不对，去官方视频里再找找' };
+      this._track('codeRedeems', 1); log('输入平台口令'); save(); return { ok: true };
+    },
+    /* 作品投稿：演示只校验链接域名并自动通过；正式版核验作品归属后再发奖 */
+    submitWork(url) {
+      load(); const W = C.works; let u;
+      try { u = new URL(String(url || '').trim()); } catch (e) { return { ok: false, msg: '请粘贴完整的作品链接（https://…）' }; }
+      if (!/^https?:$/.test(u.protocol) || !W.hosts.some(h => u.hostname === h || u.hostname.endsWith('.' + h))) return { ok: false, msg: '只支持抖音 / B站 / 小红书的作品链接' };
+      S.works = S.works || [];
+      if (S.works.some(w => w.url === u.href)) return { ok: false, msg: '这个作品已经提交过' };
+      if ((S.week.stats.worksApproved || 0) >= W.weeklyCap) return { ok: false, msg: '本周投稿奖励已达上限' };
+      S.works.unshift({ url: u.href, t: Date.now(), status: 'approved-demo' }); S.works = S.works.slice(0, 20);
+      this._track('worksApproved', 1); log('提交作品 ' + u.hostname); save(); return { ok: true };
+    },
     /* ---------- 任务中心 ---------- */
     _track(metric, n, isMax) {
       [S.stats, S.day.stats, S.week.stats].forEach(o => { o[metric] = isMax ? Math.max(o[metric] || 0, n) : (o[metric] || 0) + n; });

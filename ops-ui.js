@@ -67,6 +67,11 @@
   .ou-tab i{position:absolute;top:-6px;right:-4px;min-width:17px;height:17px;border-radius:9px;background:#ff4f7b;color:#fff;font-size:10.5px;font-style:normal;line-height:17px;padding:0 4px}
   .ou-ms{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed rgba(120,170,255,.15)}
   .ou-ms:last-child{border:none}
+  .ou-act{padding:0 0 10px;border-bottom:1px dashed rgba(120,170,255,.15)}
+  .ou-act small{display:block;font-size:12px;color:var(--ou-dim);margin-bottom:6px}
+  .ou-act-row{display:flex;gap:8px}
+  .ou-act-row input{flex:1;min-width:0;min-height:44px;border-radius:10px;border:1px solid rgba(120,170,255,.35);background:rgba(5,8,22,.6);color:#fff;padding:0 12px;font-size:16px}
+  .ou-act-row .ou-btn{flex:0 0 auto;padding:0 16px}
   .ou-ms .t{flex:1;min-width:0}
   .ou-ms b{font-size:14px}
   .ou-ms small{display:block;font-size:12px;color:var(--ou-dim)}
@@ -202,12 +207,22 @@
     const draw = () => {
       const all = Ops.missions(); const cnt = (p) => all.filter(m => m.period === p && m.done && !m.claimed).length;
       el.innerHTML = `<div class="ou-tabs">${Object.keys(PERIOD).map(p => `<button class="ou-tab ${p === tab ? 'on' : ''}" data-tab="${p}">${PERIOD[p]}${cnt(p) ? `<i>${cnt(p)}</i>` : ''}</button>`).join('')}</div>
-        <div class="ou-sec" style="margin:0">${all.filter(m => m.period === tab).map(m => `<div class="ou-ms" data-mid="${m.id}"><div class="t"><b>${esc(m.name)}</b><small>${esc(m.desc)} · ${m.progress}/${m.target}</small><div class="ou-bar"><i style="width:${Math.round(m.progress / m.target * 100)}%"></i></div></div><span class="rw">+${m.points}</span><button class="ou-claim" data-claim="${m.id}" ${m.done && !m.claimed ? '' : 'disabled'}>${m.claimed ? '已领取' : m.done ? '领取' : '进行中'}</button></div>`).join('')}</div>
+        <div class="ou-sec" style="margin:0">${all.filter(m => m.period === tab).map(m => `<div class="ou-ms" data-mid="${m.id}"><div class="t"><b>${esc(m.name)}</b><small>${esc(m.desc)} · ${m.progress}/${m.target}</small><div class="ou-bar"><i style="width:${Math.round(m.progress / m.target * 100)}%"></i></div></div><span class="rw">+${m.points}</span><button class="ou-claim" data-claim="${m.id}" ${m.done && !m.claimed ? '' : 'disabled'}>${m.claimed ? '已领取' : m.done ? '领取' : '进行中'}</button></div>${actForm(m)}`).join('')}</div>
         <p class="ou-small" style="margin-top:8px">每日任务 0 点刷新，每周任务周一刷新；任务奖励不占每日游戏积分上限。</p>`;
+      el.querySelectorAll('[data-act-go]').forEach(b => b.onclick = () => {
+        const inp = el.querySelector(`[data-act-in="${b.dataset.actGo}"]`); const kind = b.dataset.kind;
+        const r = kind === 'code' ? Ops.redeemCode(inp.value) : Ops.submitWork(inp.value);
+        toast(r.ok ? (kind === 'code' ? '口令正确 ✅ 去领取奖励' : '作品已提交 ✅（演示自动通过）去领取奖励') : r.msg); if (r.ok) draw();
+      });
       el.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { tab = b.dataset.tab; draw(); });
       el.querySelectorAll('[data-claim]').forEach(b => b.onclick = () => { const r = Ops.claimMission(b.dataset.claim); toast(r.ok ? `🎉 ${esc(r.mission.name)} +${r.points} 积分` : r.msg); draw(); opts.onChange && opts.onChange(r); });
     };
     draw(); return { refresh: draw };
+  }
+  function actForm(m) {
+    if (!m.action || m.done) return '';
+    const code = m.action === 'code', cfg = code ? C.platformCode : C.works;
+    return `<div class="ou-act"><small>${esc(cfg.hint)}</small><div class="ou-act-row"><input data-act-in="${m.id}" type="${code ? 'text' : 'url'}" placeholder="${code ? '输入口令' : '粘贴作品链接 https://…'}" autocomplete="off"><button class="ou-btn" data-act-go="${m.id}" data-kind="${m.action}">${code ? '验证' : '提交'}</button></div></div>`;
   }
   function openMissions(opts) { opts = opts || {}; return sheet('任务中心', '<div data-ms></div>', (api) => { renderMissions(api.body.querySelector('[data-ms]'), opts); api.el.addEventListener('ou-close', () => opts.onClose && opts.onClose()); }); }
 

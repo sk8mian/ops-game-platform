@@ -112,18 +112,21 @@ window.OPS_CONFIG = {
    *   games 完成局数 | kills 击落数 | bossKills 击败 Boss 数 | levelClears 通关关数 | allClear 全通关次数
    *   procMax 本局最高制程档位（0=Intel 7 … 4=18A，取最大值）| shares 分享次数 | checkins 签到次数
    *   checkinStreak 连续签到天数（取最大值）| draws 抽奖次数 | productViewed 看完产品介绍
+   *   codeRedeems 输入平台口令次数 | worksApproved 投稿作品审核通过数
+   * action: 'code' / 'post' 的任务在任务中心里直接带输入框（口令 / 作品链接）。
+   * 合规：奖励只挂在「完成动作」（找到口令、发布作品）上，不挂在分享、关注上。
    * 任务奖励积分不占「每日游戏积分上限」。 */
   missions: {
     daily: [
       { id: 'd_play1',  name: '今日出战',       desc: '完成 1 局游戏',       metric: 'games',    target: 1,  points: 30 },
       { id: 'd_kill50', name: '杂讯清道夫',     desc: '累计击落 50 个杂讯',  metric: 'kills',    target: 50, points: 50 },
-      { id: 'd_share1', name: '分享 1 次',      desc: '把活动分享给好友',     metric: 'shares',   target: 1,  points: 40 },
+      { id: 'd_code',   name: '平台口令',       desc: '去抖音 / B站官方号视频里找到今日口令并输入', metric: 'codeRedeems', target: 1, points: 40, action: 'code' },
       { id: 'd_check',  name: '每日签到',       desc: '完成今日签到',         metric: 'checkins', target: 1,  points: 20 },
     ],
     weekly: [
       { id: 'w_play10', name: '本周勤练',       desc: '本周完成 10 局',       metric: 'games',     target: 10, points: 200 },
       { id: 'w_boss5',  name: 'Boss 猎人',      desc: '本周击败 5 个 Boss',   metric: 'bossKills', target: 5,  points: 300 },
-      { id: 'w_share5', name: '传播大使',       desc: '本周分享 5 次',        metric: 'shares',    target: 5,  points: 150 },
+      { id: 'w_post',   name: '作品投稿',       desc: '发布带活动话题的录屏 / 图文，提交作品链接', metric: 'worksApproved', target: 1, points: 300, action: 'post' },
     ],
     achievements: [
       { id: 'a_boss1',   name: '首胜',          desc: '击败首个 Boss',              metric: 'bossKills',     target: 1, points: 200 },
@@ -133,6 +136,21 @@ window.OPS_CONFIG = {
       { id: 'a_product', name: '懂芯玩家',      desc: '看完产品介绍（6 张卖点卡）', metric: 'productViewed', target: 1, points: 100 },
       { id: 'a_draw1',   name: '试试手气',      desc: '完成首次抽奖',               metric: 'draws',         target: 1, points: 50 },
     ],
+  },
+
+  /* ---------- 9b. 平台口令 / 作品投稿（任务中心用） ----------
+   * 演示：口令在前端比对、作品链接只校验域名并自动通过。
+   * 正式版：口令由运营后台按天下发、服务端校验；作品由平台接口或人工核验归属后再发奖。 */
+  platformCode: {
+    codes: ['芯运2026', 'KAIROS'],                    // 示例口令（不区分大小写）
+    hint: '在抖音 / B站搜索「Kairos 芯运」，官方视频结尾或置顶评论里有今日口令（演示口令：芯运2026）',
+    dailyCap: 1,
+  },
+  works: {
+    topic: '#新芯争霸#',
+    hosts: ['douyin.com', 'iesdouyin.com', 'bilibili.com', 'b23.tv', 'xiaohongshu.com', 'xhslink.com'],
+    hint: '在抖音 / B站 / 小红书发布带 #新芯争霸# 的游戏录屏或图文，把作品链接贴到这里',
+    weeklyCap: 3,
   },
 
   /* ---------- 10. 门店引流 / 测试裂变 玩法的任务奖励 ---------- */

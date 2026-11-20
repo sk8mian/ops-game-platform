@@ -605,6 +605,9 @@ sendBtn.onclick = () => send();
 $('gearBtn').onclick = $('modelPill').onclick = openSettings;
 $('rulesBtn').onclick = () => OpsUI.openRules();
 $('walletBtn').onclick = () => OpsUI.openWallet({ onChange: renderNav, share: { title: C.campaignName, subtitle: '新芯出阵，制程为刃', cta: '扫码来玩芯片争霸！' } });
+/* 平台规划页的深链：#missions / #wallet / #rules 直接打开对应面板 */
+function openFromHash() { const h = location.hash; if (document.querySelector('.ou-root.on')) return; if (h === '#missions') OpsUI.openMissions({ onClose: renderNav }); else if (h === '#wallet') $('walletBtn').click(); else if (h === '#rules') OpsUI.openRules(); }
+setTimeout(openFromHash, 300); window.addEventListener('hashchange', openFromHash);
 OpsUI.banner();
 refreshPill();
 if (sessions.length && sessions[0].items.length === 0) cur = sessions[0]; else newSession();
