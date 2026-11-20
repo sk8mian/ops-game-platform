@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#050816" />
+<title>你是哪颗芯？· 芯片人格测试</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%230068B5%27/%3E%3C/svg%3E" />
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{min-height:100vh;background:radial-gradient(700px 500px at 0% 0%,rgba(124,140,255,.3),transparent 60%),radial-gradient(600px 500px at 100% 100%,rgba(255,79,216,.22),transparent 60%),#050816;color:#e8f0ff;font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;padding:calc(46px + env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom))}
+  .wrap{max-width:460px;margin:0 auto}
+  .view{display:none;animation:in .4s}
+  .view.on{display:block}
+  @keyframes in{from{opacity:0;transform:translateY(10px)}}
+  h1{font-size:40px;font-weight:900;text-align:center;background:linear-gradient(180deg,#fff,#c3b8ff 50%,#ff8be8);-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:18px}
+  .sub{text-align:center;color:#9fb3e8;margin-top:6px}
+  .hero{width:200px;height:200px;margin:28px auto;border-radius:36px;position:relative;background:conic-gradient(from 0deg,#00e0ff,#7c8cff,#ff4fd8,#ffd166,#00e0ff);animation:spin 8s linear infinite;box-shadow:0 0 60px rgba(124,140,255,.5)}
+  .hero:after{content:"?";position:absolute;inset:8px;border-radius:30px;background:#0a0f26;display:flex;align-items:center;justify-content:center;font-size:90px;font-weight:900;color:#fff;animation:spin 8s linear infinite reverse}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .big{width:100%;border:none;border-radius:16px;padding:15px;font-size:17px;font-weight:900;color:#041022;background:linear-gradient(90deg,#00e0ff,#7c8cff 55%,#ff4fd8);cursor:pointer;margin-top:10px}
+  .ghost{width:100%;border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:#e8f0ff;border-radius:14px;padding:12px;font-weight:700;cursor:pointer;margin-top:8px}
+  .prog{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:18px}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,#00e0ff,#ff4fd8);transition:width .3s}
+  .q{font-size:21px;font-weight:800;line-height:1.5;margin-bottom:16px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid rgba(120,170,255,.25);background:rgba(16,22,48,.75);color:#e8f0ff;border-radius:14px;padding:14px;font-size:15px;margin-bottom:10px;cursor:pointer;transition:.15s}
+  .opt:hover,.opt:active{border-color:#00e0ff;background:rgba(0,224,255,.12)}
+  .rc{text-align:center}
+  .rc canvas{width:220px;height:220px;margin:10px auto;display:block}
+  .pname{font-size:30px;font-weight:900;margin-top:6px}
+  .ptag{display:inline-block;margin-top:6px;font-size:12px;border:1px solid currentColor;border-radius:99px;padding:2px 10px}
+  .ai{margin-top:14px;text-align:left;background:rgba(16,22,48,.75);border:1px solid rgba(120,170,255,.2);border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.7}
+  .ai small{display:block;color:#8c9cc4;font-size:11.5px;margin-top:6px}
+  .row{display:flex;gap:8px}
+  .row button{flex:1}
+  .note{font-size:11.5px;color:#8c9cc4;text-align:center;margin-top:12px}
+  html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
+  button,a{touch-action:manipulation}
+  .tb{min-height:44px;min-width:56px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="view on" id="vStart"><h1 id="title">你是哪颗芯？</h1><p class="sub" id="slogan">测出你的芯片人格</p><div class="hero"></div>
+    <button class="big" id="go">开始测试（5 题）</button><button class="ghost" id="rules">活动规则</button>
+    <p class="note">完成测试 +<span id="qp"></span> 积分 · 分享海报 +<span id="sp"></span> 积分 · 结果仅供娱乐</p></section>
+  <section class="view" id="vQ"><div class="prog"><i id="bar"></i></div><div class="q" id="q"></div><div id="opts"></div></section>
+  <section class="view" id="vR"><div class="rc"><canvas id="art" width="440" height="440"></canvas><div class="pname" id="pname"></div><span class="ptag" id="ptag"></span></div>
+    <div class="ai" id="ai"></div>
+    <button class="big" id="share">生成我的人格海报 · 分享</button>
+    <div class="row"><button class="ghost" id="draw">去抽奖</button><button class="ghost" id="again">再测一次</button></div>
+    <button class="ghost" id="wallet">我的权益</button></section>
+</div>
+<script src="../ops-config.js"></script>
+<script src="../ops-engine.js"></script>
+<script src="../ops-ui.js"></script>
+<script src="../ai-client.js"></script>
+<script>
+(() => {
+  const C = OPS_CONFIG, $ = (id) => document.getElementById(id), esc = OpsUI.esc;
+  try { const raw = new URLSearchParams(location.search).get('cfg'); if (raw) { const c = JSON.parse(decodeURIComponent(escape(atob(raw.replace(/-/g, '+').replace(/_/g, '/'))))); if (c.title) $('title').textContent = String(c.title).slice(0, 16); if (c.subtitle) $('slogan').textContent = String(c.subtitle).slice(0, 24); } } catch (e) {}
+  document.title = $('title').textContent;
+  $('qp').textContent = C.tasks.quizDone.points; $('sp').textContent = C.share.pointsPerShare;
+  const PERSONA = {
+    P: { name: '性能猛兽', tag: 'P 核型 · 冲就完了', color: '#ff4f7b', glyph: '⚡', text: '你做事全力以赴，deadline 前爆发力惊人，是团队里的“满血大核”。' },
+    E: { name: '能效大师', tag: 'E 核型 · 稳定续航', color: '#3dff9a', glyph: '🍃', text: '你节奏稳、耗能低，总能把事情安静又漂亮地做完，续航王者。' },
+    N: { name: 'AI 先锋', tag: 'NPU 型 · 未来已来', color: '#00e0ff', glyph: '🧠', text: '你对新东西天然敏感，第一个用上新工具的人，总在帮大家提效。' },
+    H: { name: '全能混合', tag: '混合架构 · 能屈能伸', color: '#ffd166', glyph: '✦', text: '你能快能稳，场景切换自如，是那种“交给他就放心”的人。' },
+  };
+  const QS = [
+    { q: '周一早上 9 点，你的状态是？', o: [['已经干完两件事', 'P'], ['咖啡在手，慢慢预热', 'E'], ['先让 AI 帮我排今天的计划', 'N'], ['看心情，随时切换', 'H']] },
+    { q: '朋友约你周末出去，你会？', o: [['一天跑三个地方', 'P'], ['找个安静的店坐一下午', 'E'], ['去看新开的科技展', 'N'], ['都行，听大家的', 'H']] },
+    { q: '手机电量剩 20%，你会？', o: [['无所谓，冲', 'P'], ['立刻开省电模式', 'E'], ['让系统智能调度', 'N'], ['边用边找插座', 'H']] },
+    { q: '你最想要的超能力是？', o: [['瞬间完成所有工作', 'P'], ['永远不会累', 'E'], ['读懂所有数据', 'N'], ['同时出现在两个地方', 'H']] },
+    { q: '形容你的一句话？', o: [['跑分第一', 'P'], ['冷静不发热', 'E'], ['走在时代前面', 'N'], ['什么都能扛', 'H']] },
+  ];
+  let idx = 0, score = {}, result = null, aiText = '';
+  const show = (id) => document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === id));
+  function ask() {
+    const it = QS[idx]; $('bar').style.width = (idx / QS.length * 100) + '%'; $('q').textContent = `Q${idx + 1}. ${it.q}`;
+    $('opts').innerHTML = it.o.map((o, i) => `<button class="opt" data-i="${i}">${esc(o[0])}</button>`).join('');
+    $('opts').querySelectorAll('.opt').forEach(b => b.onclick = () => { const k = it.o[+b.dataset.i][1]; score[k] = (score[k] || 0) + 1; idx++; if (idx < QS.length) ask(); else finish(); });
+  }
+  function drawArt(p) {
+    const cv = $('art'), g = cv.getContext('2d'), W = cv.width; g.clearRect(0, 0, W, W);
+    const bg = g.createRadialGradient(W / 2, W / 2, 20, W / 2, W / 2, W / 2); bg.addColorStop(0, p.color + '55'); bg.addColorStop(1, 'rgba(5,8,22,0)'); g.fillStyle = bg; g.fillRect(0, 0, W, W);
+    g.save(); g.translate(W / 2, W / 2); g.rotate(-0.12);
+    g.fillStyle = '#0e1530'; g.strokeStyle = p.color; g.lineWidth = 6; g.shadowColor = p.color; g.shadowBlur = 30; g.beginPath(); g.roundRect ? g.roundRect(-130, -130, 260, 260, 26) : g.rect(-130, -130, 260, 260); g.fill(); g.stroke();
+    g.shadowBlur = 0; g.fillStyle = '#d4a537'; for (let i = 0; i < 12; i++) { const o = -110 + i * 20; g.fillRect(o, -146, 8, 14); g.fillRect(o, 132, 8, 14); g.fillRect(-146, o, 14, 8); g.fillRect(132, o, 14, 8); }
+    g.strokeStyle = p.color + '88'; g.lineWidth = 2; g.strokeRect(-80, -80, 160, 160);
+    g.font = '96px system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#fff'; g.fillText(p.glyph, 0, -6);
+    g.font = 'bold 26px system-ui,"PingFang SC",sans-serif'; g.fillStyle = p.color; g.fillText(p.name, 0, 100);
+    g.restore();
+  }
+  async function finish() {
+    $('bar').style.width = '100%';
+    const k = Object.keys(score).sort((a, b) => score[b] - score[a])[0]; result = PERSONA[k];
+    show('vR'); drawArt(result);
+    $('pname').textContent = result.name; $('pname').style.color = result.color; $('ptag').textContent = result.tag; $('ptag').style.color = result.color;
+    aiText = result.text;
+    $('ai').innerHTML = `${esc(aiText)}<small>${AIClient.configured() ? '🤖 ' + esc(AIClient.label()) + ' 正在生成你的专属解读…' : '🧪 演示文案 · 接入模型后由 AI 实时生成个性解读'}</small>`;
+    const r = Ops.doTask('quizDone'); if (r.ok) OpsUI.toast(`完成测试 +${r.points} 积分`);
+    if (AIClient.configured()) {
+      try {
+        const answers = QS.map((q, i) => q.q).join(' / ');
+        const txt = await AIClient.chat([{ role: 'system', content: '你是俏皮的品牌活动文案助手。用 50 字以内中文，给用户写一段“芯片人格”趣味解读，积极、有梗，不提任何真实竞品品牌。只输出解读本身。' }, { role: 'user', content: `人格：${result.name}（${result.tag}）。各类型得分：${JSON.stringify(score)}。题目：${answers}` }], { maxTokens: 160, timeout: 20000 });
+        aiText = txt.trim().slice(0, 90); $('ai').innerHTML = `${esc(aiText)}<small>🤖 由 ${esc(AIClient.label())} 生成</small>`;
+      } catch (e) { $('ai').innerHTML = `${esc(aiText)}<small>模型调用失败（${esc(e.message)}），已用演示文案</small>`; }
+    }
+  }
+  $('go').onclick = () => { idx = 0; score = {}; show('vQ'); ask(); };
+  $('again').onclick = () => { show('vStart'); };
+  $('rules').onclick = () => OpsUI.openRules();
+  $('draw').onclick = () => OpsUI.openLottery();
+  $('wallet').onclick = () => OpsUI.openWallet();
+  $('share').onclick = () => OpsUI.openShare({ title: '我是「' + result.name + '」', subtitle: result.tag, score: result.glyph, scoreLabel: aiText.slice(0, 22) + (aiText.length > 22 ? '…' : ''), image: $('art').toDataURL('image/png'), cta: '扫码测测你是哪颗芯！', note: '测试结果仅供娱乐 · 演示活动' });
+  OpsUI.banner();
+  const inv = Ops.handleInviteParam(); if (inv && inv.bound) OpsUI.toast('已绑定好友邀请码 ' + inv.code);
+  const got = Ops.collectInvites(); if (got) OpsUI.toast(`${got} 位好友通过你的链接参与 +${got * C.share.inviterBonus}`);
+})();
+</script>
+</body>
+</html>

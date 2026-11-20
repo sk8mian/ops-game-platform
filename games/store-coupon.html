@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#050816" />
+<title>芯店打卡季 · 门店引流</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%230068B5%27/%3E%3C/svg%3E" />
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{min-height:100vh;background:radial-gradient(700px 500px at 50% -10%,rgba(0,224,255,.25),transparent 60%),radial-gradient(600px 500px at 100% 100%,rgba(255,79,216,.18),transparent 60%),#050816;color:#e8f0ff;font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;padding:calc(44px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+  .wrap{max-width:460px;margin:0 auto}
+  .hero{text-align:center;padding:10px 0 6px}
+  .hero small{letter-spacing:4px;color:#7af3ff;font-size:11px}
+  .hero h1{font-size:36px;font-weight:900;background:linear-gradient(180deg,#fff,#7af3ff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(0,224,255,.5))}
+  .hero p{color:#ff9be9;font-weight:700;margin-top:4px}
+  .store{display:inline-block;margin-top:8px;font-size:12px;color:#8c9cc4;border:1px solid rgba(120,170,255,.25);border-radius:99px;padding:3px 10px}
+  .card{background:rgba(16,22,48,.75);border:1px solid rgba(120,170,255,.18);border-radius:20px;padding:14px;margin-top:12px;backdrop-filter:blur(10px)}
+  .card h3{font-size:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+  .card h3 span{font-size:12px;color:#8c9cc4;font-weight:400}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .kpi{text-align:center;background:rgba(0,224,255,.06);border:1px solid rgba(120,170,255,.18);border-radius:14px;padding:8px}
+  .kpi b{display:block;font-size:22px}
+  .kpi span{font-size:11px;color:#8c9cc4}
+  .task{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px dashed rgba(120,170,255,.15)}
+  .task:last-child{border:none}
+  .ti{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:rgba(0,224,255,.1);border:1px solid rgba(0,224,255,.3)}
+  .task>div:not(.ti){flex:1}
+  .task b{font-size:14px}
+  .task small{display:block;color:#8c9cc4;font-size:12px}
+  .tb{border:none;border-radius:12px;padding:9px 14px;font-weight:800;font-size:13px;cursor:pointer;color:#041022;background:linear-gradient(90deg,#00e0ff,#ff4fd8)}
+  .tb[disabled]{background:rgba(255,255,255,.1);color:#8c9cc4}
+  .coupon{position:relative;display:flex;border-radius:16px;overflow:hidden;margin-top:10px;background:linear-gradient(90deg,#ff4fd8,#7c8cff);color:#fff}
+  .coupon.used{filter:grayscale(1) brightness(.6)}
+  .coupon .l{flex:1;padding:12px 14px}
+  .coupon .l b{font-size:16px;display:block}
+  .coupon .l small{font-size:11.5px;opacity:.85}
+  .coupon .r{width:112px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px;border-left:2px dashed #050816}
+  .coupon .r canvas{width:84px;height:84px;image-rendering:pixelated}
+  .coupon .r button{margin-top:4px;font-size:11px;border:none;border-radius:8px;padding:4px 6px;background:#050816;color:#7af3ff;cursor:pointer}
+  .stamp{position:absolute;right:120px;top:10px;transform:rotate(-14deg);border:3px solid #fff;border-radius:8px;padding:2px 8px;font-weight:900;font-size:16px}
+  .scan{position:fixed;inset:0;z-index:9500;background:rgba(2,4,14,.92);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+  .scan.on{display:flex}
+  .frame{width:220px;height:220px;border:2px solid #00e0ff;border-radius:18px;position:relative;overflow:hidden;box-shadow:0 0 40px rgba(0,224,255,.4)}
+  .frame i{position:absolute;left:0;right:0;height:3px;background:#00e0ff;box-shadow:0 0 16px #00e0ff;animation:sc 1.2s infinite alternate}
+  @keyframes sc{from{top:0}to{top:calc(100% - 3px)}}
+  .big{width:100%;margin-top:10px;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:900;color:#041022;background:linear-gradient(90deg,#00e0ff,#7c8cff 55%,#ff4fd8);cursor:pointer}
+  .row{display:flex;gap:8px;margin-top:10px}
+  .row button{flex:1;border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:#e8f0ff;border-radius:12px;padding:10px;font-weight:700;cursor:pointer}
+  .note{font-size:11.5px;color:#8c9cc4;margin-top:8px;line-height:1.6}
+  html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
+  button,a{touch-action:manipulation}
+  .tb{min-height:44px;min-width:56px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><small>STORE TRAFFIC</small><h1 id="title">芯店打卡季</h1><p id="slogan">到店点亮新芯，好礼当场拿</p><span class="store" id="store"></span></div>
+  <div class="card"><div class="kpis"><div class="kpi"><b id="kPts">0</b><span>可用积分</span></div><div class="kpi"><b id="kStreak">0</b><span>连签天数</span></div><div class="kpi"><b id="kTier">🥉</b><span id="kTierN">铜芯玩家</span></div></div></div>
+  <div class="card"><h3>今日任务 <span>每日 0 点刷新</span></h3>
+    <div class="task"><div class="ti">📅</div><div><b>每日签到</b><small id="ckSub"></small></div><button class="tb" id="ckBtn">签到</button></div>
+    <div class="task"><div class="ti">📍</div><div><b>到店扫码打卡</b><small>扫门店桌牌码 +<span id="scanPts"></span> 积分（演示）</small></div><button class="tb" id="scanBtn">去扫码</button></div>
+    <div class="task"><div class="ti">🎁</div><div><b>积分抽奖</b><small id="drawSub"></small></div><button class="tb" id="drawBtn">去抽奖</button></div>
+    <div class="task"><div class="ti">📣</div><div><b>分享给好友</b><small id="shareSub"></small></div><button class="tb" id="shareBtn">分享</button></div>
+  </div>
+  <div class="card"><h3>到店券 <span id="cpSub"></span></h3>
+    <button class="big" id="redeemBtn">积分兑换到店券</button>
+    <div id="coupons"></div>
+    <p class="note">核销为演示流程：正式版由店员端扫码 → 后端校验券码、有效期、门店 → 记账。券面金额为示例。</p>
+  </div>
+  <div class="row"><button id="rulesBtn">活动规则</button><button id="walletBtn">我的权益</button></div>
+</div>
+<div class="scan" id="scan"><div class="frame"><i></i></div><p>对准门店桌牌二维码（演示自动识别）…</p></div>
+<script src="../vendor/qrcode.js"></script>
+<script src="../ops-config.js"></script>
+<script src="../ops-engine.js"></script>
+<script src="../ops-ui.js"></script>
+<script>
+(() => {
+  const C = OPS_CONFIG, $ = (id) => document.getElementById(id), esc = OpsUI.esc;
+  try { const raw = new URLSearchParams(location.search).get('cfg'); if (raw) { const c = JSON.parse(decodeURIComponent(escape(atob(raw.replace(/-/g, '+').replace(/_/g, '/'))))); if (c.title) $('title').textContent = String(c.title).slice(0, 16); if (c.subtitle) $('slogan').textContent = String(c.subtitle).slice(0, 24); } } catch (e) {}
+  document.title = $('title').textContent + ' · 门店引流';
+  $('store').textContent = '📍 ' + C.store.storeName; $('scanPts').textContent = C.tasks.storeScan.points;
+  function qr(cv, text) { const q = qrcode(0, 'M'); q.addData(text); q.make(); const n = q.getModuleCount(), g = cv.getContext('2d'); cv.width = cv.height = n * 4; g.fillStyle = '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.fillStyle = '#000'; for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) g.fillRect(c * 4, r * 4, 4, 4); }
+  function render() {
+    const s = Ops.state, t = Ops.tier(), ck = Ops.checkinStatus();
+    $('kPts').textContent = s.points; $('kStreak').textContent = ck.streak; $('kTier').textContent = t.icon; $('kTierN').textContent = t.name;
+    $('ckBtn').disabled = ck.done; $('ckBtn').textContent = ck.done ? '已签' : '签到'; $('ckSub').textContent = ck.done ? `已连签 ${ck.streak} 天，明天继续` : `第 ${ck.nextDay} 天 +${C.checkin.rewards[Math.min(ck.nextDay, 7) - 1]} 积分`;
+    const sd = Ops.taskDone('storeScan'); $('scanBtn').disabled = sd; $('scanBtn').textContent = sd ? '已打卡' : '去扫码';
+    $('drawSub').textContent = `${Ops.drawCost()} 积分/次 · 示例奖池`;
+    $('shareSub').textContent = `+${C.share.pointsPerShare} 积分；好友首次参与你再得 +${C.share.inviterBonus}`;
+    $('redeemBtn').textContent = `${C.store.couponCost} 积分兑换「${C.store.couponName.replace('示例：', '')}」`;
+    $('cpSub').textContent = `有效期 ${C.store.couponValidDays} 天`;
+    const list = s.coupons || [];
+    $('coupons').innerHTML = list.slice(0, 5).map(c => `<div class="coupon ${c.used ? 'used' : ''}"><div class="l"><b>${esc(c.name)}</b><small>${esc(c.store)}<br>券码 ${c.id} · 有效至 ${new Date(c.exp).toLocaleDateString('zh-CN')}</small></div><div class="r"><canvas data-qr="${c.id}"></canvas>${c.used ? '' : `<button data-use="${c.id}">店员核销（演示）</button>`}</div>${c.used ? '<div class="stamp">已核销</div>' : ''}</div>`).join('');
+    $('coupons').querySelectorAll('canvas[data-qr]').forEach(cv => qr(cv, 'DEMO-VERIFY:' + cv.dataset.qr));
+    $('coupons').querySelectorAll('[data-use]').forEach(b => b.onclick = () => { if (Ops.useCoupon(b.dataset.use)) OpsUI.toast('核销成功（演示）✓'); render(); });
+  }
+  $('ckBtn').onclick = () => { const r = Ops.checkin(); OpsUI.toast(r.ok ? `签到 +${r.points} 积分${r.play ? `，+${r.play} 场` : ''}` : r.msg); render(); };
+  $('scanBtn').onclick = () => { $('scan').classList.add('on'); setTimeout(() => { $('scan').classList.remove('on'); const r = Ops.doTask('storeScan'); OpsUI.toast(r.ok ? `打卡成功 +${r.points} 积分 📍` : r.msg); render(); }, 1600); };
+  $('drawBtn').onclick = () => OpsUI.openLottery({ onClose: render, onDraw: render });
+  $('shareBtn').onclick = () => OpsUI.openShare({ title: $('title').textContent, subtitle: $('slogan').textContent, score: Ops.state.points, scoreLabel: '我的积分', cta: '一起到店打卡领好礼！', onShare: render });
+  $('redeemBtn').onclick = () => { const r = Ops.redeemCoupon(); OpsUI.toast(r.ok ? '兑换成功，到店出示券码 🎟' : r.msg); render(); };
+  $('rulesBtn').onclick = () => OpsUI.openRules();
+  $('walletBtn').onclick = () => OpsUI.openWallet({ onChange: render });
+  OpsUI.banner();
+  const inv = Ops.handleInviteParam(); if (inv && inv.bound) OpsUI.toast('已绑定好友邀请码 ' + inv.code);
+  const got = Ops.collectInvites(); if (got) OpsUI.toast(`${got} 位好友通过你的链接参与 +${got * C.share.inviterBonus}`);
+  addEventListener('ops:change', render); render();
+})();
+</script>
+</body>
+</html>

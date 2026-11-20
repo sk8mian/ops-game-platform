@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#030714" />
+<title>芯片争霸 3D · Intel 新品闯关</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230068B5'/%3E%3Crect x='8' y='8' width='16' height='16' rx='2' fill='%2300C7FD'/%3E%3C/svg%3E" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;background:#030714;touch-action:none;user-select:none;-webkit-user-select:none;font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;color:#e8f0ff}
+  #gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+  .hud{position:fixed;inset:0;pointer-events:none;z-index:5;opacity:0;transition:opacity .3s}
+  .hud.on{opacity:1}
+  .hud-top{position:absolute;left:0;right:0;top:max(30px,calc(env(safe-area-inset-top) + 26px));padding:0 14px;display:flex;justify-content:space-between;align-items:flex-start}
+  .pill{background:rgba(6,14,36,.62);border:1px solid rgba(0,224,255,.35);border-radius:14px;padding:6px 10px;backdrop-filter:blur(6px);font-size:12px;line-height:1.35;box-shadow:0 0 18px rgba(0,224,255,.15)}
+  .pill b{font-size:18px;color:#fff;text-shadow:0 0 10px #00e0ff}
+  .pill .lv{color:#7af3ff;font-weight:700}
+  .right{display:flex;gap:8px;align-items:center;pointer-events:auto}
+  .hearts{font-size:16px;letter-spacing:2px;text-shadow:0 0 8px #ff4f7b}
+  .ibtn{pointer-events:auto;border:1px solid rgba(0,224,255,.4);background:rgba(6,14,36,.62);color:#fff;border-radius:12px;height:34px;min-width:34px;padding:0 8px;font-size:15px;cursor:pointer}
+  .boss{position:absolute;left:50%;transform:translateX(-50%);top:max(84px,calc(env(safe-area-inset-top) + 80px));width:min(78vw,520px);text-align:center;display:none}
+  .boss.on{display:block}
+  .boss .nm{font-size:13px;font-weight:800;letter-spacing:2px;margin-bottom:4px;text-shadow:0 0 10px currentColor}
+  .boss .bar{height:9px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;border:1px solid rgba(255,255,255,.2)}
+  .boss .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff4f7b,#ffd166);transition:width .15s}
+  .chips{position:absolute;left:14px;bottom:calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+  .chip{font-size:11.5px;padding:4px 9px;border-radius:10px;background:rgba(6,14,36,.62);border:1px solid rgba(122,243,255,.35);color:#bff6ff}
+  .chip.sh{border-color:#3dff9a;color:#b9ffd9}
+  .npu{position:absolute;right:16px;bottom:calc(22px + env(safe-area-inset-bottom));width:84px;height:84px;border-radius:50%;pointer-events:auto;cursor:pointer;border:none;color:#fff;font-weight:900;font-size:13px;line-height:1.15;background:conic-gradient(#ffd166 var(--p,0%),rgba(255,255,255,.08) 0);box-shadow:0 0 0 3px rgba(6,14,36,.9) inset,0 0 18px rgba(255,209,102,.25)}
+  .npu span{position:absolute;inset:7px;border-radius:50%;background:radial-gradient(circle,#22183f,#0a0a1e);display:flex;align-items:center;justify-content:center;flex-direction:column}
+  .npu.ready{animation:pulse 1s infinite;box-shadow:0 0 0 3px rgba(6,14,36,.9) inset,0 0 34px #ffd166}
+  @keyframes pulse{50%{transform:scale(1.07)}}
+  .center-msg{position:fixed;left:0;right:0;top:36%;text-align:center;z-index:6;pointer-events:none;opacity:0;transition:opacity .3s, transform .3s;transform:scale(.9)}
+  .center-msg.on{opacity:1;transform:none}
+  .center-msg h2{font-size:30px;font-weight:900;letter-spacing:3px;text-shadow:0 0 20px currentColor}
+  .center-msg p{font-size:14px;color:#cfe0ff;margin-top:8px}
+  .warn h2{color:#ff4f7b;animation:blink .35s infinite alternate}
+  @keyframes blink{to{opacity:.35}}
+  .pts-pop{position:fixed;z-index:6;pointer-events:none;font-weight:900;font-size:14px;color:#ffd166;text-shadow:0 0 8px #ffb300;animation:pop 0.9s forwards}
+  @keyframes pop{to{transform:translateY(-36px);opacity:0}}
+  .screen{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:58px 18px calc(20px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 50% 30%,rgba(10,30,80,.55),rgba(2,4,14,.88));backdrop-filter:blur(3px);overflow:auto}
+  .screen.on{display:flex}
+  .card{width:100%;max-width:440px;text-align:center}
+  .logo{font-size:12px;letter-spacing:4px;color:#7af3ff;margin-bottom:6px}
+  .title{font-size:clamp(34px,10vw,52px);font-weight:900;line-height:1.05;background:linear-gradient(180deg,#fff,#7af3ff 60%,#3a7bff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px rgba(0,224,255,.5))}
+  .sub{margin-top:8px;color:#ff8be8;font-weight:700;letter-spacing:2px}
+  .how{margin:14px auto 0;font-size:13px;line-height:1.7;color:#b9c8ec;max-width:360px}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+  .stat{background:rgba(10,20,52,.7);border:1px solid rgba(120,170,255,.22);border-radius:14px;padding:8px 4px}
+  .stat b{display:block;font-size:20px;color:#fff}
+  .stat span{font-size:11px;color:#8c9cc4}
+  .bigbtn{display:block;width:100%;border:none;cursor:pointer;font-size:18px;font-weight:900;letter-spacing:2px;color:#041022;padding:15px;border-radius:16px;background:linear-gradient(90deg,#00e0ff,#7c8cff 55%,#ff4fd8);box-shadow:0 8px 30px rgba(0,224,255,.35);margin-top:6px}
+  .bigbtn:active{transform:scale(.98)}
+  .bigbtn[disabled]{filter:grayscale(1) brightness(.6)}
+  .row{display:flex;gap:8px;margin-top:10px}
+  .row button{flex:1}
+  .sbtn{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:#e8f0ff;border-radius:13px;padding:11px 6px;font-size:14px;font-weight:700;cursor:pointer}
+  .sbtn.hot{border-color:#ffd166;color:#ffd166;box-shadow:0 0 16px rgba(255,209,102,.25)}
+  .tier{margin:12px 0 4px;font-size:13px}
+  .tbar{height:8px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
+  .tbar i{display:block;height:100%;background:linear-gradient(90deg,#00e0ff,#ff4fd8)}
+  .small{font-size:11.5px;color:#8c9cc4;margin-top:6px}
+  .res-title{font-size:40px;font-weight:900;text-shadow:0 0 24px currentColor}
+  .breakdown{margin:12px 0;background:rgba(10,20,52,.7);border:1px solid rgba(120,170,255,.22);border-radius:14px;padding:10px 14px;text-align:left;font-size:13px;line-height:1.8}
+  .breakdown div{display:flex;justify-content:space-between}
+  .breakdown .tot{border-top:1px dashed rgba(120,170,255,.3);margin-top:4px;padding-top:4px;font-weight:800;color:#ffd166;font-size:15px}
+  .back{position:fixed;left:12px;top:max(30px,calc(env(safe-area-inset-top) + 26px));z-index:21;font-size:12px;color:#8fb6ff;text-decoration:none;background:rgba(6,14,36,.6);padding:5px 10px;border-radius:10px;border:1px solid rgba(120,170,255,.25)}
+  .nogl{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:30px;z-index:50;background:#030714}
+  /* ===== 主菜单 / 面板 / 暂停 ===== */
+  .menu-card{max-width:460px}
+  .menu-card .how{font-size:12.5px}
+  .mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .mbtn{position:relative;border:1px solid rgba(120,170,255,.25);background:rgba(10,20,52,.72);color:#e8f0ff;border-radius:14px;padding:10px 4px 8px;cursor:pointer;font-size:20px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s}
+  .mbtn b{font-size:12.5px;font-weight:700}
+  .mbtn:hover{border-color:#00e0ff;background:rgba(0,224,255,.12);transform:translateY(-1px)}
+  .badge{position:absolute;top:-6px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:#ff4f7b;color:#fff;font-size:11px;font-style:normal;line-height:18px;padding:0 5px;box-shadow:0 0 10px #ff4f7b}
+  .badge:empty{display:none}
+  .panel-card{max-width:520px;text-align:left;background:rgba(8,14,36,.94);border:1px solid rgba(120,170,255,.25);border-radius:22px;padding:16px;max-height:calc(100vh - 90px);overflow:auto;box-shadow:0 0 40px rgba(0,224,255,.12)}
+  .phead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .phead h3{flex:1;font-size:18px;background:linear-gradient(90deg,#7af3ff,#ff8be8);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pback{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:#e8f0ff;border-radius:11px;padding:7px 12px;font-size:13px;cursor:pointer}
+  .set-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px dashed rgba(120,170,255,.15);font-size:14px}
+  .set-row small{display:block;color:#8c9cc4;font-size:11.5px}
+  .seg{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .seg button{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.05);color:#cfe0ff;border-radius:9px;padding:6px 10px;font-size:12.5px;cursor:pointer}
+  .seg button.on{background:linear-gradient(90deg,#00e0ff,#ff4fd8);color:#041022;border-color:transparent;font-weight:800}
+  .set-row input[type=range]{width:130px}
+  .lbl{list-style:none;padding:0;margin:0}
+  .lbl li{display:flex;justify-content:space-between;padding:9px 6px;border-bottom:1px dashed rgba(120,170,255,.12);font-size:14px}
+  .lbl li.me{color:#7af3ff;font-weight:800;background:rgba(0,224,255,.06);border-radius:8px}
+  .lbl li .rk{display:inline-block;width:26px;color:#8c9cc4}
+  .lbl li:nth-child(1) .rk{color:#ffd166}.lbl li:nth-child(2) .rk{color:#c9d6ea}.lbl li:nth-child(3) .rk{color:#d08a4f}
+  .pause-card .bigbtn{margin-top:10px}
+  .pause-card .sbtn{width:100%;margin-top:8px}
+  /* ===== 道具 → 卖点知识卡 ===== */
+  .kcard{position:fixed;left:50%;bottom:calc(122px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;z-index:8;pointer-events:none;transition:.3s;display:flex;gap:10px;align-items:center;background:rgba(10,16,40,.92);border:1px solid #ffd166;border-radius:16px;padding:9px 10px 9px 12px;box-shadow:0 0 24px rgba(255,209,102,.35);max-width:92vw;font-size:13px;white-space:nowrap}
+  .kcard.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+  .kcard button{border:none;border-radius:10px;padding:6px 10px;font-weight:800;font-size:12.5px;cursor:pointer;color:#041022;background:#ffd166}
+  /* ===== 产品介绍 ===== */
+  .prod{position:fixed;inset:0;z-index:15;display:none;pointer-events:none}
+  .prod.on{display:block}
+  .ptop{position:absolute;top:max(34px,calc(env(safe-area-inset-top) + 30px));left:12px;right:12px;display:flex;gap:10px;align-items:flex-start;pointer-events:auto}
+  .ptitle{flex:1;min-width:0}
+  .ptitle h2{font-size:21px;font-weight:900;background:linear-gradient(90deg,#fff,#7af3ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .ptitle p{font-size:12.5px;color:#cfe0ff;margin-top:2px}
+  .pdisc{display:inline-block;margin-top:5px;font-size:11px;color:#ffd27a;border:1px dashed rgba(255,190,60,.6);border-radius:8px;padding:2px 7px;background:rgba(255,190,60,.1)}
+  .ptools{position:absolute;right:12px;top:max(150px,calc(env(safe-area-inset-top) + 140px));display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+  .ptools button{border:1px solid rgba(0,224,255,.4);background:rgba(6,14,36,.72);color:#e8f0ff;border-radius:12px;padding:8px 10px;font-size:12px;cursor:pointer}
+  .pprog{font-size:11.5px;color:#8c9cc4;text-align:center}
+  .pcards{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px;overflow-x:auto;padding:4px 12px;pointer-events:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .pcards::-webkit-scrollbar{display:none}
+  .fcard{flex:none;width:74vw;max-width:300px;scroll-snap-align:center;background:rgba(8,14,36,.84);border:1px solid rgba(120,170,255,.25);border-radius:18px;padding:12px;cursor:pointer;backdrop-filter:blur(8px);transition:.2s;text-align:left;color:#e8f0ff}
+  .fcard.on{border-color:var(--fc);box-shadow:0 0 22px var(--fcg)}
+  .fcard h4{font-size:15px;display:flex;align-items:center;gap:6px}
+  .fcard h4 em{font-style:normal;font-size:11px;color:#3dff9a;margin-left:auto}
+  .fcard .s{font-size:12px;color:var(--fc);font-weight:700;margin-top:2px}
+  .fcard p{font-size:12.5px;line-height:1.6;color:#cdd8f4;margin-top:6px}
+  .fcard .spec{margin-top:6px;font-size:12px;font-family:ui-monospace,Menlo,monospace;color:#9ff;background:rgba(0,0,0,.3);border-radius:8px;padding:4px 7px;display:inline-block}
+  .fcard .d{font-size:10.5px;color:#ffcf6e;margin-top:6px}
+  /* ===== 电脑版：侧边 HUD ===== */
+  .side{display:none}
+  body.desk .side{display:flex;flex-direction:column;gap:10px;position:absolute;top:84px;width:250px;pointer-events:none}
+  body.desk #sideL{left:20px} body.desk #sideR{right:20px}
+  .scard{background:rgba(6,14,36,.66);border:1px solid rgba(0,224,255,.25);border-radius:16px;padding:12px 14px;backdrop-filter:blur(8px);font-size:13px;line-height:1.6;box-shadow:0 0 18px rgba(0,224,255,.1)}
+  .scard h5{font-size:12.5px;color:#7af3ff;margin-bottom:6px;letter-spacing:1px}
+  .scard .bigpts{font-size:30px;font-weight:900;color:#fff;text-shadow:0 0 12px #00e0ff}
+  .scard .mrow{display:flex;justify-content:space-between;font-size:12px;color:#cfe0ff}
+  .scard .mbar{height:5px;border-radius:5px;background:rgba(255,255,255,.08);margin:3px 0 7px;overflow:hidden}
+  .scard .mbar i{display:block;height:100%;background:linear-gradient(90deg,#00e0ff,#ff4fd8)}
+  .scard kbd{display:inline-block;min-width:22px;text-align:center;border:1px solid rgba(160,200,255,.4);border-bottom-width:2px;border-radius:6px;padding:0 5px;margin-right:4px;font-size:11.5px;font-family:inherit;color:#fff;background:rgba(255,255,255,.06)}
+  body.desk .hud-top .pill,body.desk .chips{display:none}
+  body.desk .hud-top{justify-content:flex-end}
+  body.desk .npu{width:108px;height:108px;right:42px;bottom:42px}
+  body.desk .screen.menu{justify-content:flex-start;padding-left:7vw;background:linear-gradient(90deg,rgba(2,4,14,.94),rgba(2,4,14,.62) 42%,rgba(2,4,14,0) 72%)}
+  body.desk .screen.menu .card{text-align:left}
+  body.desk .screen.menu .how{margin-left:0}
+  body.desk .kcard{bottom:50px}
+  body.desk .pcards{left:auto;right:24px;top:96px;bottom:24px;width:360px;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:4px}
+  body.desk .fcard{width:auto;max-width:none}
+  body.desk .ptop{right:410px;left:28px}
+  body.desk .ptools{right:410px;top:auto;bottom:28px;flex-direction:row}
+  body.desk .ptitle h2{font-size:30px}
+
+  /* ===== 移动端优先：防滚动/缩放/长按、触控目标 ≥44px、安全区 ===== */
+  html,body{overscroll-behavior:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  button,a{touch-action:manipulation;font-family:inherit}
+  .screen{touch-action:pan-y;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  /* 内容超高时不被居中裁掉顶部；顶部让出 演示条 + 返回按钮 + 刘海 */
+  .screen{align-items:flex-start;padding-top:calc(max(30px, env(safe-area-inset-top) + 26px) + 54px)}
+  .screen>.card{margin:auto}
+  body.desk .screen.menu>.card{margin:auto 0}
+  .panel-card{overscroll-behavior:contain}
+  .pcards{touch-action:pan-x;overscroll-behavior:contain}
+  .ibtn{height:44px;min-width:44px;border-radius:14px;font-size:17px}
+  .pback{min-height:44px;min-width:44px;padding:0 14px}
+  .seg button{min-height:44px;min-width:44px;padding:0 12px}
+  .ptools button{min-height:44px;padding:0 12px}
+  .kcard button{min-height:44px;padding:0 14px}
+  .back{min-height:44px;min-width:44px;display:flex;align-items:center;padding:0 12px;font-size:13px}
+  .sbtn{min-height:48px}
+  .mbtn{min-height:64px}
+  .bigbtn{min-height:54px}
+  .set-row input[type=range]{height:44px}
+  .hud-top{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+  .chips{left:max(14px,env(safe-area-inset-left))}
+  .npu{right:max(16px,calc(env(safe-area-inset-right) + 8px))}
+  .back{left:max(12px,env(safe-area-inset-left))}
+  .screen{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+  .ptop{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right))}
+  .ptools{right:max(12px,env(safe-area-inset-right))}
+  /* ===== 虚拟摇杆（左手，浮动）+ NPU 大按钮（右手） ===== */
+  .joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 96px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:132px;height:132px;margin:0 0 0 -66px;border-radius:50%;pointer-events:none;border:2px solid rgba(0,224,255,.5);background:radial-gradient(circle,rgba(0,224,255,.12),rgba(6,14,36,.4) 70%);box-shadow:0 0 24px rgba(0,224,255,.25);opacity:0;transition:opacity .15s;display:none}
+  body.touch.stick .joy{display:block}
+  .joy.ghost{opacity:.42}
+  .joy.ghost::after{content:'左手拖动';position:absolute;left:0;right:0;top:100%;margin-top:4px;text-align:center;font-size:11px;color:#9fdcff;letter-spacing:1px}
+  .joy.on{opacity:1;margin:-66px 0 0 -66px;bottom:auto}
+  .joy i{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#aaf8ff,#00a6d6 60%,#05507a);box-shadow:0 0 18px #00e0ff;will-change:transform}
+  body.touch .npu{width:100px;height:100px;font-size:15px;bottom:calc(30px + env(safe-area-inset-bottom))}
+  body.touch .npu:active{transform:scale(.94)}
+  body.touch.stick .chips{left:50%;transform:translateX(-50%);align-items:center;bottom:calc(30px + env(safe-area-inset-bottom))}
+  body.touch .kcard{bottom:calc(150px + env(safe-area-inset-bottom))}
+  /* ===== 竖屏为主；横屏自适配 HUD ===== */
+  .mc-info,.mc-act{width:100%}
+  @media (orientation:landscape) and (max-height:520px){
+    .hud-top{top:max(8px,env(safe-area-inset-top))}
+    .pill{font-size:11px;padding:4px 9px}.pill b{font-size:16px}
+    .boss{top:max(40px,calc(env(safe-area-inset-top) + 36px));width:min(46vw,420px)}
+    .center-msg{top:26%}.center-msg h2{font-size:24px}
+    body.touch .npu{width:86px;height:86px;bottom:calc(16px + env(safe-area-inset-bottom))}
+    .joy{bottom:calc(env(safe-area-inset-bottom) + 16px);left:calc(env(safe-area-inset-left) + 110px)}
+    body.touch.stick .chips{bottom:calc(14px + env(safe-area-inset-bottom));flex-direction:row}
+    body.touch .kcard{bottom:calc(20px + env(safe-area-inset-bottom))}
+    .screen{padding-top:34px;padding-bottom:calc(10px + env(safe-area-inset-bottom));align-items:flex-start}
+    .menu-card{max-width:820px;display:flex;gap:22px;align-items:center;text-align:left;margin:auto 0}
+    .menu-card .title{font-size:38px}.menu-card .how{margin-left:0;font-size:12px}
+    .menu-card .stats{margin:10px 0 4px}.menu-card .mgrid{margin-top:8px}.menu-card .mbtn{min-height:52px;flex-direction:row;justify-content:center;font-size:17px;gap:6px}
+    .pause-card{max-width:640px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:auto 0}
+    .pause-card .res-title,.pause-card .how,.pause-card .bigbtn{grid-column:1/-1}.pause-card .sbtn{margin-top:0}.pause-card .res-title{font-size:26px!important}
+    .panel-card{max-height:calc(100vh - 44px)}
+    .back{top:max(8px,env(safe-area-inset-top))}
+    .ptop{top:max(30px,env(safe-area-inset-top))}.ptools{top:auto;bottom:calc(env(safe-area-inset-bottom) + 150px)}
+    .fcard{width:44vw}
+  }
+  /* ===== 手机：面板 / 暂停为底部抽屉（可下滑关闭） ===== */
+  .grab{display:none}
+  @media (max-width:759px){
+    #panelScreen,#pauseScreen{align-items:flex-end;padding:0 0 0 0}
+    #panelScreen .panel-card,#pauseScreen .pause-card{margin:auto 0 0;max-width:none;width:100%;border-radius:24px 24px 0 0;max-height:88vh;overflow:auto;padding:8px 16px calc(18px + env(safe-area-inset-bottom));background:rgba(8,14,36,.97);border:1px solid rgba(120,170,255,.25);border-bottom:none;box-shadow:0 -10px 50px rgba(0,224,255,.15);animation:sheetUp .28s cubic-bezier(.2,.9,.3,1.1);transition:transform .2s}
+    .grab{display:block;width:100%;height:24px;position:relative;touch-action:none;cursor:grab}
+    .grab::before{content:'';position:absolute;left:50%;top:8px;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:rgba(255,255,255,.3)}
+    #pauseScreen .res-title{font-size:28px!important}
+  }
+  @keyframes sheetUp{from{transform:translateY(70px);opacity:.4}}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<div class="hud" id="hud">
+  <div class="hud-top">
+    <div class="pill"><span class="lv" id="hLv">第 1 关</span><br><b id="hPts">0</b> 积分 <span id="hCombo"></span><br><span style="color:#8c9cc4" id="hPlays"></span></div>
+    <div class="right"><span class="hearts" id="hHp">❤❤❤</span><button class="ibtn" id="muteBtn" aria-label="静音">🔊</button><button class="ibtn" id="pauseBtn" aria-label="暂停">⏸</button></div>
+  </div>
+  <div class="boss" id="bossUI"><div class="nm" id="bossName">BOSS</div><div class="bar"><i id="bossBar"></i></div></div>
+  <div class="chips" id="chips"></div>
+  <button class="npu" id="npuBtn"><span><small>NPU</small>爆发</span></button>
+  <div class="side" id="sideL">
+    <div class="scard"><h5 id="dLv">第 1 关</h5><div><span class="bigpts" id="dPts">0</span> 积分</div><div class="hearts" id="dHp"></div><div style="color:#8c9cc4" id="dPlays"></div></div>
+    <div class="scard"><h5>⚙ 芯片状态</h5><div id="dChips"></div></div>
+    <div class="scard"><h5>✅ 今日任务</h5><div id="dMissions"></div></div>
+  </div>
+  <div class="side" id="sideR">
+    <div class="scard"><h5>⌨ 操作</h5><div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>/方向键 移动</div><div><kbd>🖱</kbd>鼠标跟随移动（可在设置关闭）</div><div><kbd>空格</kbd>/ 右键 NPU 爆发</div><div><kbd>Esc</kbd>/<kbd>P</kbd> 暂停　<kbd>M</kbd> 静音</div></div>
+    <div class="scard"><h5>👾 Boss 情报</h5><div id="dBoss">清理杂讯后 Boss 现身</div></div>
+  </div>
+</div>
+<div class="joy" id="joy"><i id="joyKnob"></i></div>
+<div class="kcard" id="kcard"><span id="kText"></span><button id="kBtn">了解 ›</button></div>
+<div class="center-msg" id="cmsg"><h2></h2><p></p></div>
+
+<div class="screen menu on" id="startScreen"><div class="card menu-card"><div class="mc-info">
+  <div class="logo" id="sLogo">INTEL · NEW CHIP LAUNCH</div>
+  <div class="title" id="sTitle">芯片争霸 3D</div>
+  <div class="sub" id="sSub">新芯出阵，制程为刃</div>
+  <p class="how" id="sHow"></p>
+  </div><div class="mc-act">
+  <div class="stats"><div class="stat"><b id="sPts">0</b><span>可用积分</span></div><div class="stat"><b id="sPlays">3</b><span>今日剩余场次</span></div><div class="stat"><b id="sBest">0</b><span>最佳单局</span></div></div>
+  <button class="bigbtn" id="startBtn">开始游戏（消耗 1 场）</button>
+  <div class="mgrid">
+    <button class="mbtn" data-nav="missions">✅<b>任务</b><i class="badge" id="mBadge"></i></button>
+    <button class="mbtn" data-nav="product">💠<b>产品介绍</b></button>
+    <button class="mbtn" data-nav="rank">🏆<b>排行榜</b></button>
+    <button class="mbtn" data-nav="wallet">🎁<b>我的权益</b></button>
+    <button class="mbtn" data-nav="settings">⚙️<b>设置</b></button>
+    <button class="mbtn" data-nav="rules">📜<b>活动规则</b></button>
+  </div>
+  <div class="row"><button class="sbtn" id="sCheck">签到</button><button class="sbtn" id="sDraw">🎁 抽奖</button><button class="sbtn" id="sShare">📣 分享加场</button></div>
+  <div class="tier" id="sTier"></div><div class="tbar"><i id="sTbar"></i></div>
+  <p class="small" id="sNote"></p>
+</div></div></div>
+
+<div class="screen" id="pauseScreen"><div class="card pause-card"><div class="grab" aria-hidden="true"></div>
+  <div class="res-title" style="color:#7af3ff;font-size:34px">已暂停</div>
+  <p class="how" id="pInfo"></p>
+  <button class="bigbtn" id="pResume">▶ 继续游戏</button>
+  <button class="sbtn" id="pMissions">✅ 任务</button>
+  <button class="sbtn" id="pProduct">💠 产品介绍</button>
+  <button class="sbtn" id="pSettings">⚙️ 设置</button>
+  <button class="sbtn" id="pQuit" style="color:#ff8fa0">结束本局并结算积分</button>
+</div></div>
+
+<div class="screen" id="panelScreen"><div class="card panel-card"><div class="grab" aria-hidden="true"></div><div class="phead"><button class="pback" id="panelBack">‹ 返回</button><h3 id="panelTitle"></h3></div><div id="panelBody"></div></div></div>
+
+<div class="prod" id="prod">
+  <div class="ptop"><button class="pback" id="prodBack">‹ 返回</button><div class="ptitle"><h2 id="prodName"></h2><p id="prodTag"></p><span class="pdisc" id="prodDisc"></span></div></div>
+  <div class="ptools"><button id="prodExplode">🧩 拆解视图</button><button id="prodSpin">⟳ 自动旋转</button><div class="pprog" id="prodProg"></div></div>
+  <div class="pcards" id="prodCards"></div>
+</div>
+
+<div class="screen" id="endScreen"><div class="card">
+  <div class="res-title" id="eTitle">新芯制霸！</div>
+  <p class="how" id="eSub"></p>
+  <div class="breakdown" id="eBreak"></div>
+  <div class="row"><button class="sbtn hot" id="eDraw">🎁 去抽奖</button><button class="sbtn hot" id="eShare">📣 分享得加场</button></div>
+  <button class="bigbtn" id="eAgain">再战一局</button>
+  <div class="row"><button class="sbtn" id="eMissions">✅ 任务奖励 <i class="badge" id="eBadge" style="position:static;display:inline-block"></i></button><button class="sbtn" id="eWallet">我的权益</button><button class="sbtn" id="eHome">主菜单</button></div>
+  <div class="tier" id="eTier"></div><div class="tbar"><i id="eTbar"></i></div>
+  <p class="small" id="eNote"></p>
+</div></div>
+
+<a class="back" id="backLink" href="../index.html">‹ 平台</a>
+<div class="nogl" id="nogl"><div><h2>当前浏览器不支持 WebGL</h2><p style="margin-top:10px;color:#8c9cc4">请换用最新版 Chrome / Safari / 微信内置浏览器打开。</p></div></div>
+
+<script src="../vendor/three.bundle.min.js"></script>
+<script src="../ops-config.js"></script>
+<script src="../ops-engine.js"></script>
+<script src="../ops-ui.js"></script>
+<script>
+(() => {
+'use strict';
+/* =============================================================================
+ * CONFIG：名字 / 文案 / 配色 / 难度都在这里改。
+ * ⚠ 法律风险提示：Boss 使用戏仿代称。请勿替换为真实竞品名称（NVIDIA / AMD / 华为等）
+ *   或使用其 logo、商标——对比广告与商标侵权风险高，上线前需法务审核。
+ * 积分 / 场次 / 抽奖 / 权益规则不在这里，统一在 ../ops-config.js。
+ * ========================================================================== */
+const CONFIG = {
+  title: '芯片争霸 3D',
+  subtitle: '新芯出阵，制程为刃',
+  logo: 'INTEL · NEW CHIP LAUNCH',
+  howTo: '左手摇杆（设置里可换拖动）操控「Intel 新芯」低空掠过晶圆，自动开火。捡道具升级制程与核心，右手点 NPU 一键清屏，连闯三关 Boss！',
+  playerName: 'Intel 新芯',
+  dieLabel: 'intel',
+  dieSub: 'NEW CORE',
+  startBtn: '启动新芯',
+  winTitle: '新芯制霸！',
+  loseTitle: '过热宕机…',
+  shareCta: '扫码来挑战我的新芯战力！',
+  posterNote: '战力对比仅供娱乐，非真实性能排行 · 演示活动',
+  colors: { primary: '#00c7fd', intel: '#0068b5', accent: '#ff4fd8', gold: '#ffd166' },
+  process: ['Intel 7', 'Intel 4', 'Intel 3', 'Intel 20A', 'Intel 18A'],
+  levels: {
+    1: { title: '第 1 关 · 制程黎明', flavor: '先进封装初试锋芒', tint: '#00c7fd' },
+    2: { title: '第 2 关 · 能效战场', flavor: '光追洪流来袭，稳住护盾', tint: '#22ffb0' },
+    3: { title: '第 3 关 · 算力终局', flavor: '新芯对决东方巨阵', tint: '#ffb84d' },
+  },
+  bosses: {
+    1: { name: '红色多核战车', color: '#ff3b5c', warn: '多核齐射阵列已锁定', hp: 240, tip: '扇形齐射，贴边绕行；顶部核心阵列会直线开火。' },
+    2: { name: '绿色显卡巨兽', color: '#3dff7a', warn: '高能光束正在预热', hp: 340, tip: '地面出现预警光带时立刻换道；风扇会甩出螺旋弹。' },
+    3: { name: '东方麒麟', color: '#ffd166', warn: '终局算力体已苏醒', hp: 460, tip: '只有头部受全额伤害；半血后会俯冲，看到预警横向闪开。' },
+  },
+  waveSeconds: 24,
+  playerHp: 3,
+  /* 产品介绍：没有官方参数，以下全部为占位示例，上线前请替换为官方口径 */
+  product: {
+    name: 'Intel 新品芯片（示例名）',
+    tagline: '示例：为 AI PC 而生的新一代处理器',
+    disclaimer: '示例文案，请替换为官方参数',
+    features: [
+      { id: 'cpu', icon: '🧠', title: 'CPU · 混合架构', short: '性能核 + 能效核', text: '示例：X 个性能核 + Y 个能效核，智能调度，重负载和轻办公两不误。', spec: '示例：最高 X.X GHz · XX 线程', tile: 'compute', color: '#00c7fd' },
+      { id: 'gpu', icon: '🎮', title: 'GPU · 新一代核显', short: '光追 · AI 超分', text: '示例：新一代核显架构，支持硬件光追与 AI 超分，轻薄本也能畅玩。', spec: '示例：X 个图形核心', tile: 'graphics', color: '#a78bfa' },
+      { id: 'npu', icon: '⚡', title: 'NPU · AI 引擎', short: '端侧 AI 加速', text: '示例：独立 NPU 承担持续性 AI 负载，本地跑模型更省电、更私密。', spec: '示例：XX TOPS', tile: 'soc', color: '#ffd166' },
+      { id: 'process', icon: '🔬', title: '制程工艺', short: '先进制程（示例）', text: '示例：先进制程 + 背面供电 + 新型晶体管，带来更高密度与能效。', spec: '示例：Intel 18A', tile: 'base', color: '#3dff9a' },
+      { id: 'efficiency', icon: '🍃', title: '能效表现', short: '更长续航', text: '示例：低功耗岛设计，日常办公续航更长、风扇更安静。', spec: '示例：续航提升 XX%', tile: 'io', color: '#5effc4' },
+      { id: 'ai', icon: '🤖', title: 'AI 算力', short: 'CPU + GPU + NPU 协同', text: '示例：三大引擎协同调度，平台总 AI 算力可达 XXX TOPS。', spec: '示例：平台总算力 XXX TOPS', tile: 'all', color: '#ff4fd8' },
+    ],
+    /* 游戏道具 → 卖点卡（捡到道具时弹出「了解」） */
+    powerupLink: { proc: 'process', core: 'cpu', shield: 'efficiency', npu: 'npu' },
+  },
+};
+
+/* 平台下发的活动配置覆盖（?cfg=base64url JSON） */
+const QS = new URLSearchParams(location.search);
+(function applyCampaign() {
+  try {
+    const raw = QS.get('cfg'); if (!raw) return;
+    const json = decodeURIComponent(escape(atob(raw.replace(/-/g, '+').replace(/_/g, '/'))));
+    const c = JSON.parse(json);
+    ['title', 'subtitle', 'howTo', 'playerName', 'shareCta', 'winTitle', 'loseTitle'].forEach(k => { if (typeof c[k] === 'string' && c[k].trim()) CONFIG[k] = c[k].slice(0, 80); });
+    if (c.bosses) [1, 2, 3].forEach(i => { if (c.bosses[i] && c.bosses[i].name) CONFIG.bosses[i].name = String(c.bosses[i].name).slice(0, 12); });
+    if (c.colors && /^#[0-9a-f]{6}$/i.test(c.colors.primary || '')) CONFIG.colors.primary = c.colors.primary;
+  } catch (e) { console.warn('campaign cfg ignored', e); }
+})();
+const DEBUG_LEVEL = Math.min(3, Math.max(1, parseInt(QS.get('level') || '1', 10) || 1));
+const DEBUG_BOSS = QS.get('boss') === '1';
+const GOD = QS.get('god') === '1';
+const OPS = window.OPS_CONFIG, PT = OPS.points;
+/* 玩家设置（音效在 Audio 内单独保存） */
+const SET_KEY = 'chip3d_settings';
+const SETTINGS = Object.assign({ quality: 'auto', shake: true, mouseFollow: true, sens: 1, touchMode: 'stick', haptic: true }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY)) || {}; } catch (e) { return {}; } })());
+function saveSettings() { localStorage.setItem(SET_KEY, JSON.stringify(SETTINGS)); applyQuality(); }
+
+/* ---------------- 基础 ---------------- */
+const $ = (id) => document.getElementById(id);
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const T = window.THREE;
+if (!T) { $('nogl').style.display = 'flex'; return; }
+
+let renderer;
+try { renderer = new T.WebGLRenderer({ canvas: $('gl'), antialias: true, powerPreference: 'high-performance' }); }
+catch (e) { $('nogl').style.display = 'flex'; console.warn(e); return; }
+const MOBILE = matchMedia('(pointer:coarse)').matches, TOUCH = MOBILE;
+/* 设备分档：低端机降分辨率、弱泛光、减粒子 */
+const LOWEND = MOBILE && ((navigator.deviceMemory && navigator.deviceMemory <= 3) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || Math.min(screen.width, screen.height) <= 360);
+const IN_APP = /MicroMessenger|QQ\/|Weibo|AlipayClient|DingTalk|Lark|FBAN|FBAV|Instagram|Line\//i.test(navigator.userAgent);
+let PFX = LOWEND ? 0.5 : 1;
+document.body.classList.toggle('touch', TOUCH); document.body.classList.toggle('inapp', IN_APP);
+const syncTouchMode = () => document.body.classList.toggle('stick', SETTINGS.touchMode === 'stick');
+syncTouchMode();
+const buzz = (p) => { if (!SETTINGS.haptic || !TOUCH || typeof navigator.vibrate !== 'function') return; const ua = navigator.userActivation; if (ua && !ua.hasBeenActive) return; try { navigator.vibrate(p); } catch (e) {} };
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.toneMapping = T.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+
+const scene = new T.Scene();
+const BG = new T.Color('#030714');
+scene.background = BG;
+scene.fog = new T.Fog(BG, 40, 150);
+const camera = new T.PerspectiveCamera(60, 1, 0.1, 400);
+
+const composer = new T.EffectComposer(renderer);
+const renderPass = new T.RenderPass(scene, camera);
+composer.addPass(renderPass);
+const bloom = new T.UnrealBloomPass(new T.Vector2(256, 256), 0.85, 0.5, 0.28);
+composer.addPass(bloom);
+composer.addPass(new T.OutputPass());
+
+let W = 1, H = 1, PORTRAIT = true, XB = 7, ZB0 = -6, ZB1 = 5, DESK = false, showCam = null, viewOff = null;
+function resize() {
+  W = innerWidth; H = innerHeight; PORTRAIT = W / H < 0.85;
+  DESK = W >= 1024 && !matchMedia('(pointer:coarse)').matches; document.body.classList.toggle('desk', DESK); viewOff = null;
+  if (showCam) { showCam.aspect = W / H; showCam.updateProjectionMatrix(); }
+  renderer.setSize(W, H, false); composer.setSize(W, H);
+  const bs = (LOWEND || lowered) ? 4 : 2; bloom.resolution.set(Math.round(W / bs), Math.round(H / bs));
+  document.body.classList.toggle('landscape', !PORTRAIT);
+  camera.aspect = W / H; camera.fov = PORTRAIT ? 68 : 55; camera.updateProjectionMatrix();
+  XB = PORTRAIT ? 6.5 : 11;
+}
+addEventListener('resize', resize); addEventListener('orientationchange', () => setTimeout(resize, 300)); if (window.visualViewport) visualViewport.addEventListener('resize', () => { if (Math.abs(visualViewport.height - H) > 40 && document.activeElement === document.body) resize(); });
+let lowered = false;
+resize();
+
+scene.add(new T.HemisphereLight('#6fa8ff', '#0a0420', 0.9));
+const sun = new T.DirectionalLight('#bfe6ff', 1.6); sun.position.set(-8, 20, 10); scene.add(sun);
+
+/* ---------------- 晶圆 / 电路板地面 ---------------- */
+function circuitTexture(tint) {
+  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+  g.fillStyle = '#02050d'; g.fillRect(0, 0, 512, 512);
+  g.strokeStyle = 'rgba(80,140,255,.10)'; g.lineWidth = 1;
+  for (let i = 0; i <= 512; i += 32) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 512); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(512, i); g.stroke(); }
+  g.lineCap = 'round';
+  for (let k = 0; k < 46; k++) {
+    let x = Math.round(rand(0, 16)) * 32, y = Math.round(rand(0, 16)) * 32;
+    g.strokeStyle = Math.random() < .25 ? '#ff4fd8' : tint; g.globalAlpha = rand(.35, .95); g.lineWidth = Math.random() < .3 ? 3 : 1.6;
+    g.beginPath(); g.moveTo(x, y);
+    for (let s = 0; s < 4; s++) { const d = Math.floor(rand(0, 4)); const L = Math.round(rand(1, 4)) * 32; if (d === 0) x += L; else if (d === 1) y += L; else if (d === 2) { x += L; y += L; } else { y -= L; x += L; } g.lineTo(x, y); }
+    g.stroke(); g.fillStyle = g.strokeStyle; g.beginPath(); g.arc(x, y, 3.5, 0, 7); g.fill();
+  }
+  g.globalAlpha = 1;
+  for (let k = 0; k < 7; k++) { const x = Math.round(rand(1, 14)) * 32, y = Math.round(rand(1, 14)) * 32, w = 32 * Math.round(rand(1, 3)); g.fillStyle = '#0a1430'; g.fillRect(x, y, w, w); g.strokeStyle = tint; g.globalAlpha = .7; g.lineWidth = 2; g.strokeRect(x, y, w, w); g.globalAlpha = 1; for (let p = 4; p < w; p += 8) { g.fillStyle = '#c9a54a'; g.fillRect(x + p, y - 4, 3, 4); g.fillRect(x + p, y + w, 3, 4); } }
+  const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.colorSpace = T.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+let groundTex = circuitTexture(CONFIG.colors.primary);
+groundTex.repeat.set(5, 14);
+const groundMat = new T.MeshStandardMaterial({ color: '#2a3555', map: groundTex, emissive: '#ffffff', emissiveMap: groundTex, emissiveIntensity: 0.62, metalness: 0.3, roughness: 0.6 });
+const ground = new T.Mesh(new T.PlaneGeometry(110, 300), groundMat);
+ground.rotation.x = -Math.PI / 2; ground.position.set(0, -2.2, -110); scene.add(ground);
+
+/* 两侧元器件城市（InstancedMesh） */
+const CITY_N = 140;
+const cityMat = new T.MeshStandardMaterial({ color: '#0b1430', metalness: 0.7, roughness: 0.35 });
+const city = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), cityMat, CITY_N);
+const capMat = new T.MeshBasicMaterial({ color: '#ffffff', toneMapped: false });
+const caps = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), capMat, CITY_N);
+const cityData = [];
+const _m = new T.Object3D(), _c = new T.Color();
+for (let i = 0; i < CITY_N; i++) {
+  const side = i % 2 ? 1 : -1;
+  cityData.push({ x: side * rand(10, 42), z: rand(-220, 30), w: rand(1.2, 4.5), h: rand(0.4, 7), d: rand(1.2, 4.5), c: Math.random() < .2 ? CONFIG.colors.accent : CONFIG.colors.primary });
+  caps.setColorAt(i, _c.set(cityData[i].c).multiplyScalar(1.3));
+}
+scene.add(city, caps);
+function placeCity() {
+  for (let i = 0; i < CITY_N; i++) {
+    const b = cityData[i]; const xo = Math.sign(b.x) * Math.max(Math.abs(b.x), XB + 4);
+    _m.position.set(xo, -2.2 + b.h / 2, b.z); _m.scale.set(b.w, b.h, b.d); _m.rotation.set(0, 0, 0); _m.updateMatrix(); city.setMatrixAt(i, _m.matrix);
+    _m.position.y = -2.2 + b.h + 0.04; _m.scale.set(b.w * 0.82, 0.08, b.d * 0.82); _m.updateMatrix(); caps.setMatrixAt(i, _m.matrix);
+  }
+  city.instanceMatrix.needsUpdate = caps.instanceMatrix.needsUpdate = true;
+}
+
+/* 空中数据流 */
+const DUST_N = 380, dustGeo = new T.BufferGeometry(), dustPos = new Float32Array(DUST_N * 3);
+for (let i = 0; i < DUST_N; i++) { dustPos[i * 3] = rand(-45, 45); dustPos[i * 3 + 1] = rand(-1, 18); dustPos[i * 3 + 2] = rand(-180, 20); }
+dustGeo.setAttribute('position', new T.BufferAttribute(dustPos, 3));
+function dotTexture() { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(.35, 'rgba(255,255,255,.55)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new T.CanvasTexture(c); }
+const DOT = dotTexture();
+const dust = new T.Points(dustGeo, new T.PointsMaterial({ size: 0.28, map: DOT, color: '#7af3ff', transparent: true, opacity: .7, depthWrite: false, blending: T.AdditiveBlending }));
+scene.add(dust);
+
+/* ---------------- 粒子 ---------------- */
+const P_N = 1600, pGeo = new T.BufferGeometry(), pPos = new Float32Array(P_N * 3), pCol = new Float32Array(P_N * 3);
+pGeo.setAttribute('position', new T.BufferAttribute(pPos, 3)); pGeo.setAttribute('color', new T.BufferAttribute(pCol, 3));
+const parts = new T.Points(pGeo, new T.PointsMaterial({ size: 0.7, map: DOT, vertexColors: true, transparent: true, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+parts.frustumCulled = false; scene.add(parts);
+const pData = []; for (let i = 0; i < P_N; i++) pData.push({ life: 0, max: 1, vx: 0, vy: 0, vz: 0, r: 1, g: 1, b: 1 });
+let pHead = 0;
+function burst(x, y, z, color, n, speed, life) {
+  _c.set(color); n = Math.max(1, Math.round(n * PFX));
+  for (let k = 0; k < n; k++) {
+    const i = pHead; pHead = (pHead + 1) % P_N; const p = pData[i];
+    const th = rand(0, Math.PI * 2), ph = rand(-1, 1), s = rand(0.3, 1) * speed;
+    p.vx = Math.cos(th) * Math.sqrt(1 - ph * ph) * s; p.vy = ph * s * 0.7 + speed * 0.15; p.vz = Math.sin(th) * Math.sqrt(1 - ph * ph) * s;
+    p.life = p.max = rand(0.5, 1) * (life || 0.8); p.r = _c.r * 2; p.g = _c.g * 2; p.b = _c.b * 2;
+    pPos[i * 3] = x; pPos[i * 3 + 1] = y; pPos[i * 3 + 2] = z;
+  }
+}
+function updateParticles(dt) {
+  for (let i = 0; i < P_N; i++) {
+    const p = pData[i];
+    if (p.life <= 0) { pCol[i * 3] = pCol[i * 3 + 1] = pCol[i * 3 + 2] = 0; continue; }
+    p.life -= dt; const k = Math.max(0, p.life / p.max);
+    pPos[i * 3] += p.vx * dt; pPos[i * 3 + 1] += p.vy * dt; pPos[i * 3 + 2] += (p.vz + 6) * dt;
+    p.vx *= 0.96; p.vy = p.vy * 0.96 - 4 * dt; p.vz *= 0.96;
+    pCol[i * 3] = p.r * k; pCol[i * 3 + 1] = p.g * k; pCol[i * 3 + 2] = p.b * k;
+  }
+  pGeo.attributes.position.needsUpdate = pGeo.attributes.color.needsUpdate = true;
+}
+/* 冲击环 */
+const rings = [];
+function ring(x, z, color, maxR, dur) {
+  const m = new T.Mesh(new T.RingGeometry(0.85, 1, 48), new T.MeshBasicMaterial({ color: new T.Color(color).multiplyScalar(2.5), transparent: true, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+  m.rotation.x = -Math.PI / 2; m.position.set(x, -0.5, z); scene.add(m); rings.push({ m, t: 0, dur: dur || 0.6, maxR });
+}
+function updateRings(dt) {
+  for (let i = rings.length - 1; i >= 0; i--) { const r = rings[i]; r.t += dt; const k = r.t / r.dur; r.m.scale.setScalar(0.5 + k * r.maxR); r.m.material.opacity = 1 - k; if (k >= 1) { scene.remove(r.m); r.m.geometry.dispose(); r.m.material.dispose(); rings.splice(i, 1); } }
+}
+
+/* ---------------- 屏幕震动 ---------------- */
+let shakeAmt = 0;
+const shake = (a) => { if (!SETTINGS.shake) return; shakeAmt = Math.min(1.6, shakeAmt + a); };
+
+/* ---------------- 音效（WebAudio 合成） ---------------- */
+const Audio = (() => {
+  let ac = null, master = null, muted = localStorage.getItem('chip3d_muted') === '1';
+  function ensure() { if (ac) return; try { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.gain.value = muted ? 0 : 0.5; master.connect(ac.destination); } catch (e) {} }
+  function tone(f, d, type, vol, slide) { if (!ac || muted) return; const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(); o.type = type || 'square'; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(30, f * slide), t + d); g.gain.setValueAtTime(vol || .1, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(g); g.connect(master); o.start(t); o.stop(t + d + .02); }
+  function noise(d, vol, lp) { if (!ac || muted) return; const t = ac.currentTime, n = ac.sampleRate * d, b = ac.createBuffer(1, n, ac.sampleRate), ch = b.getChannelData(0); for (let i = 0; i < n; i++) ch[i] = (Math.random() * 2 - 1) * (1 - i / n); const s = ac.createBufferSource(); s.buffer = b; const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = lp || 1200; const g = ac.createGain(); g.gain.value = vol || .3; s.connect(f); f.connect(g); g.connect(master); s.start(t); }
+  let lastShot = 0;
+  return {
+    ensure, get muted() { return muted; }, get state() { return ac ? ac.state : 'none'; },
+    /* 首次触摸解锁（iOS / 微信内置浏览器需要用户手势） */
+    unlock() { ensure(); if (!ac) return; if (ac.state === 'suspended') ac.resume().catch(() => {}); try { const b = ac.createBuffer(1, 1, 22050), s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination); s.start(0); } catch (e) {} },
+    suspend() { if (ac && ac.state === 'running') ac.suspend().catch(() => {}); },
+    resume() { if (ac && ac.state === 'suspended') ac.resume().catch(() => {}); },
+    toggle() { ensure(); muted = !muted; localStorage.setItem('chip3d_muted', muted ? '1' : '0'); if (master) master.gain.value = muted ? 0 : 0.5; return muted; },
+    shoot() { const n = performance.now(); if (n - lastShot < 90) return; lastShot = n; tone(880, .05, 'square', .025, .5); },
+    hit() { tone(220, .06, 'sawtooth', .04, .6); },
+    boom(big) { noise(big ? .9 : .3, big ? .55 : .25, big ? 600 : 1500); tone(big ? 90 : 140, big ? .6 : .2, 'sine', .3, .3); },
+    power() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tone(f, .09, 'triangle', .1), i * 55)); },
+    hurt() { tone(160, .3, 'sawtooth', .18, .4); noise(.2, .2, 800); },
+    warn() { for (let i = 0; i < 3; i++) setTimeout(() => { tone(440, .25, 'square', .08, 1.5); }, i * 380); },
+    npu() { tone(120, .8, 'sawtooth', .25, 8); noise(.6, .35, 3000); },
+    win() { [523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => tone(f, .18, 'triangle', .12), i * 110)); },
+    lose() { [392, 330, 262, 196].forEach((f, i) => setTimeout(() => tone(f, .25, 'triangle', .12), i * 160)); },
+  };
+})();
+
+/* ---------------- 材质 / 文字贴图 ---------------- */
+const glow = (hex, k) => new T.MeshBasicMaterial({ color: new T.Color(hex).multiplyScalar(k || 2.2), toneMapped: false });
+const metal = (hex, em, ei) => new T.MeshStandardMaterial({ color: hex, metalness: 0.85, roughness: 0.3, emissive: em || '#000000', emissiveIntensity: ei || 0 });
+function labelTex(text, sub, color, w, h) {
+  const c = document.createElement('canvas'); c.width = w || 256; c.height = h || 256; const g = c.getContext('2d');
+  g.fillStyle = '#0b1220'; g.fillRect(0, 0, c.width, c.height);
+  g.strokeStyle = color; g.lineWidth = 6; g.strokeRect(10, 10, c.width - 20, c.height - 20);
+  g.fillStyle = color; g.textAlign = 'center'; g.font = 'bold 64px system-ui,sans-serif'; g.fillText(text, c.width / 2, c.height / 2 + 4);
+  if (sub) { g.font = 'bold 26px system-ui,sans-serif'; g.fillStyle = '#ffffff'; g.fillText(sub, c.width / 2, c.height / 2 + 52); }
+  const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace; return t;
+}
+function spriteText(text, color) {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 80; const g = c.getContext('2d');
+  g.font = 'bold 40px system-ui,"PingFang SC","Noto Sans SC",sans-serif'; g.textAlign = 'center'; g.shadowColor = color; g.shadowBlur = 14; g.fillStyle = '#fff'; g.fillText(text, 128, 54);
+  const t = new T.CanvasTexture(c); t.colorSpace = T.SRGBColorSpace;
+  const s = new T.Sprite(new T.SpriteMaterial({ map: t, transparent: true, depthWrite: false })); s.scale.set(3.2, 1, 1); return s;
+}
+
+/* ---------------- 玩家芯片 ---------------- */
+const player = new T.Group();
+(function buildPlayer() {
+  const sub = new T.Mesh(new T.BoxGeometry(2.6, 0.22, 2.6), new T.MeshStandardMaterial({ color: '#0b3a2a', metalness: .4, roughness: .5, emissive: '#06331f', emissiveIntensity: .6 }));
+  player.add(sub);
+  const ihs = new T.Mesh(new T.BoxGeometry(1.7, 0.22, 1.7), [metal('#9aa6b8'), metal('#9aa6b8'), new T.MeshStandardMaterial({ map: labelTex(CONFIG.dieLabel, CONFIG.dieSub, CONFIG.colors.primary), emissive: '#ffffff', emissiveMap: labelTex(CONFIG.dieLabel, CONFIG.dieSub, CONFIG.colors.primary), emissiveIntensity: 0.55, metalness: .5, roughness: .3 }), metal('#9aa6b8'), metal('#9aa6b8'), metal('#9aa6b8')]);
+  ihs.position.y = 0.2; player.add(ihs);
+  const pinGeo = new T.BoxGeometry(0.12, 0.06, 0.28), pins = new T.InstancedMesh(pinGeo, metal('#d4a537', '#5a3c00', .5), 64); let k = 0;
+  for (let s = 0; s < 4; s++) for (let i = 0; i < 16; i++) { const o = -1.12 + i * 0.15; const pos = [[o, 1.36], [o, -1.36], [1.36, o], [-1.36, o]][s]; _m.position.set(pos[0], -0.05, pos[1]); _m.rotation.set(0, s >= 2 ? Math.PI / 2 : 0, 0); _m.scale.set(1, 1, 1); _m.updateMatrix(); pins.setMatrixAt(k++, _m.matrix); }
+  player.add(pins);
+  const edge = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(2.62, 0.24, 2.62)), new T.LineBasicMaterial({ color: new T.Color(CONFIG.colors.primary).multiplyScalar(2), toneMapped: false })); player.add(edge);
+  [-0.7, 0.7].forEach(x => { const e = new T.Mesh(new T.SphereGeometry(0.22, 12, 8), glow(CONFIG.colors.primary, 3)); e.position.set(x, 0, 1.4); player.add(e); });
+  const shield = new T.Mesh(new T.SphereGeometry(2.1, 32, 16), new T.MeshBasicMaterial({ color: new T.Color('#3dff9a').multiplyScalar(1.4), transparent: true, opacity: .22, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+  shield.visible = false; shield.name = 'shield'; player.add(shield);
+  const pl = new T.PointLight(CONFIG.colors.primary, 10, 10); pl.position.y = 1.2; player.add(pl);
+})();
+scene.add(player);
+const shieldMesh = player.getObjectByName('shield');
+
+/* ---------------- 子弹池（InstancedMesh） ---------------- */
+function Pool(max, geo, color) {
+  const mat = new T.MeshBasicMaterial({ color: '#ffffff', toneMapped: false });
+  const mesh = new T.InstancedMesh(geo, mat, max); mesh.instanceMatrix.setUsage(T.DynamicDrawUsage); mesh.frustumCulled = false; mesh.count = 0;
+  for (let i = 0; i < max; i++) mesh.setColorAt(i, _c.set(color || '#ffffff'));
+  scene.add(mesh);
+  return { mesh, list: [], max,
+    add(b) { if (this.list.length < max) this.list.push(b); },
+    sync() { const L = this.list; for (let i = 0; i < L.length; i++) { const b = L[i]; _m.position.set(b.x, b.y || 0, b.z); _m.rotation.set(0, b.ry || 0, 0); _m.scale.setScalar(b.s || 1); _m.updateMatrix(); mesh.setMatrixAt(i, _m.matrix); if (b.col) mesh.setColorAt(i, b.col); } mesh.count = L.length; mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true; },
+    clear() { this.list.length = 0; } };
+}
+const pBullets = Pool(260, new T.BoxGeometry(0.14, 0.14, 1.3), '#ffffff');
+const eBullets = Pool(420, new T.SphereGeometry(0.34, 10, 8), '#ffffff');
+
+/* ---------------- 游戏状态 ---------------- */
+const G = {
+  state: 'menu', level: 1, phase: 'waves', phaseT: 0, t: 0,
+  px: 0, pz: 2, hp: CONFIG.playerHp, inv: 0, shield: 0, proc: 0, cores: 1, npu: 0,
+  fireT: 0, spawnT: 0, puT: 0, hitThisLevel: false, enemies: [], pus: [], beams: [], boss: null,
+  run: null, speed: 30,
+};
+function newRun() { return { points: 0, kills: 0, elites: 0, bosses: 0, levels: 0, pus: 0, nohit: 0, maxLevel: 1, procMax: 0, learned: {} }; }
+function addPts(n, x, y, z) { G.run.points += n; if (x != null) popAt(n, x, y || 0, z); }
+const _v = new T.Vector3();
+let popCount = 0;
+function popAt(n, x, y, z) {
+  if (popCount > 8) return; _v.set(x, y, z).project(camera); if (_v.z > 1) return;
+  const el = document.createElement('div'); el.className = 'pts-pop'; el.textContent = '+' + n; el.style.left = ((_v.x + 1) / 2 * W - 12) + 'px'; el.style.top = ((1 - _v.y) / 2 * H - 10) + 'px';
+  document.body.appendChild(el); popCount++; setTimeout(() => { el.remove(); popCount--; }, 900);
+}
+
+/* ---------------- 敌人 ---------------- */
+const enemyGeo = { bug: new T.OctahedronGeometry(0.9), weaver: new T.TetrahedronGeometry(1.05), eliteCore: new T.IcosahedronGeometry(0.8, 0), eliteRing: new T.TorusGeometry(1.35, 0.14, 8, 24) };
+function spawnEnemy(type) {
+  const lv = G.level, col = CONFIG.bosses[lv].color;
+  const g = new T.Group(); let hp = 2;
+  if (type === 'elite') {
+    const core = new T.Mesh(enemyGeo.eliteCore, metal('#221022', col, 1.6)); g.add(core);
+    const r = new T.Mesh(enemyGeo.eliteRing, glow(col, 2.4)); r.rotation.x = Math.PI / 2; g.add(r); hp = 7 + lv * 2;
+  } else {
+    const m = new T.Mesh(enemyGeo[type], metal('#1a1030', type === 'bug' ? col : '#b04bff', 1.3)); g.add(m);
+    const w = new T.LineSegments(new T.EdgesGeometry(enemyGeo[type]), new T.LineBasicMaterial({ color: new T.Color(type === 'bug' ? col : '#d48bff').multiplyScalar(2.2), toneMapped: false })); g.add(w);
+    hp = 2 + (lv - 1);
+  }
+  const e = { type, g, hp, x: rand(-XB, XB), z: -95, y: 0, t: rand(0, 6), fire: rand(0.8, 1.6), baseX: 0, flash: 0 };
+  e.baseX = e.x; g.position.set(e.x, 0, e.z); scene.add(g); G.enemies.push(e);
+}
+function killEnemy(e, i) {
+  scene.remove(e.g); G.enemies.splice(i, 1);
+  const col = e.type === 'elite' ? '#ffd166' : CONFIG.bosses[G.level].color;
+  burst(e.x, 0, e.z, col, e.type === 'elite' ? 46 : 22, e.type === 'elite' ? 14 : 9, 0.8); ring(e.x, e.z, col, e.type === 'elite' ? 6 : 3.5, 0.45);
+  Audio.boom(false); shake(e.type === 'elite' ? 0.35 : 0.12);
+  if (e.type === 'elite') { G.run.elites++; addPts(PT.perElite, e.x, 1, e.z); } else { G.run.kills++; addPts(PT.perKill, e.x, 1, e.z); }
+  G.npu = Math.min(100, G.npu + (e.type === 'elite' ? 10 : 4));
+  if (Math.random() < (e.type === 'elite' ? 0.6 : 0.05)) spawnPU(null, e.x, e.z);
+}
+
+/* ---------------- 道具 ---------------- */
+const PU_TYPES = { proc: { label: '制程升级', color: '#00e0ff' }, core: { label: '核心 +1', color: '#ff4fd8' }, shield: { label: '能效护盾', color: '#3dff9a' }, npu: { label: 'NPU 充能', color: '#ffd166' } };
+const puGeo = new T.IcosahedronGeometry(0.75, 0), puCore = new T.SphereGeometry(0.38, 12, 10);
+let puCycle = 0;
+function spawnPU(type, x, z) {
+  if (!type) { const order = ['proc', 'core', 'shield', 'npu', 'proc', 'core']; type = order[puCycle++ % order.length]; }
+  const d = PU_TYPES[type], g = new T.Group();
+  const shell = new T.Mesh(puGeo, new T.MeshBasicMaterial({ color: new T.Color(d.color).multiplyScalar(2), wireframe: true, toneMapped: false })); g.add(shell);
+  g.add(new T.Mesh(puCore, glow(d.color, 1.8)));
+  const s = spriteText(d.label, d.color); s.position.y = 1.5; g.add(s);
+  const p = { type, g, x: x != null ? x : rand(-XB * .8, XB * .8), z: z != null ? z : -90, t: 0 };
+  g.position.set(p.x, 0, p.z); scene.add(g); G.pus.push(p);
+}
+function takePU(p) {
+  const d = PU_TYPES[p.type]; Audio.power(); buzz(15); burst(p.x, 0, p.z, d.color, 30, 8, .6); ring(p.x, p.z, d.color, 4, .4);
+  G.run.pus++; addPts(PT.perPowerup, p.x, 1, p.z);
+  if (p.type === 'proc') { if (G.proc < CONFIG.process.length - 1) G.proc++; else addPts(20); flash(CONFIG.process[G.proc] + ' 制程！', d.color); }
+  if (p.type === 'core') { if (G.cores < 5) G.cores++; else addPts(20); flash('核心 ×' + G.cores, d.color); }
+  if (p.type === 'shield') { G.shield = 10; flash('能效护盾 10s', d.color); }
+  if (p.type === 'npu') { G.npu = Math.min(100, G.npu + 50); flash('NPU +50%', d.color); }
+  G.run.procMax = Math.max(G.run.procMax, G.proc);
+  if (!G.run.learned[p.type]) { G.run.learned[p.type] = 1; showKCard(p.type); }
+  updateChips();
+}
+
+/* ---------------- Boss 建模（几何体拼装） ---------------- */
+function buildBoss(lv) {
+  const B = CONFIG.bosses[lv], col = B.color, g = new T.Group(); const parts = {};
+  if (lv === 1) { // 红色多核战车
+    const body = new T.Mesh(new T.BoxGeometry(9, 2, 5.5), metal('#2a0a12', col, .25)); g.add(body);
+    const edges = new T.LineSegments(new T.EdgesGeometry(body.geometry), new T.LineBasicMaterial({ color: new T.Color(col).multiplyScalar(2.4), toneMapped: false })); g.add(edges);
+    [-1, 1].forEach(s => { const tr = new T.Mesh(new T.BoxGeometry(1.4, 1.5, 6.4), metal('#15060a')); tr.position.set(s * 5.1, -0.4, 0); g.add(tr); for (let i = 0; i < 7; i++) { const w = new T.Mesh(new T.CylinderGeometry(0.55, 0.55, 1.5, 12), metal('#3a1018', col, .3)); w.rotation.z = Math.PI / 2; w.position.set(s * 5.1, -0.5, -2.6 + i * 0.86); g.add(w); } });
+    const turret = new T.Mesh(new T.BoxGeometry(6, 1.1, 3.6), metal('#3a0c16', col, .2)); turret.position.y = 1.5; g.add(turret);
+    parts.cores = [];
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) { const k = new T.Mesh(new T.BoxGeometry(1.0, 0.5, 1.0), glow(col, 2.6)); k.position.set(-2.1 + c * 1.4, 2.2, -0.75 + r * 1.5); g.add(k); parts.cores.push(k); }
+    parts.barrels = [];
+    for (let i = 0; i < 4; i++) { const b = new T.Mesh(new T.CylinderGeometry(0.28, 0.36, 4, 10), metal('#551020', col, .5)); b.rotation.x = Math.PI / 2; b.position.set(-2.4 + i * 1.6, 1.3, 3.8); g.add(b); parts.barrels.push(b); }
+    g.userData.hitR = 4.6;
+  } else if (lv === 2) { // 绿色显卡巨兽
+    const card = new T.Mesh(new T.BoxGeometry(13, 1.6, 5), metal('#0b1a12', col, .15)); g.add(card);
+    g.add(new T.LineSegments(new T.EdgesGeometry(card.geometry), new T.LineBasicMaterial({ color: new T.Color(col).multiplyScalar(2.4), toneMapped: false })));
+    for (let i = 0; i < 3; i++) { const s = new T.Mesh(new T.BoxGeometry(13.2, .12, .18), glow(col, 2.6)); s.position.set(0, 0.86, -2 + i * 2); g.add(s); }
+    parts.fans = [];
+    for (let f = 0; f < 3; f++) {
+      const fan = new T.Group(); fan.position.set(-4.2 + f * 4.2, 1.0, 0);
+      const rim = new T.Mesh(new T.TorusGeometry(1.8, 0.16, 10, 36), glow(col, 2.2)); rim.rotation.x = Math.PI / 2; fan.add(rim);
+      const hub = new T.Mesh(new T.CylinderGeometry(0.45, 0.45, 0.3, 16), metal('#0a0a0a', col, 1)); fan.add(hub);
+      for (let b = 0; b < 9; b++) { const bl = new T.Mesh(new T.BoxGeometry(1.5, 0.06, 0.42), metal('#1d2b22', col, .35)); bl.position.x = 0.9; const piv = new T.Group(); piv.rotation.y = b / 9 * Math.PI * 2; bl.rotation.x = 0.5; piv.add(bl); fan.add(piv); }
+      g.add(fan); parts.fans.push(fan);
+    }
+    const bracket = new T.Mesh(new T.BoxGeometry(.4, 3.2, 5), metal('#8892a0')); bracket.position.set(6.7, 0.8, 0); g.add(bracket);
+    for (let i = 0; i < 12; i++) { const fin = new T.Mesh(new T.BoxGeometry(.12, .9, 4.4), metal('#2a3a30')); fin.position.set(-5.8 + i * 1.05, -1.1, 0); g.add(fin); }
+    g.userData.hitR = 5.2;
+  } else { // 东方麒麟
+    const head = new T.Group(); parts.head = head;
+    const skull = new T.Mesh(new T.BoxGeometry(2.6, 1.8, 3), metal('#3a2a08', col, .2)); head.add(skull);
+    const snout = new T.Mesh(new T.BoxGeometry(1.8, 1.1, 1.8), metal('#4a3510', col, .15)); snout.position.set(0, -0.3, 2.0); head.add(snout);
+    [-0.7, 0.7].forEach(x => { const eye = new T.Mesh(new T.SphereGeometry(0.28, 10, 8), glow('#ff3030', 3)); eye.position.set(x, 0.4, 1.4); head.add(eye); const horn = new T.Mesh(new T.ConeGeometry(0.3, 2.4, 8), glow(col, 1.25)); horn.position.set(x * 1.1, 1.6, -0.4); horn.rotation.x = -0.6; horn.rotation.z = -x * 0.3; head.add(horn); });
+    for (let i = 0; i < 6; i++) { const m = new T.Mesh(new T.ConeGeometry(0.35, 1.6, 6), glow('#ff8a3d', 1.1)); m.position.set(rand(-1.2, 1.2), rand(0.2, .8), -1.5 - rand(0, .6)); m.rotation.x = -1.9; head.add(m); }
+    [-1, 1].forEach(s => { const w = new T.Mesh(new T.ConeGeometry(0.12, 2.4, 6), glow(col, 2)); w.position.set(s * 1.0, -0.4, 2.8); w.rotation.set(Math.PI / 2, 0, s * 0.6); head.add(w); });
+    head.scale.setScalar(1.45); g.add(head);
+    parts.body = [];
+    for (let i = 0; i < 16; i++) { const r = 1.25 - i * 0.05; const seg = new T.Mesh(new T.IcosahedronGeometry(r, 1), metal('#4a3410', col, .18)); const sc = new T.Mesh(new T.TorusGeometry(r * 0.95, 0.08, 6, 20), glow(i % 2 ? col : '#ff6a3d', 1.3)); seg.add(sc); scene.add(seg); parts.body.push(seg); }
+    g.userData.hitR = 3.4;
+  }
+  return { g, parts };
+}
+function spawnBoss() {
+  const lv = G.level, B = CONFIG.bosses[lv], built = buildBoss(lv);
+  const sc = PORTRAIT ? 0.72 : 1.1; built.g.scale.setScalar(sc);
+  if (built.parts.body) built.parts.body.forEach(s => s.scale.setScalar(sc));
+  const maxHp = Math.round(B.hp * (1 + (G.cores - 1) * 0.18 + G.proc * 0.12));
+  G.boss = { lv, g: built.g, parts: built.parts, hp: maxHp, maxHp, x: 0, z: -120, t: 0, entering: true, atk: 0, atk2: 0, phase2: false, hitR: built.g.userData.hitR * sc, trail: [], dive: 0, dying: 0, flash: 0 };
+  G.boss.g.position.set(0, 0.5, -120); scene.add(G.boss.g);
+  $('bossName').textContent = B.name; $('bossName').style.color = B.color; $('bossUI').classList.add('on'); $('bossBar').style.width = '100%';
+}
+function eShot(x, z, ang, sp, color, opts) {
+  opts = opts || {};
+  eBullets.add({ x, z, y: 0, vx: Math.sin(ang) * sp, vz: Math.cos(ang) * sp, col: new T.Color(color).multiplyScalar(2.4), s: opts.s || 1, homing: opts.homing || 0, life: opts.life || 8 });
+}
+const angTo = (x, z) => Math.atan2(G.px - x, G.pz - z);
+function bossAI(dt) {
+  const b = G.boss, lv = b.lv, col = CONFIG.bosses[lv].color, sc = PORTRAIT ? 0.72 : 1.1;
+  b.t += dt; b.flash = Math.max(0, b.flash - dt * 4);
+  const tz = PORTRAIT ? (lv === 3 ? -24 : -28) : (lv === 3 ? -27 : -31);
+  if (b.entering) { b.z = lerp(b.z, tz, dt * 1.4); if (Math.abs(b.z - tz) < 1) b.entering = false; }
+  b.phase2 = b.hp < b.maxHp * 0.5;
+  const rate = b.phase2 ? 1.45 : 1;
+  if (lv === 1) {
+    b.x = Math.sin(b.t * 0.6) * XB * 0.55;
+    b.parts.cores.forEach((k, i) => { k.position.y = 2.2 + Math.max(0, Math.sin(b.t * 8 + i)) * 0.25; });
+    if (!b.entering) {
+      b.atk -= dt * rate; b.atk2 -= dt * rate;
+      if (b.atk <= 0) { b.atk = 1.5; const a0 = angTo(b.x, b.z), n = b.phase2 ? 11 : 9; for (let i = 0; i < n; i++) eShot(b.x, b.z + 3 * sc, a0 + (i - (n - 1) / 2) * 0.13, 17, col); Audio.hit(); }
+      if (b.atk2 <= 0) { b.atk2 = 3.2; b.parts.cores.forEach((k) => { const wp = k.getWorldPosition(_v); eShot(wp.x, wp.z, 0, 13, '#ffb3c0', { s: .8 }); }); if (b.phase2) for (let i = 0; i < 16; i++) eShot(b.x, b.z, i / 16 * Math.PI * 2, 10, '#ff7a8a'); }
+    }
+  } else if (lv === 2) {
+    b.x = Math.sin(b.t * 0.4) * XB * 0.45;
+    b.parts.fans.forEach((f, i) => { f.rotation.y += dt * (10 + i * 2) * (b.phase2 ? 1.6 : 1); });
+    if (!b.entering) {
+      b.atk -= dt * rate;
+      if (b.atk <= 0) { b.atk = 0.32; const a = b.t * 2.2; [0, 1, 2].forEach(f => { const fx = b.x + (-4.2 + f * 4.2) * sc; for (let k = 0; k < 2; k++) eShot(fx, b.z, a + k * Math.PI + f, 10, col, { s: .85 }); }); }
+      b.atk2 -= dt * rate;
+      if (b.atk2 <= 0) { b.atk2 = 4.2; const n = b.phase2 ? 3 : 2; for (let i = 0; i < n; i++) addBeam(clamp(G.px + (i - (n - 1) / 2) * 4.2 + rand(-1, 1), -XB, XB), col); Audio.warn(); }
+    }
+  } else {
+    const hd = b.parts.head;
+    if (b.dive > 0) { b.dive -= dt; const k = b.dive > 1.2 ? 0 : (b.dive > 0.6 ? 1 : 0); b.z = lerp(b.z, k ? -2 : tz, dt * (k ? 4 : 2)); b.x = lerp(b.x, b.diveX, dt * 3); }
+    else { b.x = Math.sin(b.t * 0.7) * XB * 0.7; if (!b.entering) b.z = tz + Math.sin(b.t * 1.3) * 5; }
+    hd.rotation.y = Math.sin(b.t * 2) * 0.25; hd.rotation.z = Math.sin(b.t * 1.4) * 0.15;
+    b.trail.unshift({ x: b.x, z: b.z, t: b.t }); if (b.trail.length > 200) b.trail.pop();
+    b.parts.body.forEach((s, i) => { const p = b.trail[Math.min(b.trail.length - 1, (i + 1) * 6)] || { x: b.x, z: b.z }; s.position.set(p.x + Math.sin(b.t * 3 + i * .6) * 0.4, 0.5 + Math.sin(b.t * 4 + i * .8) * 0.6, p.z - (i + 1) * 1.6 * sc); s.rotation.y += dt; });
+    if (!b.entering) {
+      b.atk -= dt * rate;
+      if (b.atk <= 0) { b.atk = 0.11; const a = b.t * 3.1; eShot(b.x, b.z + 1.5, a, 11, col, { s: .8 }); eShot(b.x, b.z + 1.5, a + Math.PI, 11, '#ff8a3d', { s: .8 }); if (b.phase2) eShot(b.x, b.z + 1.5, -a * 0.7, 9, '#ffe9a8', { s: .7 }); }
+      b.atk2 -= dt * rate;
+      if (b.atk2 <= 0) { b.atk2 = 3.4; for (let i = 0; i < 5; i++) eShot(b.x, b.z, angTo(b.x, b.z) + (i - 2) * 0.35, 8, '#ff3030', { s: 1.4, homing: 2.2 }); if (b.phase2 && b.dive <= 0 && Math.random() < .5) { b.dive = 2.2; b.diveX = G.px; flash('⚠ 麒麟俯冲', '#ff4f7b', 900); Audio.warn(); } }
+    }
+  }
+  b.g.position.set(b.x, 0.5 + Math.sin(b.t * 2) * 0.3, b.z);
+  b.g.rotation.z = Math.sin(b.t * 1.1) * 0.05;
+  b.g.traverse(o => { if (o.material && o.material.emissive && o.material.userData.base == null) o.material.userData.base = o.material.emissiveIntensity; if (o.material && o.material.emissive) o.material.emissiveIntensity = o.material.userData.base + b.flash * 0.25; });
+}
+function addBeam(x, col) {
+  const len = 70;
+  const m = new T.Mesh(new T.BoxGeometry(1.4, 0.3, len), new T.MeshBasicMaterial({ color: new T.Color(col).multiplyScalar(0.6), transparent: true, opacity: 0.25, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+  m.position.set(x, 0, G.boss.z + len / 2); scene.add(m); G.beams.push({ m, x, t: 0, col });
+}
+function updateBeams(dt) {
+  for (let i = G.beams.length - 1; i >= 0; i--) {
+    const bm = G.beams[i]; bm.t += dt;
+    if (bm.t < 1.1) { bm.m.material.opacity = 0.15 + Math.abs(Math.sin(bm.t * 18)) * 0.2; bm.m.scale.x = 0.5; }
+    else if (bm.t < 2.0) { if (!bm.fired) { bm.fired = true; Audio.npu(); shake(.3); bm.m.material.color.set(bm.col).multiplyScalar(3); } bm.m.material.opacity = 0.95; bm.m.scale.x = 1.4 + Math.sin(bm.t * 40) * .15; if (Math.abs(G.px - bm.x) < 1.25) hurtPlayer(); }
+    else { scene.remove(bm.m); bm.m.geometry.dispose(); bm.m.material.dispose(); G.beams.splice(i, 1); }
+  }
+}
+function damageBoss(n, x, z) {
+  const b = G.boss; if (!b || b.entering || b.dying) return false;
+  const half = b.hp > b.maxHp * 0.55; b.hp -= n; b.flash = 1; if (half && b.hp <= b.maxHp * 0.55 && b.hp > 0) snap(); if (Math.random() < .25) burst(x, 0.5, z, CONFIG.bosses[b.lv].color, 2, 6, .25);
+  $('bossBar').style.width = Math.max(0, b.hp / b.maxHp * 100) + '%';
+  if (b.hp <= 0) killBoss();
+  return true;
+}
+function killBoss() {
+  const b = G.boss; b.dying = 1.8; Audio.boom(true); buzz([60, 50, 60, 50, 200]); if (!lastSnapshot) snap();
+  G.run.bosses++; addPts(PT.perBoss, b.x, 2, b.z); eBullets.clear(); G.beams.forEach(bm => scene.remove(bm.m)); G.beams.length = 0;
+}
+function updateBossDeath(dt) {
+  const b = G.boss; b.dying -= dt;
+  if (Math.random() < .5) { const x = b.x + rand(-4, 4), z = b.z + rand(-3, 3); burst(x, rand(0, 2), z, Math.random() < .5 ? CONFIG.bosses[b.lv].color : '#ffffff', 26, 12, .9); ring(x, z, CONFIG.bosses[b.lv].color, 5, .5); shake(.25); if (Math.random() < .3) Audio.boom(false); }
+  b.g.rotation.z += dt * 0.6; b.g.position.y -= dt * 0.8;
+  if (b.dying <= 0) {
+    burst(b.x, 1, b.z, '#ffffff', 160, 26, 1.4); burst(b.x, 1, b.z, CONFIG.bosses[b.lv].color, 160, 18, 1.6); ring(b.x, b.z, '#ffffff', 26, 1.1); shake(1.4); Audio.boom(true);
+    scene.remove(b.g); if (b.parts.body) b.parts.body.forEach(s => scene.remove(s));
+    G.boss = null; $('bossUI').classList.remove('on'); levelClear();
+  }
+}
+
+/* ---------------- 玩家行为 ---------------- */
+function fire() {
+  const dmg = [1, 1.3, 1.6, 2, 2.5][G.proc], n = G.cores, spread = 0.09;
+  const col = new T.Color(G.proc >= 3 ? '#9ff6ff' : CONFIG.colors.primary).multiplyScalar(1.8);
+  for (let i = 0; i < n; i++) { const a = (i - (n - 1) / 2) * spread; pBullets.add({ x: G.px + (i - (n - 1) / 2) * 0.35, z: G.pz - 1.4, y: 0.1, vx: Math.sin(a) * 60, vz: -Math.cos(a) * 60, ry: -a, dmg, col }); }
+  Audio.shoot();
+}
+function hurtPlayer() {
+  if (G.inv > 0 || G.state !== 'play' || GOD) return;
+  if (G.shield > 0) { G.shield = 0; G.inv = 1; burst(G.px, 0, G.pz, '#3dff9a', 40, 10, .6); ring(G.px, G.pz, '#3dff9a', 6, .5); Audio.hit(); updateChips(); return; }
+  G.hp--; G.inv = 1.6; G.hitThisLevel = true; shake(0.9); Audio.hurt(); buzz(G.hp <= 0 ? [80, 60, 160] : 70); burst(G.px, 0, G.pz, '#ff4f7b', 50, 12, .7);
+  if (G.proc > 0) { G.proc--; } updateChips(); updateHUD();
+  if (G.hp <= 0) gameOver(false);
+}
+function useNPU() {
+  if (G.state !== 'play' || G.npu < 100) return;
+  G.npu = 0; Audio.npu(); shake(1.1); buzz([30, 40, 90]);
+  ring(G.px, G.pz, '#ffd166', 40, 0.9); ring(G.px, G.pz, '#ffffff', 26, 0.6); burst(G.px, 0, G.pz, '#ffd166', 120, 30, 1);
+  eBullets.list.forEach(b => burst(b.x, 0, b.z, '#ffd166', 2, 4, .4)); eBullets.clear();
+  for (let i = G.enemies.length - 1; i >= 0; i--) { const e = G.enemies[i]; e.hp -= 30; if (e.hp <= 0) killEnemy(e, i); }
+  if (G.boss) damageBoss(Math.round(G.boss.maxHp * 0.12), G.boss.x, G.boss.z);
+  flash('NPU 爆发！', '#ffd166', 900);
+}
+
+/* ---------------- 关卡流程 ---------------- */
+let flashT;
+function flash(title, color, ms, sub) {
+  const el = $('cmsg'); el.classList.remove('warn'); el.querySelector('h2').textContent = title; el.querySelector('h2').style.color = color || '#7af3ff'; el.querySelector('p').textContent = sub || '';
+  el.classList.add('on'); clearTimeout(flashT); flashT = setTimeout(() => el.classList.remove('on'), ms || 1000);
+}
+function startLevel(lv) {
+  G.level = lv; G.run.maxLevel = Math.max(G.run.maxLevel, lv); G.phase = DEBUG_BOSS && G.firstLevel ? 'warning' : 'waves'; G.phaseT = 0; G.hitThisLevel = false; G.spawnT = 1.2; G.puT = 4;
+  G.firstLevel = false;
+  const L = CONFIG.levels[lv];
+  const tint = new T.Color(L.tint);
+  groundTex.dispose(); groundTex = circuitTexture(L.tint); groundTex.repeat.set(5, 14); groundMat.map = groundMat.emissiveMap = groundTex; groundMat.needsUpdate = true;
+  scene.fog.color.copy(BG).lerp(tint, 0.06); dust.material.color.copy(tint);
+  $('hLv').textContent = L.title; $('dLv').textContent = L.title;
+  $('dBoss').innerHTML = `<b style="color:${CONFIG.bosses[lv].color}">${CONFIG.bosses[lv].name}</b><br>${CONFIG.bosses[lv].tip}`;
+  if (G.phase === 'warning') { bossWarning(); } else flash(L.title, L.tint, 1800, L.flavor);
+}
+function bossWarning() { G.phase = 'warning'; G.phaseT = 0; const B = CONFIG.bosses[G.level]; const el = $('cmsg'); flash('WARNING', '#ff4f7b', 2400, B.name + ' · ' + B.warn); el.classList.add('warn'); Audio.warn(); }
+function levelClear() {
+  G.run.levels++; addPts(PT.perLevelClear);
+  let msg = '通关 +' + PT.perLevelClear;
+  if (!G.hitThisLevel) { G.run.nohit++; addPts(PT.noHitBonus); msg += ' · 零受伤 +' + PT.noHitBonus; }
+  Audio.win();
+  if (G.level >= 3) { flash('全部通关！', '#ffd166', 1800, msg); setTimeout(() => gameOver(true), 1900); G.phase = 'done'; return; }
+  flash('关卡完成', '#3dff9a', 2000, msg); G.phase = 'clear'; G.phaseT = 0;
+}
+
+/* ---------------- 输入 ---------------- */
+const keys = {};
+addEventListener('keydown', e => {
+  if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+  const k = e.key.toLowerCase(); keys[k] = true;
+  if (/^(arrow|[wasd]$)/.test(k)) mouseTarget = null;
+  if (e.code === 'Space') { e.preventDefault(); if (!G.paused) useNPU(); }
+  if (k === 'escape' || k === 'p') { if (VIEW === 'product') closeProduct(); else if ($('panelScreen').classList.contains('on')) closePanel(); else if (G.state === 'play') setPaused(!G.paused); }
+  if (k === 'm') { const m = Audio.toggle(); $('muteBtn').textContent = m ? '🔇' : '🔊'; }
+  if (k === 'enter' && G.state === 'menu' && $('startScreen').classList.contains('on') && !document.querySelector('.ou-mask')) startGame();
+});
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+let drag = null;
+const glc = $('gl');
+const ray = new T.Raycaster(), groundPlane = new T.Plane(new T.Vector3(0, 1, 0), 0), ndc = new T.Vector2(), hitP = new T.Vector3();
+let mouseTarget = null;
+const mouseMode = (e) => e.pointerType === 'mouse' && DESK && SETTINGS.mouseFollow;
+glc.addEventListener('pointerdown', e => {
+  Audio.ensure();
+  if (VIEW === 'product') { drag = { id: e.pointerId, x: e.clientX, y: e.clientY, rot: true }; showIdle = 0; try { glc.setPointerCapture(e.pointerId); } catch (er) {} return; }
+  if (mouseMode(e)) return;
+  if (e.pointerType !== 'mouse' && SETTINGS.touchMode === 'stick') {
+    if (G.state !== 'play' || G.paused || joy.id !== null) return;
+    if (e.clientX > W * (PORTRAIT ? 0.62 : 0.5)) return; // 右半屏留给 NPU 按钮
+    joyStart(e); try { glc.setPointerCapture(e.pointerId); } catch (er) {} return;
+  }
+  drag = { id: e.pointerId, x: e.clientX, y: e.clientY }; try { glc.setPointerCapture(e.pointerId); } catch (er) {}
+});
+/* 浮动虚拟摇杆：在左侧任意位置按下即出现，超出半径时底座跟随手指 */
+const joy = { id: null, ox: 0, oy: 0, x: 0, y: 0 }, JR = 56;
+const joyEl = $('joy'), joyKnob = $('joyKnob');
+function joyPlace() { joyEl.style.left = joy.ox + 'px'; joyEl.style.top = joy.oy + 'px'; }
+function joyStart(e) { joy.id = e.pointerId; joy.ox = e.clientX; joy.oy = e.clientY; joy.x = joy.y = 0; joyPlace(); joyEl.classList.add('on'); joyEl.classList.remove('ghost'); joyKnob.style.transform = ''; }
+function joyMove(e) {
+  let dx = e.clientX - joy.ox, dy = e.clientY - joy.oy; const d = Math.hypot(dx, dy);
+  if (d > JR) { joy.ox += dx / d * (d - JR); joy.oy += dy / d * (d - JR); joyPlace(); dx = dx / d * JR; dy = dy / d * JR; }
+  joy.x = dx / JR; joy.y = dy / JR; joyKnob.style.transform = `translate(${dx}px,${dy}px)`;
+}
+function joyEnd() { joy.id = null; joy.x = joy.y = 0; joyEl.style.left = joyEl.style.top = ''; joyKnob.style.transform = ''; joyEl.classList.remove('on'); joyGhost(); }
+function joyGhost() { joyEl.classList.toggle('ghost', G.state === 'play' && !G.paused && joy.id === null); }
+glc.addEventListener('contextmenu', e => { e.preventDefault(); if (G.state === 'play' && !G.paused) useNPU(); });
+glc.addEventListener('wheel', e => { if (VIEW === 'product') { showZoom = clamp(showZoom + e.deltaY * 0.01, 7, 16); e.preventDefault(); } }, { passive: false });
+glc.addEventListener('pointermove', e => {
+  if (joy.id !== null && e.pointerId === joy.id) { joyMove(e); return; }
+  if (drag && drag.rot && e.pointerId === drag.id) { showRotY += (e.clientX - drag.x) * 0.008; showRotX = clamp(showRotX + (e.clientY - drag.y) * 0.005, -0.2, 1.1); drag.x = e.clientX; drag.y = e.clientY; showIdle = 0; return; }
+  if (mouseMode(e) && G.state === 'play' && !G.paused && VIEW === 'game') {
+    ndc.set(e.clientX / W * 2 - 1, -(e.clientY / H) * 2 + 1); ray.setFromCamera(ndc, camera);
+    if (ray.ray.intersectPlane(groundPlane, hitP)) mouseTarget = { x: clamp(hitP.x, -XB, XB), z: clamp(hitP.z + 1.5, ZB0, ZB1) };
+    return;
+  }
+  if (!drag || e.pointerId !== drag.id || G.state !== 'play' || G.paused) return;
+  const k = (XB * 2.2) / Math.min(W, 520) * SETTINGS.sens;
+  G.px = clamp(G.px + (e.clientX - drag.x) * k, -XB, XB); G.pz = clamp(G.pz + (e.clientY - drag.y) * k, ZB0, ZB1);
+  drag.x = e.clientX; drag.y = e.clientY;
+});
+const endDrag = (e) => { if (drag && e.pointerId === drag.id) drag = null; if (joy.id !== null && e.pointerId === joy.id) joyEnd(); };
+glc.addEventListener('pointerup', endDrag); glc.addEventListener('pointercancel', endDrag);
+$('npuBtn').addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); Audio.unlock(); if (G.npu < 100) buzz(10); useNPU(); });
+$('muteBtn').addEventListener('click', () => { const m = Audio.toggle(); $('muteBtn').textContent = m ? '🔇' : '🔊'; });
+$('muteBtn').textContent = Audio.muted ? '🔇' : '🔊';
+$('pauseBtn').addEventListener('click', () => setPaused(true));
+/* 切后台 / 微信等内置浏览器：自动暂停 + 静音挂起；不依赖全屏 API */
+document.addEventListener('visibilitychange', () => { if (document.hidden) { if (G.state === 'play' && !G.paused) setPaused(true); if (joy.id !== null) joyEnd(); Audio.suspend(); } else Audio.resume(); });
+addEventListener('pagehide', () => { if (G.state === 'play' && !G.paused) setPaused(true); Audio.suspend(); });
+addEventListener('blur', () => { if (TOUCH && G.state === 'play' && !G.paused) setPaused(true); });
+const unlockOnce = () => { Audio.unlock(); if (Audio.state === 'running') ['pointerdown', 'touchend', 'keydown'].forEach(ev => removeEventListener(ev, unlockOnce, true)); };
+['pointerdown', 'touchend', 'keydown'].forEach(ev => addEventListener(ev, unlockOnce, true));
+document.addEventListener('WeixinJSBridgeReady', () => Audio.unlock(), false);
+/* 防止：长按菜单、双击/双指缩放、页面滚动与下拉刷新（可滚动的面板除外） */
+document.addEventListener('contextmenu', e => { if (e.target.tagName !== 'IMG') e.preventDefault(); });
+['gesturestart', 'gesturechange', 'dblclick'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), { passive: false }));
+document.addEventListener('touchmove', e => { if (e.touches.length > 1 || !e.target.closest('.screen.on, .ou-mask, .pcards, .panel-card')) e.preventDefault(); }, { passive: false });
+document.addEventListener('selectstart', e => { if (!e.target.closest || !e.target.closest('input,textarea')) e.preventDefault(); });
+/* 底部抽屉：下滑关闭（手机） */
+function swipeClose(card, onClose) {
+  let y0 = null, dy = 0, t0 = 0;
+  card.addEventListener('touchstart', e => { if (e.touches.length !== 1 || innerWidth >= 760) return; const onGrab = e.target.closest('.grab, .phead'); if (!onGrab && card.scrollTop > 0) return; y0 = e.touches[0].clientY; dy = 0; t0 = performance.now(); }, { passive: true });
+  card.addEventListener('touchmove', e => { if (y0 === null) return; dy = e.touches[0].clientY - y0; if (dy > 0) { e.preventDefault(); card.style.transition = 'none'; card.style.transform = `translateY(${dy}px)`; } else if (dy < -10) { y0 = null; card.style.transform = ''; } }, { passive: false });
+  const end = () => { if (y0 === null) return; y0 = null; card.style.transition = ''; const fast = dy > 40 && performance.now() - t0 < 250; if (dy > 110 || fast) { card.style.transform = 'translateY(100%)'; setTimeout(() => { card.style.transform = ''; onClose(); }, 180); buzz(8); } else card.style.transform = ''; };
+  card.addEventListener('touchend', end); card.addEventListener('touchcancel', end);
+}
+
+/* ---------------- HUD ---------------- */
+let hudPts = -1, hudHp = -1, hudNpu = -1;
+function updateHUD() {
+  if (G.run && hudPts !== G.run.points) { hudPts = G.run.points; $('hPts').textContent = $('dPts').textContent = hudPts; }
+  if (hudHp !== G.hp) { hudHp = G.hp; $('hHp').textContent = $('dHp').textContent = '❤'.repeat(Math.max(0, G.hp)) + '♡'.repeat(Math.max(0, CONFIG.playerHp - G.hp)); }
+  if (DESK && G.t - lastDeskM > 1) { lastDeskM = G.t; updateDeskMissions(); }
+  const n = Math.floor(G.npu); if (n !== hudNpu) { hudNpu = n; $('npuBtn').style.setProperty('--p', n + '%'); $('npuBtn').classList.toggle('ready', n >= 100); }
+}
+function updateChips() {
+  $('chips').innerHTML = `<div class="chip">⚙ ${CONFIG.process[G.proc]}</div><div class="chip">🧠 核心 ×${G.cores}</div>` + (G.shield > 0 ? `<div class="chip sh">🛡 护盾 ${Math.ceil(G.shield)}s</div>` : '');
+  $('dChips').innerHTML = `<div class="mrow"><span>制程</span><b>${CONFIG.process[G.proc]}</b></div><div class="mbar"><i style="width:${(G.proc + 1) / CONFIG.process.length * 100}%"></i></div><div class="mrow"><span>核心</span><b>×${G.cores}</b></div><div class="mbar"><i style="width:${G.cores / 5 * 100}%"></i></div><div class="mrow"><span>能效护盾</span><b>${G.shield > 0 ? Math.ceil(G.shield) + 's' : '—'}</b></div>`;
+}
+let lastDeskM = -9;
+function updateDeskMissions() {
+  const live = { kills: G.run ? G.run.kills + G.run.elites : 0, bossKills: G.run ? G.run.bosses : 0 };
+  $('dMissions').innerHTML = Ops.missions().filter(m => m.period === 'daily').map(m => { const v = Math.min(m.target, m.progress + (m.claimed || m.done ? 0 : (live[m.metric] || 0))); return `<div class="mrow"><span>${m.name}</span><span>${m.claimed ? '已领' : v + '/' + m.target}</span></div><div class="mbar"><i style="width:${v / m.target * 100}%"></i></div>`; }).join('');
+}
+
+/* ---------------- 主循环 ---------------- */
+const clock = new T.Clock();
+let groundScroll = 0, lastChipSec = -1;
+function update(dt) {
+  G.t += dt;
+  const play = G.state === 'play';
+  const spd = G.speed * (G.phase === 'boss' || G.phase === 'warning' ? 0.55 : 1);
+  groundScroll += spd * dt; groundTex.offset.y = (groundScroll / (300 / 14)) % 1;
+  for (let i = 0; i < CITY_N; i++) { const b = cityData[i]; b.z += spd * dt; if (b.z > 30) { b.z -= 250; b.h = rand(.4, 7); } }
+  placeCity();
+  for (let i = 0; i < DUST_N; i++) { dustPos[i * 3 + 2] += spd * 1.4 * dt; if (dustPos[i * 3 + 2] > 20) dustPos[i * 3 + 2] -= 200; }
+  dustGeo.attributes.position.needsUpdate = true;
+
+  if (play) {
+    let mx = 0, mz = 0; if (keys.arrowleft || keys.a) mx -= 1; if (keys.arrowright || keys.d) mx += 1; if (keys.arrowup || keys.w) mz -= 1; if (keys.arrowdown || keys.s) mz += 1;
+    if (mx || mz) { G.px = clamp(G.px + mx * 14 * dt, -XB, XB); G.pz = clamp(G.pz + mz * 10 * dt, ZB0, ZB1); }
+    else if (joy.id !== null && Math.hypot(joy.x, joy.y) > 0.12) { const k = SETTINGS.sens; G.px = clamp(G.px + joy.x * 15 * k * dt, -XB, XB); G.pz = clamp(G.pz + joy.y * 11 * k * dt, ZB0, ZB1); }
+    else if (mouseTarget) { const dx = mouseTarget.x - G.px, dz = mouseTarget.z - G.pz, d = Math.hypot(dx, dz), st = Math.min(d, 26 * dt * SETTINGS.sens); if (d > 0.01) { G.px += dx / d * st; G.pz += dz / d * st; } }
+    G.inv = Math.max(0, G.inv - dt);
+    if (G.shield > 0) { G.shield -= dt; if (Math.ceil(G.shield) !== lastChipSec) { lastChipSec = Math.ceil(G.shield); updateChips(); } if (G.shield <= 0) updateChips(); }
+    G.fireT -= dt; if (G.fireT <= 0 && G.phase !== 'clear') { G.fireT = 1 / (7 + G.proc * 1.2); fire(); }
+    G.npu = Math.min(100, G.npu + dt * 1.2);
+    // 阶段
+    G.phaseT += dt;
+    if (G.phase === 'waves') {
+      G.spawnT -= dt;
+      if (G.spawnT <= 0) { G.spawnT = [0, 0.85, 0.68, 0.55][G.level] * rand(0.7, 1.3); const r = Math.random(); spawnEnemy(r < [0, .1, .17, .24][G.level] ? 'elite' : (r < .55 ? 'bug' : 'weaver')); }
+      G.puT -= dt; if (G.puT <= 0) { G.puT = 6.5; spawnPU(); }
+      if (G.phaseT > CONFIG.waveSeconds) bossWarning();
+    } else if (G.phase === 'warning') { if (G.phaseT > 2.4 && G.enemies.length < 4) { G.phase = 'boss'; spawnBoss(); } }
+    else if (G.phase === 'clear') { if (G.phaseT > 2.4) startLevel(G.level + 1); }
+  }
+  // 玩家姿态
+  const tx = G.px, tz = G.pz;
+  player.rotation.z = lerp(player.rotation.z, clamp((player.position.x - tx) * 0.35, -0.6, 0.6), dt * 8);
+  player.rotation.x = lerp(player.rotation.x, clamp((player.position.z - tz) * 0.15, -0.3, 0.3), dt * 8);
+  player.position.x = lerp(player.position.x, tx, dt * 18); player.position.z = lerp(player.position.z, tz, dt * 18);
+  player.position.y = Math.sin(G.t * 3) * 0.15;
+  player.visible = !(G.inv > 0 && Math.floor(G.t * 18) % 2);
+  shieldMesh.visible = G.shield > 0; shieldMesh.rotation.y += dt;
+  if (G.state === 'play') { if (Math.random() < 0.6) { burst(player.position.x + rand(-.7, .7), 0, player.position.z + 1.5, CONFIG.colors.primary, 1, 2, .35); } }
+
+  // 子弹
+  const pb = pBullets.list;
+  for (let i = pb.length - 1; i >= 0; i--) {
+    const b = pb[i]; b.x += b.vx * dt; b.z += b.vz * dt; let dead = b.z < -110;
+    if (!dead) for (let j = G.enemies.length - 1; j >= 0; j--) { const e = G.enemies[j]; const r = e.type === 'elite' ? 1.6 : 1.2; if (Math.abs(e.x - b.x) < r && Math.abs(e.z - b.z) < r + .6) { e.hp -= b.dmg; e.flash = 1; dead = true; Audio.hit(); if (e.hp <= 0) killEnemy(e, j); break; } }
+    if (!dead && G.boss && !G.boss.dying) {
+      const B = G.boss; if (Math.hypot(B.x - b.x, (B.z - b.z) * 0.8) < B.hitR) dead = damageBoss(b.dmg, b.x, b.z) || B.entering;
+      else if (B.parts.body) for (const s of B.parts.body) if (Math.hypot(s.position.x - b.x, s.position.z - b.z) < 1.2) { dead = true; damageBoss(b.dmg * 0.35, b.x, b.z); break; }
+    }
+    if (dead) pb.splice(i, 1);
+  }
+  const eb = eBullets.list;
+  for (let i = eb.length - 1; i >= 0; i--) {
+    const b = eb[i]; b.life -= dt;
+    if (b.homing > 0 && G.state === 'play') { b.homing -= dt; const sp = Math.hypot(b.vx, b.vz), a = angTo(b.x, b.z), ca = Math.atan2(b.vx, b.vz); let d = a - ca; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2; const na = ca + clamp(d, -2 * dt, 2 * dt); b.vx = Math.sin(na) * sp; b.vz = Math.cos(na) * sp; }
+    b.x += b.vx * dt; b.z += b.vz * dt;
+    if (b.z > 22 || b.z < -130 || Math.abs(b.x) > 40 || b.life <= 0) { eb.splice(i, 1); continue; }
+    if (G.state === 'play' && Math.hypot(b.x - G.px, b.z - G.pz) < 0.75 + 0.3 * (b.s || 1)) { eb.splice(i, 1); hurtPlayer(); }
+  }
+  pBullets.sync(); eBullets.sync();
+
+  // 敌人
+  for (let i = G.enemies.length - 1; i >= 0; i--) {
+    const e = G.enemies[i]; e.t += dt; e.flash = Math.max(0, e.flash - dt * 6);
+    if (e.type === 'bug') { e.z += (16 + G.level * 2) * dt; e.x += clamp(G.px - e.x, -1, 1) * 2.2 * dt; }
+    else if (e.type === 'weaver') { e.z += 13 * dt; e.x = clamp(e.baseX + Math.sin(e.t * 2.4) * 4, -XB, XB); }
+    else { if (e.z < -34) e.z += 22 * dt; else { e.x += Math.sin(e.t * 1.5) * 3 * dt; e.fire -= dt; if (e.fire <= 0 && G.state === 'play') { e.fire = 1.6 - G.level * .15; const a = angTo(e.x, e.z); for (let k = -1; k <= 1; k++) eShot(e.x, e.z, a + k * .18, 15, '#ffb84d'); } if (e.t > 9) e.z += 10 * dt; } }
+    e.g.position.set(e.x, Math.sin(e.t * 3) * .3, e.z); e.g.rotation.y += dt * 2.5; e.g.rotation.x += dt * 1.3;
+    e.g.scale.setScalar(1 + e.flash * .25);
+    if (e.z > 20) { scene.remove(e.g); G.enemies.splice(i, 1); continue; }
+    if (G.state === 'play' && Math.hypot(e.x - G.px, e.z - G.pz) < 1.6) { e.hp = 0; killEnemy(e, i); hurtPlayer(); }
+  }
+  // 道具
+  for (let i = G.pus.length - 1; i >= 0; i--) {
+    const p = G.pus[i]; p.t += dt; p.z += 15 * dt; p.g.position.set(p.x, Math.sin(p.t * 3) * .4 + .3, p.z); p.g.children[0].rotation.y += dt * 2; p.g.children[0].rotation.x += dt;
+    if (G.state === 'play' && Math.hypot(p.x - G.px, p.z - G.pz) < 2.1) { takePU(p); scene.remove(p.g); G.pus.splice(i, 1); continue; }
+    if (p.z > 20) { scene.remove(p.g); G.pus.splice(i, 1); }
+  }
+  if (G.boss) { if (G.boss.dying) updateBossDeath(dt); else bossAI(dt); }
+  updateBeams(dt); updateParticles(dt); updateRings(dt);
+
+  // 相机
+  const camX = player.position.x * (PORTRAIT ? 0.62 : 0.45);
+  const cy = PORTRAIT ? 13 : 10.5, cz = (PORTRAIT ? 15 : 14) + player.position.z * 0.5;
+  shakeAmt = Math.max(0, shakeAmt - dt * 2.2);
+  const s = shakeAmt * shakeAmt * 0.8;
+  camera.position.set(camX + rand(-s, s), cy + rand(-s, s), cz);
+  camera.lookAt(player.position.x * (PORTRAIT ? 0.45 : 0.3), 0, -14 + player.position.z * 0.3);
+  if (G.state === 'menu' && DESK) { const a = G.t * 0.35; camera.position.set(Math.sin(a) * 6.5, 3.6, 2 + Math.cos(a) * 6.5); camera.lookAt(0, 0.2, 2); }
+  else if (G.state === 'menu' || G.state === 'end') { camera.position.x = Math.sin(G.t * 0.25) * 6; camera.position.y = 7; camera.lookAt(0, 0, -16); }
+  const wantOff = DESK && G.state === 'menu' ? 'menu' : '';
+  if (viewOff !== wantOff) { viewOff = wantOff; if (wantOff) camera.setViewOffset(W, H, -W * 0.2, 0, W, H); else camera.clearViewOffset(); }
+  if (play) updateHUD();
+}
+let fpsAcc = 0, fpsN = 0, VIEW = 'game';
+function applyQuality() {
+  const q = SETTINGS.quality, dpr = devicePixelRatio || 1;
+  // DPR 上限 2；自动档：低端/掉帧 1.25，手机 1.75，电脑 2
+  const pr = q === 'low' ? 1 : q === 'mid' ? Math.min(dpr, 1.5) : q === 'high' ? Math.min(dpr, 2) : Math.min(dpr, (lowered || LOWEND) ? 1.25 : MOBILE ? 1.75 : 2);
+  const weak = q === 'low' || (q === 'auto' && (lowered || LOWEND));
+  PFX = weak ? 0.5 : 1; bloom.strength = weak ? 0.6 : 0.85; if (typeof dustGeo !== 'undefined') dustGeo.setDrawRange(0, weak ? Math.floor(DUST_N / 2) : DUST_N);
+  renderer.setPixelRatio(pr); composer.setPixelRatio(pr); bloom.enabled = q !== 'low'; resize();
+}
+function loop() {
+  const dt = Math.min(clock.getDelta(), 1 / 20);
+  if (VIEW === 'product') { updateShow(dt); renderPass.scene = showScene; renderPass.camera = showCam; }
+  else { if (!G.paused) update(dt); renderPass.scene = scene; renderPass.camera = camera; }
+  composer.render();
+  fpsAcc += dt; fpsN++;
+  if (!lowered && SETTINGS.quality === 'auto' && fpsAcc > 4) { const fps = fpsN / fpsAcc; if (fps < 32) { lowered = true; applyQuality(); } fpsAcc = 0; fpsN = 0; }
+  requestAnimationFrame(loop);
+}
+
+/* ---------------- 开始 / 结束 / 运营 ---------------- */
+function clearWorld() {
+  G.enemies.forEach(e => scene.remove(e.g)); G.enemies.length = 0; G.pus.forEach(p => scene.remove(p.g)); G.pus.length = 0;
+  G.beams.forEach(b => scene.remove(b.m)); G.beams.length = 0; pBullets.clear(); eBullets.clear();
+  if (G.boss) { scene.remove(G.boss.g); if (G.boss.parts.body) G.boss.parts.body.forEach(s => scene.remove(s)); G.boss = null; }
+  $('bossUI').classList.remove('on');
+}
+function refreshMenus() {
+  const s = Ops.state, t = Ops.tier(), n = Ops.nextTier(), left = Ops.playsLeft();
+  $('sPts').textContent = s.points; $('sPlays').textContent = left; $('sBest').textContent = s.best;
+  $('startBtn').disabled = left <= 0; $('startBtn').textContent = left > 0 ? `开始游戏（消耗 1 场）` : '今日场次已用完 · 分享可加场';
+  const cc = Ops.claimableCount(); $('mBadge').textContent = $('eBadge').textContent = cc || '';
+  const ck = Ops.checkinStatus(); $('sCheck').textContent = ck.done ? '已签到 ✓' : '签到 +' + OPS.checkin.rewards[Math.min(ck.nextDay, 7) - 1];
+  const tierTxt = `<span style="color:${t.color};font-weight:800">${t.icon} ${t.name}</span> · ${n ? `再得 ${n.min - s.lifetime} 积分升级 ${n.icon}${n.name}` : '已满级'}`;
+  $('sTier').innerHTML = tierTxt; $('eTier').innerHTML = tierTxt;
+  $('sTbar').style.width = $('eTbar').style.width = Math.round(Ops.tierProgress() * 100) + '%';
+  $('hPlays').textContent = $('dPlays').textContent = '今日剩余 ' + left + ' 场';
+  $('eAgain').textContent = left > 0 ? `再战一局（剩 ${left} 场）` : '场次用完 · 分享得加场';
+  $('eAgain').disabled = false;
+}
+function startGame() {
+  Audio.ensure();
+  if (!Ops.consumePlay()) { OpsUI.toast('今日场次已用完，分享可得加场'); openShare(); return; }
+  clearWorld();
+  closeAllScreens(); mouseTarget = null;
+  Object.assign(G, { state: 'play', paused: false, px: 0, pz: 2, hp: CONFIG.playerHp, inv: 1, shield: 0, proc: 0, cores: 1, npu: 0, fireT: 0, firstLevel: true, run: newRun() });
+  if (DEBUG_LEVEL > 1) { G.proc = Math.min(4, DEBUG_LEVEL); G.cores = DEBUG_LEVEL + 1; }
+  hudPts = hudHp = hudNpu = -1; if (TOUCH) { try { screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait').catch(() => {}); } catch (e) {} }
+  lastSnapshot = null;
+  $('startScreen').classList.remove('on'); $('endScreen').classList.remove('on'); $('hud').classList.add('on'); $('backLink').style.display = 'none';
+  refreshMenus(); updateChips(); startLevel(DEBUG_LEVEL); updateDeskMissions(); joyGhost();
+}
+let lastSnapshot = null;
+/* 截取当前 3D 画面（偏下居中，保证主角与 Boss 同框）给分享海报用 */
+function snap() {
+  try {
+    composer.render(); const src = renderer.domElement, sw = src.width, sh = src.height;
+    const ar = 670 / 560; let cw = sw, ch = cw / ar; if (ch > sh) { ch = sh; cw = ch * ar; }
+    const cy = clamp(sh * 0.62 - ch / 2, 0, sh - ch), cx = (sw - cw) / 2;
+    const c = document.createElement('canvas'); c.width = 670; c.height = 560; c.getContext('2d').drawImage(src, cx, cy, cw, ch, 0, 0, 670, 560);
+    lastSnapshot = c.toDataURL('image/jpeg', 0.86);
+  } catch (e) { lastSnapshot = null; }
+}
+function gameOver(win) {
+  if (G.state !== 'play') return;
+  G.state = 'end'; G.paused = false; if (joy.id !== null) joyEnd(); joyGhost(); $('pauseScreen').classList.remove('on'); $('kcard').classList.remove('on');
+  if (!win || !lastSnapshot) snap();
+  win ? Audio.win() : Audio.lose();
+  const R = G.run, res = Ops.settleGame(R.points, { kills: R.kills + R.elites, bossKills: R.bosses, levelClears: R.levels, allClear: win ? 1 : 0, procMax: R.procMax });
+  $('hud').classList.remove('on'); $('backLink').style.display = '';
+  $('eTitle').textContent = win ? CONFIG.winTitle : CONFIG.loseTitle; $('eTitle').style.color = win ? '#ffd166' : '#ff4f7b';
+  $('eSub').textContent = win ? `三关 Boss 全部拿下，${CONFIG.process[G.proc]} 制程封神！` : `止步第 ${G.level} 关 · ${CONFIG.bosses[G.level].name}。换条走线再冲！`;
+  const row = (a, b) => `<div><span>${a}</span><span>${b}</span></div>`;
+  $('eBreak').innerHTML =
+    row(`击落杂讯 ×${R.kills}`, '+' + R.kills * PT.perKill) + row(`击落精英 ×${R.elites}`, '+' + R.elites * PT.perElite) + row(`拾取道具 ×${R.pus}`, '+' + R.pus * PT.perPowerup + (R.pus ? '+' : '')) +
+    row(`击败 Boss ×${R.bosses}`, '+' + R.bosses * PT.perBoss) + row(`通关 ×${R.levels}`, '+' + R.levels * PT.perLevelClear) + row(`零受伤关卡 ×${R.nohit}`, '+' + R.nohit * PT.noHitBonus) +
+    `<div class="tot"><span>本局积分</span><span>${R.points}</span></div>` +
+    row('实际入账', `<b style="color:#3dff9a">+${res.granted}</b>`) +
+    (res.cappedByGame ? row('', `<span style="color:#ffcf6e">单局上限 ${PT.perGameCap}</span>`) : '') + (res.cappedByDay ? row('', `<span style="color:#ffcf6e">已触达每日上限 ${PT.dailyCap}</span>`) : '') +
+    (res.welcome ? row('好友邀请新人礼', '+' + res.welcome) : '') +
+    row('可用积分', Ops.state.points) +
+    (Ops.claimableCount() ? row('✅ 可领取任务', `<b style="color:#ffd166">${Ops.claimableCount()} 个</b>`) : '');
+  $('eNote').textContent = `抽奖 ${Ops.drawCost()} 积分/次 · 分享 +${OPS.plays.perShare} 场 +${OPS.share.pointsPerShare} 积分 · ${OPS.demoBanner}`;
+  refreshMenus();
+  setTimeout(() => $('endScreen').classList.add('on'), 400);
+}
+function openShare() {
+  OpsUI.openShare({ title: CONFIG.title, subtitle: CONFIG.subtitle, score: G.run ? G.run.points : Ops.state.best, scoreLabel: G.run ? '本局战力' : '最佳战力', extra: G.run ? `闯到第 ${G.run.maxLevel} 关` : '', image: lastSnapshot, cta: CONFIG.shareCta, note: CONFIG.posterNote, onShare: refreshMenus, onClose: refreshMenus });
+}
+$('startBtn').onclick = startGame;
+$('eAgain').onclick = () => { if (Ops.playsLeft() > 0) startGame(); else openShare(); };
+$('eDraw').onclick = () => OpsUI.openLottery({ onClose: refreshMenus, onDraw: refreshMenus });
+$('eShare').onclick = openShare;
+$('eWallet').onclick = () => OpsUI.openWallet({ onChange: refreshMenus, share: { title: CONFIG.title, subtitle: CONFIG.subtitle, image: lastSnapshot, cta: CONFIG.shareCta, note: CONFIG.posterNote } });
+$('sDraw').onclick = () => OpsUI.openLottery({ onClose: refreshMenus, onDraw: refreshMenus });
+$('sShare').onclick = openShare;
+$('eMissions').onclick = () => openPanel('missions', 'endScreen');
+$('sCheck').onclick = () => { const r = Ops.checkin(); OpsUI.toast(r.ok ? `签到成功 +${r.points} 积分${r.play ? `，+${r.play} 场` : ''}` : r.msg); refreshMenus(); };
+$('eHome').onclick = () => { $('endScreen').classList.remove('on'); $('startScreen').classList.add('on'); clearWorld(); G.state = 'menu'; G.px = 0; G.pz = 2; refreshMenus(); };
+
+/* ---------------- 菜单系统：主菜单 / 面板 / 暂停 ---------------- */
+const SCREENS = ['startScreen', 'endScreen', 'pauseScreen', 'panelScreen'];
+function closeAllScreens() { SCREENS.forEach(id => $(id).classList.remove('on')); }
+let panelReturn = 'startScreen';
+function walletOpen() { OpsUI.openWallet({ onChange: refreshMenus, share: { title: CONFIG.title, subtitle: CONFIG.subtitle, image: lastSnapshot, cta: CONFIG.shareCta, note: CONFIG.posterNote } }); }
+document.querySelectorAll('[data-nav]').forEach(b => b.onclick = () => {
+  const n = b.dataset.nav;
+  if (n === 'wallet') return walletOpen();
+  if (n === 'rules') return OpsUI.openRules();
+  if (n === 'product') return openProduct(null, 'startScreen');
+  openPanel(n, 'startScreen');
+});
+function openPanel(kind, from) {
+  panelReturn = from || 'startScreen'; closeAllScreens(); $('panelScreen').classList.add('on');
+  const body = $('panelBody');
+  if (kind === 'missions') { $('panelTitle').textContent = '任务中心'; OpsUI.renderMissions(body, { onChange: refreshMenus }); }
+  if (kind === 'rank') {
+    $('panelTitle').textContent = '排行榜';
+    body.innerHTML = `<p class="small" style="margin:0 0 8px">按最佳单局积分排名 · 演示为本地 + 模拟数据，正式版由后端统计</p><ul class="lbl">${Ops.leaderboard().map(r => `<li class="${r.me ? 'me' : ''}"><span><span class="rk">${r.rank}</span>${OpsUI.esc(r.name)}${r.gold ? ' 🥇' : ''}</span><b>${r.score}</b></li>`).join('')}</ul>`;
+  }
+  if (kind === 'settings') { $('panelTitle').textContent = '设置'; renderSettings(body); }
+}
+function closePanel() { $('panelScreen').classList.remove('on'); $(panelReturn).classList.add('on'); refreshMenus(); }
+$('panelBack').onclick = closePanel;
+swipeClose(document.querySelector('#panelScreen .panel-card'), () => closePanel());
+swipeClose(document.querySelector('#pauseScreen .pause-card'), () => setPaused(false));
+function renderSettings(body) {
+  const seg = (key, opts) => `<div class="seg" data-key="${key}">${opts.map(([v, l]) => `<button data-v="${v}" class="${String(SETTINGS[key]) === String(v) ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  body.innerHTML = `
+    <div class="set-row"><div>音效<small>按 M 键也可切换</small></div><div class="seg" data-key="sound"><button data-v="1" class="${!Audio.muted ? 'on' : ''}">开</button><button data-v="0" class="${Audio.muted ? 'on' : ''}">关</button></div></div>
+    <div class="set-row"><div>画质<small>低：关闭泛光，最流畅；自动：掉帧时自动降级</small></div>${seg('quality', [['auto', '自动'], ['low', '低'], ['mid', '中'], ['high', '高']])}</div>
+    <div class="set-row"><div>镜头震动</div>${seg('shake', [[true, '开'], [false, '关']])}</div>
+    <div class="set-row"><div>触屏操控<small>摇杆：左手浮动摇杆 + 右手 NPU；拖动：手指拖到哪芯片到哪</small></div>${seg('touchMode', [['stick', '摇杆'], ['drag', '拖动']])}</div>
+    <div class="set-row"><div>震动反馈<small>受击 / NPU / 击败 Boss 时震动（支持的设备）</small></div>${seg('haptic', [[true, '开'], [false, '关']])}</div>
+    ${TOUCH ? '' : `<div class="set-row"><div>鼠标跟随移动<small>电脑版：芯片跟随鼠标位置</small></div>${seg('mouseFollow', [[true, '开'], [false, '关']])}</div>`}
+    <div class="set-row"><div>操控灵敏度<small id="sensV">${SETTINGS.sens.toFixed(1)}×</small></div><input type="range" id="sens" min="0.5" max="1.8" step="0.1" value="${SETTINGS.sens}"></div>
+    <div class="set-row" style="border:none"><div>数据<small>清空本机演示积分、任务、奖品</small></div><button class="pback" id="resetData">重置演示数据</button></div>`;
+  body.querySelectorAll('.seg').forEach(sg => sg.querySelectorAll('button').forEach(bt => bt.onclick = () => {
+    const key = sg.dataset.key, v = bt.dataset.v;
+    if (key === 'sound') { if ((v === '1') === Audio.muted) { const m = Audio.toggle(); $('muteBtn').textContent = m ? '🔇' : '🔊'; } }
+    else { SETTINGS[key] = v === 'true' ? true : v === 'false' ? false : v; saveSettings(); syncTouchMode(); if (key === 'haptic' && SETTINGS.haptic) buzz(20); }
+    renderSettings(body);
+  }));
+  body.querySelector('#sens').oninput = (e) => { SETTINGS.sens = +e.target.value; body.querySelector('#sensV').textContent = SETTINGS.sens.toFixed(1) + '×'; saveSettings(); };
+  body.querySelector('#resetData').onclick = () => { if (confirm('清空本机演示数据？')) { Ops.reset(); localStorage.removeItem(SEEN_KEY); OpsUI.toast('已重置'); refreshMenus(); } };
+}
+function setPaused(p) {
+  if (G.state !== 'play') return;
+  G.paused = p; drag = null; if (joy.id !== null) joyEnd(); joyGhost();
+  if (p) { closeAllScreens(); $('pauseScreen').classList.add('on'); $('pInfo').textContent = `${CONFIG.levels[G.level].title} · 本局 ${G.run.points} 积分 · ${CONFIG.process[G.proc]} · 核心 ×${G.cores}`; clock.getDelta(); }
+  else { closeAllScreens(); clock.getDelta(); }
+}
+$('pResume').onclick = () => setPaused(false);
+$('pMissions').onclick = () => openPanel('missions', 'pauseScreen');
+$('pSettings').onclick = () => openPanel('settings', 'pauseScreen');
+$('pProduct').onclick = () => openProduct(null, 'pauseScreen');
+$('pQuit').onclick = () => { G.paused = false; gameOver(false); };
+
+/* ---------------- 道具 → 卖点知识卡 ---------------- */
+let kTimer, kFeat = null;
+function showKCard(puType) {
+  const fid = CONFIG.product.powerupLink[puType]; const f = CONFIG.product.features.find(x => x.id === fid); if (!f) return;
+  kFeat = fid; $('kText').innerHTML = `💡 解锁「${PU_TYPES[puType].label}」→ 了解 ${f.icon} ${f.title.split(' ·')[0]}`;
+  $('kcard').classList.add('on'); clearTimeout(kTimer); kTimer = setTimeout(() => $('kcard').classList.remove('on'), 4200);
+}
+$('kBtn').onclick = () => { $('kcard').classList.remove('on'); if (G.state === 'play') { setPaused(true); openProduct(kFeat, 'pauseScreen'); } };
+
+/* ---------------- 产品介绍：可旋转 3D 芯片 + 卖点卡 ---------------- */
+const SEEN_KEY = 'chip3d_product_seen';
+const showScene = new T.Scene(); showScene.background = new T.Color('#040818');
+showCam = new T.PerspectiveCamera(42, W / H, 0.1, 200);
+let showRotY = 0.6, showRotX = 0.55, showZoom = 11, showIdle = 9, showSpin = true, explodeT = 0, explodeOn = false, selFeat = 'cpu', showT = 0;
+const showRoot = new T.Group(); showScene.add(showRoot);
+const tiles = {};
+(function buildShowcase() {
+  showScene.add(new T.HemisphereLight('#8fb8ff', '#120624', 1.1));
+  const key = new T.DirectionalLight('#ffffff', 2.2); key.position.set(5, 9, 6); showScene.add(key);
+  const rim = new T.PointLight('#ff4fd8', 40, 30); rim.position.set(-6, 3, -5); showScene.add(rim);
+  const rim2 = new T.PointLight('#00e0ff', 40, 30); rim2.position.set(6, 2, -4); showScene.add(rim2);
+  // 底座光环
+  const disc = new T.Mesh(new T.CircleGeometry(7, 64), new T.MeshBasicMaterial({ map: circuitTexture('#00c7fd'), transparent: true, opacity: 0.35, toneMapped: false })); disc.rotation.x = -Math.PI / 2; disc.position.y = -1.2; showScene.add(disc);
+  [5.2, 6.4].forEach((r, i) => { const ring = new T.Mesh(new T.TorusGeometry(r, 0.04, 8, 96), glow(i ? '#ff4fd8' : '#00e0ff', 2)); ring.rotation.x = Math.PI / 2; ring.position.y = -1.15; showScene.add(ring); });
+  const sp = new Float32Array(300 * 3); for (let i = 0; i < 300; i++) { const a = rand(0, Math.PI * 2), r = rand(4, 12); sp[i * 3] = Math.cos(a) * r; sp[i * 3 + 1] = rand(-1, 7); sp[i * 3 + 2] = Math.sin(a) * r; }
+  const sg = new T.BufferGeometry(); sg.setAttribute('position', new T.BufferAttribute(sp, 3));
+  showScene.add(new T.Points(sg, new T.PointsMaterial({ size: 0.12, map: DOT, color: '#7af3ff', transparent: true, depthWrite: false, blending: T.AdditiveBlending })));
+  // 封装基板
+  const sub = new T.Mesh(new T.BoxGeometry(6, 0.3, 6), new T.MeshStandardMaterial({ color: '#0b3a2a', metalness: .4, roughness: .45, emissive: '#04281a', emissiveIntensity: .8 })); showRoot.add(sub);
+  const pins = new T.InstancedMesh(new T.BoxGeometry(0.12, 0.06, 0.32), metal('#d4a537', '#5a3c00', .5), 4 * 30); let k = 0;
+  for (let sd = 0; sd < 4; sd++) for (let i = 0; i < 30; i++) { const o = -2.75 + i * 0.19; const pos = [[o, 3.1], [o, -3.1], [3.1, o], [-3.1, o]][sd]; _m.position.set(pos[0], -0.1, pos[1]); _m.rotation.set(0, sd >= 2 ? Math.PI / 2 : 0, 0); _m.scale.set(1, 1, 1); _m.updateMatrix(); pins.setMatrixAt(k++, _m.matrix); }
+  showRoot.add(pins);
+  for (let i = 0; i < 18; i++) { const cap = new T.Mesh(new T.BoxGeometry(0.22, 0.14, 0.12), metal('#c9a54a')); cap.position.set(rand(-2.7, 2.7), 0.22, Math.random() < .5 ? rand(2.5, 2.8) : rand(-2.8, -2.5)); showRoot.add(cap); }
+  // 基础晶圆层（制程）
+  const baseTex = circuitTexture('#3dff9a'); baseTex.repeat.set(2, 2);
+  tiles.base = new T.Mesh(new T.BoxGeometry(4.6, 0.18, 4.6), new T.MeshStandardMaterial({ color: '#10202a', map: baseTex, emissive: '#3dff9a', emissiveMap: baseTex, emissiveIntensity: .3, metalness: .6, roughness: .35 }));
+  tiles.base.position.y = 0.24; tiles.base.userData = { y0: 0.24, y1: 0.5, color: '#3dff9a' }; showRoot.add(tiles.base);
+  // 功能模块（tile）
+  const T4 = [['compute', 'CPU', 2.4, 2.2, -0.95, -0.95, '#00c7fd'], ['graphics', 'GPU', 1.75, 2.2, 1.3, -0.95, '#a78bfa'], ['soc', 'NPU · SoC', 2.4, 1.75, -0.95, 1.25, '#ffd166'], ['io', 'I/O · 低功耗岛', 1.75, 1.75, 1.3, 1.25, '#5effc4']];
+  T4.forEach(([id, lab, w, d, x, z, col]) => {
+    const top = labelTex(lab.split(' ')[0], lab.includes('·') ? lab.split('· ')[1] : '', col, 256, 256);
+    const mat = new T.MeshStandardMaterial({ color: '#0d1426', map: top, emissive: col, emissiveMap: top, emissiveIntensity: .5, metalness: .5, roughness: .3 });
+    const m = new T.Mesh(new T.BoxGeometry(w, 0.22, d), [metal('#1a2235', col, .2), metal('#1a2235', col, .2), mat, metal('#1a2235'), metal('#1a2235', col, .2), metal('#1a2235', col, .2)]);
+    m.position.set(x, 0.45, z); m.userData = { y0: 0.45, y1: 1.6 + (id === 'compute' ? .3 : 0), color: col, mat }; showRoot.add(m); tiles[id] = m;
+    const edge = new T.LineSegments(new T.EdgesGeometry(m.geometry), new T.LineBasicMaterial({ color: new T.Color(col).multiplyScalar(1.6), toneMapped: false })); m.add(edge);
+  });
+  // 顶盖 IHS
+  const lidTex = labelTex(CONFIG.dieLabel, CONFIG.dieSub, CONFIG.colors.primary, 512, 512);
+  const lidTop = new T.MeshStandardMaterial({ map: lidTex, emissive: '#ffffff', emissiveMap: lidTex, emissiveIntensity: .45, metalness: .7, roughness: .25, transparent: true });
+  const lidSide = new T.MeshStandardMaterial({ color: '#a7b2c4', metalness: .9, roughness: .25, transparent: true });
+  tiles.lid = new T.Mesh(new T.BoxGeometry(5, 0.28, 5), [lidSide, lidSide, lidTop, lidSide, lidSide, lidSide]);
+  tiles.lid.position.y = 0.72; tiles.lid.userData = { y0: 0.72, y1: 3.4 }; showRoot.add(tiles.lid);
+})();
+function updateShow(dt) {
+  showT += dt; showIdle += dt;
+  if (showSpin && showIdle > 2.5) showRotY += dt * 0.35;
+  explodeT = lerp(explodeT, explodeOn ? 1 : 0, dt * 4);
+  showRoot.rotation.set(0, showRotY, 0);
+  const tilt = showRotX, r = showZoom;
+  showCam.position.set(0, Math.sin(tilt) * r + 0.8, Math.cos(tilt) * r); showCam.lookAt(0, 0.9 * explodeT + 0.2, 0);
+  showRoot.position.y = Math.sin(showT * 1.2) * 0.12;
+  const sel = CONFIG.product.features.find(f => f.id === selFeat), tile = sel ? sel.tile : '';
+  ['base', 'compute', 'graphics', 'soc', 'io'].forEach(id => {
+    const m = tiles[id], u = m.userData, on = tile === 'all' || tile === id;
+    m.position.y = lerp(u.y0, u.y1, explodeT);
+    const mat = u.mat || m.material; mat.emissiveIntensity = on ? 0.7 + Math.abs(Math.sin(showT * 3)) * 0.9 : (tile ? 0.15 : 0.45);
+  });
+  const lid = tiles.lid; lid.position.y = lerp(lid.userData.y0, lid.userData.y1, explodeT);
+  lid.material.forEach(mm => { mm.opacity = 1 - explodeT * 0.75; });
+}
+function seen() { try { return JSON.parse(localStorage.getItem(SEEN_KEY)) || []; } catch (e) { return []; } }
+function selectFeature(id, scroll) {
+  selFeat = id; const f = CONFIG.product.features.find(x => x.id === id);
+  if (f && f.tile !== 'all' && f.tile !== 'base') explodeOn = true; if (f && f.tile === 'base') explodeOn = true;
+  showIdle = 0;
+  const S = seen(); if (!S.includes(id)) { S.push(id); localStorage.setItem(SEEN_KEY, JSON.stringify(S)); }
+  if (S.length >= CONFIG.product.features.length && !Ops.state.stats.productViewed) { Ops.track('productViewed', 1, true); OpsUI.toast('已看完产品介绍 ✅ 任务「懂芯玩家」可领取'); refreshMenus(); }
+  renderProdCards();
+  if (scroll) { const el = document.querySelector(`.fcard[data-f="${id}"]`); el && el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+}
+function renderProdCards() {
+  const S = seen(), P = CONFIG.product;
+  $('prodCards').innerHTML = P.features.map(f => `<div class="fcard ${f.id === selFeat ? 'on' : ''}" data-f="${f.id}" style="--fc:${f.color};--fcg:${f.color}66"><h4>${f.icon} ${OpsUI.esc(f.title)}${S.includes(f.id) ? '<em>✓ 已了解</em>' : ''}</h4><div class="s">${OpsUI.esc(f.short)}</div><p>${OpsUI.esc(f.text)}</p><span class="spec">${OpsUI.esc(f.spec)}</span><div class="d">⚠ ${OpsUI.esc(P.disclaimer)}</div></div>`).join('');
+  $('prodCards').querySelectorAll('.fcard').forEach(c => c.onclick = () => selectFeature(c.dataset.f, true));
+  $('prodProg').textContent = `已了解 ${Math.min(S.length, P.features.length)}/${P.features.length}`;
+  $('prodExplode').textContent = explodeOn ? '🧩 合上顶盖' : '🧩 拆解视图';
+}
+let prodReturn = 'startScreen';
+function openProduct(focus, from) {
+  prodReturn = from || 'startScreen'; closeAllScreens(); $('hud').classList.remove('on'); $('kcard').classList.remove('on');
+  VIEW = 'product'; $('prod').classList.add('on'); $('backLink').style.display = 'none';
+  const P = CONFIG.product; $('prodName').textContent = P.name; $('prodTag').textContent = P.tagline; $('prodDisc').textContent = '⚠ ' + P.disclaimer;
+  if (focus) selectFeature(focus, true); else { explodeOn = false; renderProdCards(); }
+  showCam.aspect = W / H; showCam.updateProjectionMatrix(); showZoom = PORTRAIT ? 14 : 10.5; Ops.track('productOpens', 1);
+}
+function closeProduct() {
+  VIEW = 'game'; $('prod').classList.remove('on'); drag = null; clock.getDelta();
+  if (G.state === 'play') { $('hud').classList.add('on'); $('pauseScreen').classList.add('on'); }
+  else { $(prodReturn).classList.add('on'); if (window.self === window.top) $('backLink').style.display = ''; }
+  refreshMenus();
+}
+$('prodBack').onclick = closeProduct;
+$('prodExplode').onclick = () => { explodeOn = !explodeOn; renderProdCards(); };
+$('prodSpin').onclick = () => { showSpin = !showSpin; $('prodSpin').textContent = showSpin ? '⟳ 自动旋转' : '⏸ 停止旋转'; };
+addEventListener('ops:change', refreshMenus);
+
+/* 文案注入 */
+document.title = CONFIG.title + ' · ' + CONFIG.subtitle;
+$('sTitle').textContent = CONFIG.title; $('sSub').textContent = CONFIG.subtitle; $('sHow').textContent = CONFIG.howTo; $('sLogo').textContent = CONFIG.logo;
+$('sNote').textContent = `Boss 为戏仿代称，战力对比仅供娱乐 · 电脑版：WASD/鼠标移动，空格 NPU，Esc 暂停，Enter 开始`;
+OpsUI.banner();
+const inv = Ops.handleInviteParam();
+if (inv && inv.self) OpsUI.toast('这是你自己的邀请链接（正式版由后端校验）');
+else if (inv && inv.bound) OpsUI.toast(`已绑定好友邀请码 ${inv.code}，完成首局得新人礼 +${OPS.share.inviteeWelcome}`, 3200);
+const got = Ops.collectInvites(); if (got) OpsUI.toast(`有 ${got} 位好友通过你的链接完成首局 +${got * OPS.share.inviterBonus}`);
+if (window.self !== window.top) $('backLink').style.display = 'none';
+applyQuality(); refreshMenus(); updateChips(); placeCity();
+window.__game = { get joy() { return { ...joy }; }, get PFX() { return PFX; }, LOWEND, IN_APP, TOUCH, Audio, G, setPaused, openPanel, openProduct, closeProduct, SETTINGS, get VIEW() { return VIEW; }, showKCard, startGame, useNPU, gameOver, spawnBoss: () => { G.phase = 'boss'; spawnBoss(); }, damageBoss: (n) => G.boss && damageBoss(n, G.boss.x, G.boss.z), renderer, scene };
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

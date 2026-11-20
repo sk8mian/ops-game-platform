@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+<meta name="theme-color" content="#050816" />
+<title>运营游戏工坊 · AI 运营专家</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23070b1a'/%3E%3Cpath d='M9 22l7-12 7 12z' fill='none' stroke='%2300e0ff' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='18' r='2.5' fill='%23ff4fd8'/%3E%3C/svg%3E" />
+<style>
+  :root{--bg:#050816;--panel:rgba(16,22,48,.72);--line:rgba(120,170,255,.16);--cyan:#00e0ff;--pink:#ff4fd8;--violet:#7c8cff;--text:#e8f0ff;--dim:#8c9cc4}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif}
+  body{overflow:hidden}
+  .bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+    radial-gradient(600px 400px at 10% -10%,rgba(0,224,255,.18),transparent 60%),
+    radial-gradient(700px 500px at 110% 10%,rgba(255,79,216,.14),transparent 60%),
+    radial-gradient(800px 600px at 50% 120%,rgba(124,140,255,.16),transparent 60%)}
+  .bgfx:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(120,170,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(120,170,255,.05) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(180deg,#000,transparent 75%)}
+  .app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;max-width:1680px;margin:0 auto}
+  header{display:flex;align-items:center;gap:10px;padding:calc(34px + env(safe-area-inset-top)) 16px 10px}
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+  .orb{width:38px;height:38px;border-radius:12px;flex:none;background:conic-gradient(from 200deg,var(--cyan),var(--violet),var(--pink),var(--cyan));box-shadow:0 0 22px rgba(0,224,255,.45);position:relative}
+  .orb:after{content:"AI";position:absolute;inset:3px;border-radius:10px;background:#0a0f26;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#bff6ff}
+  .brand h1{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand p{font-size:11.5px;color:var(--dim)}
+  .hbtn{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:12px;height:36px;padding:0 10px;font-size:13px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px}
+  .hbtn:hover{border-color:rgba(0,224,255,.5)}
+  .model-pill{font-size:12px;border-color:rgba(0,224,255,.35)}
+  .model-pill i{width:7px;height:7px;border-radius:50%;background:#ffb84d;box-shadow:0 0 8px #ffb84d}
+  .model-pill.live i{background:#3dff9a;box-shadow:0 0 8px #3dff9a}
+  .main{flex:1;min-height:0;display:flex;gap:16px;padding:0 16px calc(12px + env(safe-area-inset-bottom))}
+  .chat{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:22px;backdrop-filter:blur(12px);overflow:hidden}
+  .msgs{flex:1;overflow-y:auto;padding:16px 14px 8px;scroll-behavior:smooth}
+  .msg{display:flex;gap:8px;margin:10px 0;animation:in .35s cubic-bezier(.2,.9,.3,1.2)}
+  @keyframes in{from{opacity:0;transform:translateY(8px)}}
+  .msg.me{justify-content:flex-end}
+  .av{width:30px;height:30px;border-radius:10px;flex:none;background:conic-gradient(from 200deg,var(--cyan),var(--violet),var(--pink),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+  .bub{max-width:min(86%,640px);padding:10px 13px;border-radius:16px;font-size:14.5px;line-height:1.65;background:rgba(255,255,255,.06);border:1px solid var(--line);border-top-left-radius:6px}
+  .me .bub{background:linear-gradient(135deg,rgba(0,224,255,.25),rgba(124,140,255,.25));border-color:rgba(0,224,255,.35);border-top-left-radius:16px;border-top-right-radius:6px}
+  .bub b{color:#fff}
+  .bub .hl{color:#7af3ff;font-weight:700}
+  .bub ul{padding-left:18px;margin:4px 0}
+  .sys{font-size:12px;color:#ffcf6e;background:rgba(255,190,60,.08);border:1px dashed rgba(255,190,60,.4);border-radius:12px;padding:6px 10px;margin:8px auto;max-width:92%;text-align:center}
+  .think{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--dim)}
+  .think span{opacity:.35;transition:.3s}
+  .think span.on{opacity:1;color:#bff6ff}
+  .think span.on:before{content:"◆ ";color:var(--pink)}
+  .dots:after{content:"";animation:dots 1.2s infinite}
+  @keyframes dots{0%{content:""}33%{content:"."}66%{content:".."}100%{content:"..."}}
+  .ccard{margin-top:10px;border-radius:18px;padding:14px;background:linear-gradient(160deg,rgba(0,224,255,.12),rgba(255,79,216,.08) 60%,rgba(124,140,255,.1));border:1px solid rgba(0,224,255,.35);box-shadow:0 0 30px rgba(0,224,255,.12) inset;position:relative;overflow:hidden}
+  .ccard:before{content:"";position:absolute;right:-40px;top:-40px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,79,216,.35),transparent 70%)}
+  .ctag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid rgba(0,224,255,.5);color:#7af3ff;margin-right:6px}
+  .ctitle{font-size:20px;font-weight:900;margin:8px 0 2px;background:linear-gradient(90deg,#fff,#7af3ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .cslogan{font-size:13px;color:#ff9be9;font-weight:700}
+  .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+  .cbox{background:rgba(5,8,22,.5);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12.5px;line-height:1.6}
+  .cbox h5{font-size:12px;color:var(--cyan);margin-bottom:3px}
+  .cbox.full{grid-column:1/-1}
+  .cact{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{appearance:none;border:none;cursor:pointer;font-weight:800;font-size:14px;color:#041022;padding:11px 16px;border-radius:13px;background:linear-gradient(90deg,var(--cyan),var(--violet) 55%,var(--pink));box-shadow:0 6px 24px rgba(0,224,255,.3)}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--line);box-shadow:none;font-weight:700}
+  .btn.play{flex:1;min-width:150px;font-size:15px}
+  .src{font-size:11px;color:var(--dim);margin-top:8px}
+  .composer{border-top:1px solid var(--line);padding:10px 12px 12px;background:rgba(5,8,22,.55)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid rgba(0,224,255,.35);background:rgba(0,224,255,.07);color:#bff6ff;border-radius:99px;padding:7px 12px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .chip:hover{background:rgba(0,224,255,.16)}
+  .inrow{display:flex;gap:8px;align-items:flex-end}
+  textarea{flex:1;resize:none;min-height:46px;max-height:130px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font:inherit;font-size:15px;padding:12px 13px;outline:none}
+  textarea:focus{border-color:rgba(0,224,255,.6);box-shadow:0 0 0 3px rgba(0,224,255,.12)}
+  .send{width:48px;height:46px;border-radius:14px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--pink));color:#041022;font-size:20px;font-weight:900}
+  .send[disabled]{filter:grayscale(1) brightness(.6)}
+  .side{width:400px;flex:none;display:none;flex-direction:column;gap:12px;min-height:0}
+  @media (min-width:1000px){.side{display:flex}}
+  /* 侧边栏：电脑版常驻，手机版抽屉 */
+  .nav{width:268px;flex:none;display:flex;flex-direction:column;gap:10px;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:12px;backdrop-filter:blur(12px)}
+  .nav .newbtn{width:100%}
+  .nav h4{font-size:12px;color:var(--dim);letter-spacing:1px;margin:6px 4px 2px;display:flex;justify-content:space-between}
+  .nav .scroll{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:2px}
+  .sitem{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:12px;cursor:pointer;border:1px solid transparent;font-size:13px}
+  .sitem small{color:var(--dim);font-size:11px}
+  .sitem:hover{background:rgba(255,255,255,.05)}
+  .sitem.on{background:rgba(0,224,255,.1);border-color:rgba(0,224,255,.35)}
+  .sitem .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .me-card{background:rgba(5,8,22,.5);border:1px solid var(--line);border-radius:14px;padding:10px;font-size:12.5px}
+  .me-card b{font-size:18px}
+  .navlinks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .navlinks button{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:10px;padding:8px 4px;font-size:12.5px;cursor:pointer;position:relative}
+  .navlinks button:hover{border-color:rgba(0,224,255,.5)}
+  .navlinks i{position:absolute;top:-6px;right:-4px;min-width:17px;height:17px;border-radius:9px;background:#ff4f7b;color:#fff;font-size:10.5px;font-style:normal;line-height:17px;padding:0 4px}
+  .navlinks i:empty{display:none}
+  .menu-btn{display:flex}
+  @media (min-width:1200px){.menu-btn{display:none}}
+  @media (max-width:1199px){.nav{position:fixed;left:0;top:0;bottom:0;z-index:9060;border-radius:0 22px 22px 0;transform:translateX(-105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);padding-top:calc(40px + env(safe-area-inset-top));background:#0a0f26;width:min(300px,84vw)}
+    .nav.open{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.6)}
+    .navmask{position:fixed;inset:0;z-index:9055;background:rgba(2,4,14,.6);display:none}.navmask.on{display:block}}
+  @media (min-width:1200px){.navmask{display:none!important}}
+  /* 方向卡 */
+  .dirs{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+  .dcard{position:relative;border-radius:18px;padding:13px;background:linear-gradient(160deg,rgba(124,140,255,.12),rgba(5,8,22,.6));border:1px solid rgba(124,140,255,.35);display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.6;transition:.2s}
+  .dcard:hover{border-color:rgba(0,224,255,.6);box-shadow:0 0 24px rgba(0,224,255,.15)}
+  .dcard.rec{border-color:rgba(255,209,102,.6)}
+  .dcard.chosen{border-color:#3dff9a;box-shadow:0 0 26px rgba(61,255,154,.25)}
+  .dcard.dim{opacity:.45}
+  .dcard .dh{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .dcard .dl{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#041022;background:linear-gradient(135deg,var(--cyan),var(--pink));flex:none}
+  .dcard .dn{font-size:16px;font-weight:900;color:#fff}
+  .dcard .pill{font-size:10.5px;padding:1px 7px;border-radius:99px;border:1px solid rgba(0,224,255,.5);color:#7af3ff}
+  .dcard .pill.rec{border-color:#ffd166;color:#ffd166}
+  .dcard .pill.eff{border-color:rgba(255,79,216,.5);color:#ff9be9}
+  .dcard .concept{color:#fff;font-weight:700;font-size:13.5px}
+  .dcard .k{color:var(--cyan);font-weight:700}
+  .dcard .tags{display:flex;flex-wrap:wrap;gap:4px}
+  .dcard .tags span{font-size:11px;padding:1px 7px;border-radius:8px;background:rgba(255,255,255,.07);color:#cdd8f4}
+  .dcard .btn{margin-top:4px}
+  .assume{font-size:12px;color:#b9c8ec;background:rgba(0,224,255,.06);border:1px dashed rgba(0,224,255,.35);border-radius:10px;padding:6px 10px;margin-top:6px}
+  details.spec{margin-top:8px;background:rgba(5,8,22,.5);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:12.5px;line-height:1.65}
+  details.spec summary{cursor:pointer;color:var(--cyan);font-weight:700}
+  details.spec h6{font-size:12px;color:#ff9be9;margin:8px 0 2px}
+  .overlay.wide .frame{width:min(1400px,94vw)!important;height:min(860px,90vh)!important}
+  .phone{flex:1;min-height:0;border-radius:34px;padding:10px;background:linear-gradient(160deg,#1a2350,#0a0f26);border:1px solid rgba(0,224,255,.3);box-shadow:0 0 50px rgba(0,224,255,.15);display:flex;flex-direction:column}
+  .phone .bar{display:flex;justify-content:space-between;align-items:center;padding:4px 10px 8px;font-size:12px;color:var(--dim)}
+  .phone iframe{flex:1;width:100%;border:none;border-radius:26px;background:#030714}
+  .phone .empty{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--dim);font-size:13px;line-height:1.8;border-radius:26px;background:rgba(0,0,0,.3);padding:20px}
+  .list{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:10px 12px;max-height:200px;overflow:auto}
+  .list h4{font-size:13px;color:var(--cyan);margin-bottom:6px}
+  .litem{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px;cursor:pointer}
+  .litem:hover{color:#7af3ff}
+  .litem small{color:var(--dim)}
+  .overlay{position:fixed;inset:0;z-index:9050;background:#030714;display:none;flex-direction:column}
+  .overlay.on{display:flex}
+  .overlay .ob{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:calc(30px + env(safe-area-inset-top)) 12px 8px;background:#050816}
+  .overlay iframe{flex:1;border:none;width:100%}
+  @media (min-width:1000px){.overlay{background:rgba(2,4,14,.8);backdrop-filter:blur(6px);align-items:center;justify-content:center}.overlay .frame{width:420px;height:min(860px,92vh);display:flex;flex-direction:column;border-radius:30px;overflow:hidden;border:1px solid rgba(0,224,255,.4)}.overlay .ob{padding:10px 12px}}
+  .overlay .frame{flex:1;display:flex;flex-direction:column;min-height:0}
+  .form label{display:block;font-size:12.5px;color:var(--dim);margin:12px 0 5px}
+  .form input,.form select{width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);font:inherit;font-size:14px;padding:0 12px;outline:none}
+  .form select option{background:#0a0f26}
+  .form input:focus,.form select:focus{border-color:rgba(0,224,255,.6)}
+  .form .hint{font-size:11.5px;color:var(--dim);margin-top:4px;line-height:1.5}
+  .kv{display:flex;gap:8px}
+  .kv input{flex:1}
+  .switch{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:12px}
+  .switch input{width:18px;height:18px}
+  .tstat{font-size:12.5px;margin-top:10px;min-height:18px;line-height:1.5;word-break:break-all}
+  .brand>div{min-width:0}
+  .msgs{container-type:inline-size;position:relative}
+  @container (min-width:880px){.dirs.wide3{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){#rulesBtn,#walletBtn{display:none}.dcard .dn{font-size:15px}.hbtn .t{display:none}.brand p{display:none}header{gap:6px;padding-left:12px;padding-right:12px}.main{padding:0 8px calc(8px + env(safe-area-inset-bottom))}.chat{border-radius:18px}.cgrid{grid-template-columns:1fr}}
+  /* ===== 移动端优先 ===== */
+  html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  .app{height:var(--vvh,100%)}
+  .msgs{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  button,summary,.chip,.sitem,.litem{touch-action:manipulation}
+  header{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .main{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .composer{padding-bottom:12px}
+  .ddots{display:none}
+  @media (pointer:coarse){
+    .hbtn{height:44px;min-width:44px;justify-content:center}
+    .chip{min-height:44px;display:flex;align-items:center}
+    .btn{min-height:44px}
+    .send{width:52px;height:50px}
+    .navlinks button{min-height:44px}
+    .sitem,.litem{min-height:44px;justify-content:center}
+    details.spec summary{min-height:44px;display:flex;align-items:center}
+    textarea{font-size:16px}
+  }
+  @media (max-width:760px){
+    .main{padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}
+    /* 方向卡：横向滑动轮播 */
+    .dirs.wide3{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;margin:10px -13px 0;padding:2px 13px 4px;scrollbar-width:none;overscroll-behavior-x:contain;scroll-padding:0 13px}
+    .dirs.wide3::-webkit-scrollbar{display:none}
+    .dirs.wide3 .dcard{flex:none;width:86%;scroll-snap-align:center;scroll-snap-stop:always}
+    .ddots{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:6px;font-size:11.5px;color:var(--dim)}
+    .ddots button{width:44px;height:28px;border:none;background:none;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .ddots button i{display:block;width:8px;height:8px;border-radius:5px;background:rgba(255,255,255,.25);transition:.2s}
+    .ddots button.on i{width:22px;background:linear-gradient(90deg,var(--cyan),var(--pink))}
+    body.kb header{padding-top:calc(6px + env(safe-area-inset-top))}
+    body.kb .brand p,body.kb .ou-banner{display:none}
+    body.kb .main{padding-bottom:6px}
+  }
+  /* 极矮可视区（横屏 + 键盘）：只留对话与输入框 */
+  @media (max-height:330px){header{display:none}.chips{display:none}.main{padding-top:4px;padding-bottom:4px}.composer{padding:6px 10px}.msgs{padding-top:8px}}
+</style>
+</head>
+<body>
+<div class="bgfx"></div>
+<div class="app">
+  <header>
+    <button class="hbtn menu-btn" id="navBtn" aria-label="菜单">☰</button>
+    <div class="brand"><div class="orb"></div><div><h1>运营游戏工坊</h1><p>说出需求，AI 运营专家直接给你 3 个游戏方向，选一个就生成</p></div></div>
+    <button class="hbtn model-pill" id="modelPill" title="模型设置"><i></i><span id="modelLabel">演示引擎</span></button>
+    <button class="hbtn" id="rulesBtn" title="活动规则">📜<span class="t">活动规则</span></button>
+    <button class="hbtn" id="walletBtn" title="我的权益">🎁<span class="t">我的权益</span></button>
+    <button class="hbtn" id="gearBtn" title="设置" aria-label="设置">⚙</button>
+  </header>
+  <div class="main">
+    <nav class="nav" id="nav">
+      <button class="btn newbtn" id="newChat">＋ 新的策划</button>
+      <h4>历史对话</h4>
+      <div class="scroll" id="sessList"></div>
+      <h4>我的活动 <span id="campCount"></span></h4>
+      <div class="scroll" id="campList" style="max-height:28%"></div>
+      <div class="me-card" id="meCard"></div>
+      <div class="navlinks"><button id="nMissions">✅ 任务中心<i id="nBadge"></i></button><button id="nRules">📜 活动规则</button><button id="nWallet">🎁 我的权益</button><button id="nSettings">⚙ 模型设置</button></div>
+    </nav>
+    <div class="navmask" id="navMask"></div>
+    <section class="chat">
+      <div class="msgs" id="msgs"></div>
+      <div class="composer">
+        <div class="chips" id="chips"></div>
+        <div class="inrow"><textarea id="inp" rows="1" placeholder="说出你的需求，一句话就行：比如 Intel 新品芯片上市，想拉新+话题传播"></textarea><button class="send" id="sendBtn" aria-label="发送">➤</button></div>
+      </div>
+    </section>
+    <aside class="side">
+      <div class="phone"><div class="bar"><span id="pvTitle">手机端预览</span><span id="pvOpen"></span></div><div class="empty" id="pvEmpty">🎮<br>选定方向后，这里实时预览<br>手机端效果</div><iframe id="pvFrame" title="活动预览" style="display:none" allow="clipboard-write"></iframe></div>
+    </aside>
+  </div>
+</div>
+<div class="overlay" id="overlay"><div class="frame"><div class="ob"><button class="btn ghost" id="ovClose">‹ 返回对话</button><span id="ovTitle" style="font-size:13px;color:var(--dim);flex:1;text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis"></span><a class="btn ghost" id="ovNew" target="_blank" rel="noopener" style="text-decoration:none">新窗口</a></div><iframe id="ovFrame" title="活动试玩" allow="clipboard-write"></iframe></div></div>
+
+<script src="ops-config.js"></script>
+<script src="ops-engine.js"></script>
+<script src="ops-ui.js"></script>
+<script src="ai-client.js"></script>
+<script>
+(() => {
+'use strict';
+const C = window.OPS_CONFIG, esc = OpsUI.esc, $ = (id) => document.getElementById(id);
+const CAMP_KEY = 'ops_campaigns_v1', SESS_KEY = 'ops_sessions_v1';
+
+/* ===================== AI 运营专家：系统提示词 =====================
+ * 交互约定：不追问。任何需求 → 立即给 3 个方向（JSON directions）；
+ * 用户选定方向 → 展开成完整活动配置 + 设计规格（JSON campaign）。 */
+const RULES_BRIEF = `每日免费 ${C.plays.dailyFree} 场；分享 +${C.plays.perShare} 场（日上限 ${C.plays.maxShareBonusPerDay}）+${C.share.pointsPerShare} 积分；好友经邀请链接完成首局，邀请人 +${C.share.inviterBonus}；
+游戏积分：击落 +${C.points.perKill}、精英 +${C.points.perElite}、Boss +${C.points.perBoss}、通关 +${C.points.perLevelClear}，单局上限 ${C.points.perGameCap}，日上限 ${C.points.dailyCap}；
+抽奖 ${C.lottery.costPerDraw} 积分/次（奖品与概率为示例）；连续签到 7 天递增；任务中心：${C.missions.daily.map(m => m.desc).join('、')}（每日）、${C.missions.achievements.map(m => m.desc).join('、')}（成就）；
+权益等级 ${C.tiers.map(t => t.name + '≥' + t.min).join('、')}。`;
+const SYSTEM_PROMPT = `你是「运营游戏工坊」的资深 AI 运营专家，把品牌营销需求转化为可落地的 H5 互动游戏活动。
+
+【交互铁律】绝不反问、绝不追问。信息不全时自己给出合理默认值，并在 assumptions 里用一行写明（如“默认：品牌 Intel · 目标 拉新 · 周期 4 周 · 受众 18-35 数码兴趣人群”）。
+
+【可落地的玩法模板】（format 只能取以下 id）
+- "chip-3d"：3D 闯关射击 + Boss 战，含主菜单 / 任务中心 / 产品介绍（可旋转 3D 产品模型 + 卖点卡）/ 排行榜 / 权益 / 设置
+- "poster-quiz"：AI 互动测试 / 剧情问答 → AI 生成个性化解读 + 分享海报 + 邀请裂变
+- "store-coupon"：签到 + 到店打卡 + 积分抽奖 + 到店券核销（轻量打卡 / 裂变）
+
+【平台统一运营规则】（只能引用，不得编造新数值）
+${RULES_BRIEF}
+
+【硬性约束】不得出现真实竞品品牌名、商标或 logo，对手一律用戏仿代称（如“红色多核战车”“绿色显卡巨兽”“东方麒麟”）；不收集手机号/身份证等个人信息；不涉及支付；奖品与产品参数一律写“示例”。文案中文，短、俏皮。
+
+【第一步：收到任何需求】只输出 JSON：
+{"type":"directions","assumptions":"一行默认假设","directions":[
+  {"id":"A","format":"chip-3d|poster-quiz|store-coupon","name":"方向名(≤10字)","concept":"一句话概念","why":"为什么适合这个目标","loop":"核心玩法循环（用 → 连接）","ops":["积分→抽奖、分享奖励、任务、权益等级等 3~5 条"],"sections":["主菜单","任务中心","产品介绍",...],"kpi":"目标指标","effort":"低|中|高","recommended":true|false}
+  ...共 3 个，且必须风格不同：一个 3D 动作/闯关，一个 AI 互动/剧情/测试，一个轻量 抽奖/打卡/裂变；只有 1 个 recommended=true
+]}
+
+【第二步：用户消息以“选择方向”开头时】把该方向展开，只输出 JSON：
+{"type":"campaign","campaign":{
+  "format":"同所选方向","title":"活动名(≤12字)","slogan":"(≤16字)","reason":"一句话","reply":"给运营的一两句话",
+  "mechanics":["3~5 条运营机制"],"kpis":["2~3 条"],
+  "game":{"playerName":"主角名","bosses":{"1":{"name":"戏仿代称"},"2":{"name":"…"},"3":{"name":"…"}},"colors":{"primary":"#RRGGBB"}},
+  "spec":{"menus":["菜单项…"],"tasks":[{"name":"任务","reward":"+N 积分"}],"productIntro":["卖点卡标题：一句话（示例文案）"],"rules":["规则要点"],"rewards":["奖励/权益要点（示例）"],"timeline":["阶段：做什么"]}
+}}`;
+
+/* ===================== 演示规则引擎（无模型 / 调用失败时同样遵守“3 方向 → 选定展开”） ===================== */
+const FMT_ORDER = ['chip-3d', 'poster-quiz', 'store-coupon'];
+const DIR_TPL = {
+  'chip-3d': { name: '3D 芯片争霸', concept: '驾驶新品芯片低空穿越晶圆城市，三关 Boss 战，卖点即升级道具。', loop: '出战 → 击落杂讯攒积分 → 捡「制程/核心/NPU」道具变强 → Boss 战 → 结算抽奖 → 分享加场再战',
+    ops: ['积分 → 抽奖（' + C.lottery.costPerDraw + '/次，示例奖池）', '分享 +' + C.plays.perShare + ' 场 +' + C.share.pointsPerShare + ' 积分，邀请首局 +' + C.share.inviterBonus, '任务中心：每日 / 每周 / 成就', '铜→银→金权益：加场、抽奖折扣'],
+    sections: ['主菜单', '任务中心', '产品介绍（3D 模型）', '排行榜', '我的权益', '设置 / 暂停'], kpi: '参与 UV、人均 2.5 局、分享率 ≥ 15%', effort: '中' },
+  'poster-quiz': { name: 'AI 芯片人格', concept: '5 道趣味题测出你的“芯片人格”，AI 现写专属解读，一键生成海报去晒。', loop: '答题 → AI 生成人格解读 → 生成海报 → 分享/邀请 → 积分抽奖',
+    ops: ['完成测试 +' + C.tasks.quizDone.points + ' 积分（每日 1 次）', '海报带二维码 + 邀请码，好友参与邀请人 +' + C.share.inviterBonus, '分享 +' + C.share.pointsPerShare + ' 积分', '积分可抽奖，权益等级共享'],
+    sections: ['测试首页', 'AI 解读结果', '分享海报', '抽奖', '我的权益', '活动规则'], kpi: '海报生成数、分享率 ≥ 25%、K 因子 ≥ 0.4', effort: '低' },
+  'store-coupon': { name: '芯店打卡季', concept: '线上签到 + 到店扫码打卡攒积分，积分换到店券、抽好礼，店员扫码核销。', loop: '签到 → 到店扫码打卡 → 积分换券 / 抽奖 → 到店核销 → 分享拉新',
+    ops: ['连签 7 天递增（' + C.checkin.rewards[0] + '→' + C.checkin.rewards[6] + ' 积分）', '到店打卡 +' + C.tasks.storeScan.points + ' 积分', C.store.couponCost + ' 积分换到店券（示例）', '分享 / 邀请奖励同平台规则'],
+    sections: ['任务首页', '签到日历', '到店打卡', '抽奖', '我的券包（核销）', '活动规则'], kpi: '到店打卡人数、券核销率 ≥ 30%', effort: '低' },
+};
+function detect(text) {
+  const t = text.toLowerCase(); const sc = { 'chip-3d': 0, 'poster-quiz': 0, 'store-coupon': 0 };
+  Object.entries(C.formats).forEach(([id, f]) => { sc[id] += f.goals.filter(g => t.includes(g.toLowerCase())).length; });
+  if (/3d|闯关|游戏|boss|射击|新品|上市|发布|拉新|促活|动作/.test(t)) sc['chip-3d'] += 2;
+  if (/门店|到店|线下|核销|券|引流|客流|打卡|签到/.test(t)) sc['store-coupon'] += 2;
+  if (/曝光|裂变|转发|分享|传播|海报|测试|种草|社交|剧情|ai 互动|人格/.test(t)) sc['poster-quiz'] += 2;
+  const best = Object.keys(sc).sort((a, b) => sc[b] - sc[a])[0];
+  return { best: sc[best] > 0 ? best : 'chip-3d', matched: sc[best] > 0 };
+}
+function assumptionsFor(text) {
+  const brand = /intel|英特尔|酷睿|ultra/i.test(text) ? 'Intel 新品芯片' : (/芯片|处理器|cpu/i.test(text) ? '新品芯片' : '你的品牌/新品（可随时改）');
+  const goal = /门店|到店|线下|客流/.test(text) ? '门店引流' : /曝光|裂变|传播|分享|转发/.test(text) ? '品牌曝光裂变' : /促活|老用户|召回/.test(text) ? '老用户促活' : '新品上市拉新';
+  const period = (text.match(/(\d+)\s*(天|周|个月)/) || [])[0] || '4 周';
+  return `默认：品牌 ${brand} · 目标 ${goal} · 周期 ${period} · 受众 18-35 岁数码兴趣人群 · 渠道 微信/小红书 H5 · 奖品均为示例`;
+}
+function demoDirections(text) {
+  const { best } = detect(text);
+  const why = {
+    'chip-3d': best === 'chip-3d' ? '新品上市要“第一眼惊艳 + 记住卖点”：卖点做成道具，Boss 战自带话题，重度玩法拉时长。' : '重度玩法拉长停留与复访，适合作为活动主会场。',
+    'poster-quiz': best === 'poster-quiz' ? '曝光裂变靠“晒”：结果个性化，用户自发转发，邀请码把新人带回来。' : '门槛最低、传播最快，可作为引流入口把人导到主玩法。',
+    'store-coupon': best === 'store-coupon' ? '门店引流看到店：签到养习惯，到店打卡给积分，积分换券再核销，形成闭环。' : '把线上热度转成线下到店与券核销，补齐转化环节。',
+  };
+  return { type: 'directions', assumptions: assumptionsFor(text), directions: FMT_ORDER.map((f, i) => Object.assign({ id: 'ABC'[i], format: f, why: why[f], recommended: f === best }, DIR_TPL[f])) };
+}
+const DEMO_CAMP = {
+  'chip-3d': { title: '芯片争霸 3D', slogan: '新芯出阵，制程为刃', reason: '3D 闯关 + Boss 战，卖点即道具，话题与时长兼得。', reply: '已按“3D 芯片争霸”展开：菜单、任务、产品介绍、规则和奖励都配好了，右侧/弹窗可直接试玩。',
+    kpis: ['参与 UV / 新增用户', '人均 2.5 局', '分享率 ≥ 15%'], menus: ['开始游戏', '任务中心', '产品介绍（可旋转 3D 芯片 + 6 张卖点卡）', '排行榜', '我的权益', '设置（音效 / 画质 / 震动 / 鼠标跟随）', '暂停菜单'],
+    productIntro: ['CPU · 混合架构：性能核 + 能效核（示例文案）', 'GPU · 新一代核显：光追 / AI 超分（示例文案）', 'NPU · AI 引擎：端侧 AI 加速（示例文案）', '制程工艺：先进制程（示例文案）', '能效表现：更长续航（示例文案）', 'AI 算力：CPU+GPU+NPU 协同（示例文案）'] },
+  'poster-quiz': { title: '你是哪颗芯？', slogan: '测出你的芯片人格', reason: '测试 + AI 解读 + 海报，低门槛高传播。', reply: '已按“AI 芯片人格”展开：接入模型后人格解读由 AI 实时生成，海报自带邀请码。',
+    kpis: ['海报生成数', '分享率 ≥ 25%', 'K 因子 ≥ 0.4'], menus: ['测试首页', '答题（5 题）', 'AI 解读结果', '分享海报', '抽奖', '我的权益'],
+    productIntro: ['结果页挂 4 种人格对应卖点：性能 / 能效 / AI / 混合架构（示例文案）'] },
+  'store-coupon': { title: '芯店打卡季', slogan: '到店点亮新芯，好礼当场拿', reason: '签到 + 到店打卡 + 换券核销，线上线下闭环。', reply: '已按“芯店打卡季”展开：核销为演示流程，正式版需接门店系统。',
+    kpis: ['到店打卡人数', '券领取率 / 核销率', '门店客流增量'], menus: ['任务首页', '签到日历', '到店扫码打卡', '积分抽奖', '我的券包（核销码）', '活动规则'],
+    productIntro: ['门店体验区卖点海报 + 打卡点讲解（示例文案）'] },
+};
+function demoCampaign(dir) {
+  const d = DEMO_CAMP[dir.format] || DEMO_CAMP['chip-3d'];
+  const tasks = dir.format === 'chip-3d' ? [...C.missions.daily, ...C.missions.weekly, ...C.missions.achievements].map(m => ({ name: m.desc, reward: '+' + m.points + ' 积分' }))
+    : dir.format === 'poster-quiz' ? [{ name: C.tasks.quizDone.name, reward: '+' + C.tasks.quizDone.points + ' 积分' }, { name: '分享海报', reward: '+' + C.share.pointsPerShare + ' 积分' }, { name: '邀请好友完成首局', reward: '+' + C.share.inviterBonus + ' 积分' }]
+    : [{ name: '每日签到', reward: C.checkin.rewards[0] + '~' + C.checkin.rewards[6] + ' 积分' }, { name: C.tasks.storeScan.name, reward: '+' + C.tasks.storeScan.points + ' 积分' }, { name: '分享给好友', reward: '+' + C.share.pointsPerShare + ' 积分' }];
+  return { type: 'campaign', campaign: {
+    format: dir.format, title: d.title, slogan: d.slogan, reason: d.reason, reply: d.reply, mechanics: dir.ops, kpis: d.kpis, game: {},
+    spec: { menus: d.menus, tasks, productIntro: d.productIntro,
+      rules: [`每日 ${C.plays.dailyFree} 场免费，分享 +${C.plays.perShare} 场（日上限 ${C.plays.maxShareBonusPerDay}）`, `游戏积分单局上限 ${C.points.perGameCap}、日上限 ${C.points.dailyCap}`, `抽奖 ${C.lottery.costPerDraw} 积分/次，每日 ${C.lottery.dailyDrawCap} 次`, '正式版：服务端校验积分、服务端抽奖、设备/账号限频'],
+      rewards: [...C.lottery.prizes.filter(p => p.kind !== 'none').map(p => p.tier + '：' + p.name), ...C.tiers.map(t => t.icon + t.name + '：' + t.perks.join('、'))],
+      timeline: C.strategy.phases.map(p => p.name + '：' + p.text) } } };
+}
+
+/* ===================== 校验 / 清洗（品牌安全） ===================== */
+const BANNED = /nvidia|英伟达|amd|超威|huawei|华为|麒麟芯|apple|苹果|高通|qualcomm|联发科|mediatek/i;
+const S_ = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');
+const arr = (v, n, len) => (Array.isArray(v) ? v : []).slice(0, n).map(x => S_(typeof x === 'string' ? x : JSON.stringify(x), len)).filter(Boolean).filter(x => !BANNED.test(x));
+function sanitizeDirections(j) {
+  const ds = (j && Array.isArray(j.directions) ? j.directions : []).slice(0, 3).map((d, i) => {
+    const f = C.formats[d.format] ? d.format : FMT_ORDER[i]; const tpl = DIR_TPL[f];
+    const pick = (k, n) => { const v = S_(d[k], n); return v && !BANNED.test(v) ? v : tpl[k]; };
+    return { id: 'ABC'[i], format: f, name: pick('name', 14), concept: pick('concept', 60), why: S_(d.why, 80) || '', loop: pick('loop', 90), ops: arr(d.ops, 5, 50).length ? arr(d.ops, 5, 50) : tpl.ops, sections: arr(d.sections, 8, 20).length ? arr(d.sections, 8, 20) : tpl.sections, kpi: pick('kpi', 50), effort: ['低', '中', '高'].includes(d.effort) ? d.effort : tpl.effort, recommended: !!d.recommended };
+  });
+  if (ds.length < 3) throw new Error('模型返回的方向不足 3 个');
+  if (ds.filter(d => d.recommended).length !== 1) ds.forEach((d, i) => d.recommended = i === 0);
+  return { assumptions: S_(j.assumptions, 120) || '默认：按通用新品上市活动配置', directions: ds };
+}
+function sanitizeCampaign(c, dir) {
+  c = c || {}; const f = C.formats[c.format] ? c.format : dir.format, d = DEMO_CAMP[f];
+  const out = { format: f, title: S_(c.title, 16) || d.title, slogan: S_(c.slogan, 24) || d.slogan, reason: S_(c.reason, 80) || d.reason, reply: S_(c.reply, 120), mechanics: arr(c.mechanics, 6, 60), kpis: arr(c.kpis, 4, 40) };
+  if (!out.mechanics.length) out.mechanics = dir.ops; if (!out.kpis.length) out.kpis = d.kpis;
+  if (BANNED.test(out.title + out.slogan)) { out.title = d.title; out.slogan = d.slogan; }
+  const g = c.game || {}; out.game = {};
+  if (S_(g.playerName, 12) && !BANNED.test(g.playerName)) out.game.playerName = S_(g.playerName, 12);
+  if (g.bosses) { out.game.bosses = {}; [1, 2, 3].forEach(i => { const n = g.bosses[i] && S_(g.bosses[i].name, 12); if (n && !BANNED.test(n)) out.game.bosses[i] = { name: n }; }); }
+  if (g.colors && /^#[0-9a-f]{6}$/i.test(g.colors.primary || '')) out.game.colors = { primary: g.colors.primary };
+  const sp = c.spec || {}, dflt = demoCampaign(dir).campaign.spec;
+  out.spec = { menus: arr(sp.menus, 10, 40), tasks: (Array.isArray(sp.tasks) ? sp.tasks : []).slice(0, 14).map(t => ({ name: S_(t && t.name, 30), reward: S_(t && t.reward, 20) })).filter(t => t.name && !BANNED.test(t.name)), productIntro: arr(sp.productIntro, 8, 60), rules: arr(sp.rules, 8, 70), rewards: arr(sp.rewards, 10, 60), timeline: arr(sp.timeline, 6, 70) };
+  Object.keys(out.spec).forEach(k => { if (!out.spec[k].length) out.spec[k] = dflt[k]; });
+  return out;
+}
+
+/* ===================== 会话存储 ===================== */
+function loadJSON(k, d) { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } }
+let sessions = loadJSON(SESS_KEY, []);
+let cur = null;
+function saveSessions() { localStorage.setItem(SESS_KEY, JSON.stringify(sessions.slice(0, 30))); renderNav(); }
+function newSession() { cur = { id: 's' + Date.now().toString(36), title: '新的策划', t: Date.now(), items: [], history: [] }; sessions.unshift(cur); renderSession(); renderNav(); }
+function pushItem(it) { cur.items.push(it); cur.t = Date.now(); saveSessions(); }
+function loadCamps() { return loadJSON(CAMP_KEY, []); }
+function saveCamp(c) { const l = loadCamps(); l.unshift(c); localStorage.setItem(CAMP_KEY, JSON.stringify(l.slice(0, 30))); renderNav(); }
+
+/* ===================== 消息渲染 ===================== */
+const msgs = $('msgs'), inp = $('inp'), sendBtn = $('sendBtn');
+/* 键盘弹出：用 visualViewport 把整页高度贴到可视区，输入框始终在键盘上方 */
+(function stickyComposer() {
+  const vv = window.visualViewport; if (!vv) return;
+  const app = document.querySelector('.app');
+  const apply = () => {
+    const kb = innerHeight - vv.height > 120;
+    document.documentElement.style.setProperty('--vvh', vv.height + 'px');
+    app.style.transform = vv.offsetTop ? `translateY(${vv.offsetTop}px)` : '';
+    document.body.classList.toggle('kb', kb);
+    if (kb && document.activeElement === inp) msgs.scrollTop = msgs.scrollHeight;
+  };
+  vv.addEventListener('resize', apply); vv.addEventListener('scroll', apply); apply();
+  inp.addEventListener('focus', () => setTimeout(() => { apply(); window.scrollTo(0, 0); }, 250));
+})();
+function scroll() { requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; }); }
+function bubble(who, html, wide) {
+  const d = document.createElement('div'); d.className = 'msg ' + (who === 'me' ? 'me' : 'ai');
+  d.innerHTML = who === 'me' ? `<div class="bub">${html}</div>` : `<div class="av">AI</div><div class="bub" ${wide ? 'style="max-width:min(96%,1100px);width:100%"' : ''}>${html}</div>`;
+  msgs.appendChild(d); scroll(); return d;
+}
+function sysLine(text) { const d = document.createElement('div'); d.className = 'sys'; d.textContent = text; msgs.appendChild(d); scroll(); }
+function welcome() {
+  bubble('ai', `嗨，我是你的 <span class="hl">AI 运营专家</span> 👋<br>直接说需求就行，一句话也可以。我不会反问，缺的信息按常规默认补齐，马上给你 <b>3 个不同的游戏方向</b>：3D 动作闯关、AI 互动测试、轻量打卡抽奖裂变。选一个，我就展开成完整活动，包括菜单、任务、产品介绍、规则和奖励，并打开试玩。<br><span style="color:var(--dim);font-size:12.5px">当前：${AIClient.configured() ? '已接入 ' + esc(AIClient.label()) : '演示规则引擎（点 ⚙ 接入 Astra 6.2 等模型）'}</span>`);
+}
+function renderItem(it) {
+  if (it.k === 'me') bubble('me', esc(it.text));
+  else if (it.k === 'sys') sysLine(it.text);
+  else if (it.k === 'dirs') renderDirections(it);
+  else if (it.k === 'camp') renderCampaign(it.camp);
+}
+function renderSession() { msgs.innerHTML = ''; welcome(); cur.items.forEach(renderItem); }
+function thinking(steps) {
+  const d = bubble('ai', `<div class="think">${steps.map(s => `<span>${s}</span>`).join('')}<em class="dots" style="font-style:normal">AI 运营专家策划中</em></div>`);
+  const sp = d.querySelectorAll('.think span'); let i = 0; const iv = setInterval(() => { if (i < sp.length) sp[i++].classList.add('on'); }, 360);
+  return { done() { clearInterval(iv); d.remove(); } };
+}
+function renderDirections(it) {
+  const html = `给你 3 个方向，挑一个我马上展开 👇<div class="assume">📌 ${esc(it.assumptions)}</div>
+  <div class="dirs wide3">${it.directions.map(d => `<div class="dcard ${d.recommended ? 'rec' : ''} ${it.chosen === d.id ? 'chosen' : it.chosen ? 'dim' : ''}" data-id="${d.id}">
+    <div class="dh"><span class="dl">${d.id}</span><span class="dn">${esc(d.name)}</span>${d.recommended ? '<span class="pill rec">★ 推荐</span>' : ''}<span class="pill">${esc(C.formats[d.format].tag)}</span><span class="pill eff">工作量 ${esc(d.effort)}</span></div>
+    <div class="concept">${esc(d.concept)}</div>
+    <div><span class="k">为什么适合：</span>${esc(d.why)}</div>
+    <div><span class="k">核心循环：</span>${esc(d.loop)}</div>
+    <div><span class="k">运营机制：</span><div class="tags">${d.ops.map(o => `<span>${esc(o)}</span>`).join('')}</div></div>
+    <div><span class="k">包含模块：</span><div class="tags">${d.sections.map(o => `<span>${esc(o)}</span>`).join('')}</div></div>
+    <div><span class="k">目标 KPI：</span>${esc(d.kpi)}</div>
+    <button class="btn ${it.chosen === d.id ? '' : 'ghost'}" data-pick="${d.id}" ${it.chosen ? 'disabled' : ''}>${it.chosen === d.id ? '✓ 已选择' : '选这个方向'}</button>
+  </div>`).join('')}</div><div class="ddots" aria-label="方向切换">${it.directions.map((d, i) => `<button data-dot="${i}" aria-label="方向 ${d.id}"><i></i></button>`).join('')}<span>左右滑动看 3 个方向</span></div>`;
+  const el = bubble('ai', html, true);
+  const track = el.querySelector('.dirs'), dots = [...el.querySelectorAll('[data-dot]')];
+  const cardsEl = [...track.querySelectorAll('.dcard')];
+  const syncDots = () => { const c = track.scrollLeft + track.clientWidth / 2; let best = 0, bd = 1e9; cardsEl.forEach((cd, i) => { const m = cd.offsetLeft + cd.offsetWidth / 2 - track.offsetLeft, d = Math.abs(m - c); if (d < bd) { bd = d; best = i; } }); dots.forEach((d, i) => d.classList.toggle('on', i === best)); };
+  track.addEventListener('scroll', () => requestAnimationFrame(syncDots), { passive: true });
+  dots.forEach((d, i) => d.onclick = () => cardsEl[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }));
+  const startIdx = Math.max(0, it.chosen ? it.directions.findIndex(d => d.id === it.chosen) : 0);
+  requestAnimationFrame(() => { if (track.scrollWidth > track.clientWidth + 4) track.scrollLeft = cardsEl[startIdx].offsetLeft - track.offsetLeft - 13; syncDots(); });
+  requestAnimationFrame(() => requestAnimationFrame(() => { msgs.scrollTop = el.offsetTop - 8; }));
+  el.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => pickDirection(it, b.dataset.pick, el));
+}
+function campaignURL(c) { return C.formats[c.format].url + '?cfg=' + btoa(unescape(encodeURIComponent(JSON.stringify(Object.assign({ title: c.title, subtitle: c.slogan }, c.game || {}))))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function specHTML(sp) {
+  const L = (a) => a.map(x => '· ' + esc(x)).join('<br>');
+  return `<details class="spec" open><summary>📐 设计规格（菜单 / 任务 / 产品介绍 / 规则 / 奖励 / 节奏）</summary>
+    <h6>🧭 菜单结构</h6>${L(sp.menus)}
+    <h6>✅ 任务列表</h6>${sp.tasks.map(t => '· ' + esc(t.name) + ' <b style="color:#ffd166">' + esc(t.reward) + '</b>').join('<br>')}
+    <h6>💠 产品介绍</h6>${L(sp.productIntro)}<br><span style="color:#ffcf6e;font-size:11.5px">⚠ 示例文案，请替换为官方参数</span>
+    <h6>📜 规则要点</h6>${L(sp.rules)}
+    <h6>🎁 奖励与权益（示例）</h6>${L(sp.rewards)}
+    <h6>📅 运营节奏</h6>${L(sp.timeline)}</details>`;
+}
+function renderCampaign(c) {
+  const f = C.formats[c.format];
+  const html = `已展开：<span class="hl">${esc(f.name)}</span> · ${esc(c.reason)}${c.reply ? `<br><span style="color:#cdd8f4">${esc(c.reply)}</span>` : ''}
+  <div class="ccard" data-id="${c.id}">
+    <span class="ctag">${esc(f.tag)}</span><span class="ctag" style="border-color:rgba(255,79,216,.5);color:#ff9be9">${esc(f.name)}</span>
+    <div class="ctitle">${esc(c.title)}</div><div class="cslogan">${esc(c.slogan)}</div>
+    <div class="cgrid">
+      <div class="cbox full"><h5>⚙ 运营机制</h5>${c.mechanics.map(m => '· ' + esc(m)).join('<br>')}</div>
+      <div class="cbox"><h5>🎯 目标指标</h5>${c.kpis.map(m => '· ' + esc(m)).join('<br>')}</div>
+      <div class="cbox"><h5>🏅 权益</h5>${C.tiers.map(t => t.icon + ' ' + esc(t.name) + ' ≥' + t.min).join('<br>')}</div>
+      ${c.game && c.game.bosses && Object.keys(c.game.bosses).length ? `<div class="cbox full"><h5>👾 Boss（戏仿代称）</h5>${Object.values(c.game.bosses).map(b => esc(b.name)).join(' → ')}</div>` : ''}
+    </div>
+    ${specHTML(c.spec)}
+    <div class="cact" style="margin-top:10px"><button class="btn play" data-act="play">▶ 预览试玩</button><button class="btn ghost" data-act="pc">🖥 电脑版</button><button class="btn ghost" data-act="rules">规则</button><button class="btn ghost" data-act="copy">复制链接</button></div>
+    <div class="src">${c.source === 'llm' ? '🤖 由 ' + esc(c.model) + ' 生成' : '🧪 演示规则引擎生成（未接模型）'} · ${new Date(c.t).toLocaleString('zh-CN', { hour12: false })}</div>
+  </div>`;
+  const d = bubble('ai', html, true);
+  d.querySelectorAll('[data-act]').forEach(b => b.onclick = async () => {
+    const a = b.dataset.act;
+    if (a === 'play') openPreview(c, true);
+    if (a === 'pc') openPreview(c, true, true);
+    if (a === 'rules') OpsUI.openRules();
+    if (a === 'copy') { const ok = await OpsUI.copyText(new URL(campaignURL(c), location.href).toString()); OpsUI.toast(ok ? '活动链接已复制' : '复制失败'); }
+  });
+}
+
+/* ===================== 对话流程 ===================== */
+let busy = false;
+async function callModel(userText, steps) {
+  cur.history.push({ role: 'user', content: userText });
+  const th = thinking(steps);
+  try {
+    const content = await AIClient.chat([{ role: 'system', content: SYSTEM_PROMPT }, ...cur.history.slice(-8)], { maxTokens: 2400, timeout: 45000 });
+    const j = AIClient.extractJSON(content); cur.history.push({ role: 'assistant', content: JSON.stringify(j) });
+    th.done(); return j;
+  } catch (e) { th.done(); cur.history.pop(); throw e; }
+}
+async function send(text) {
+  text = (text || inp.value).trim(); if (!text || busy) return;
+  busy = true; sendBtn.disabled = true; inp.value = ''; autoGrow();
+  if (cur.items.length === 0) cur.title = text.slice(0, 22);
+  bubble('me', esc(text)); pushItem({ k: 'me', text });
+  const steps = ['解析需求，补齐默认值', '发散 3 个差异化方向', '为每个方向配运营机制'];
+  let res = null, source = 'demo';
+  if (AIClient.configured()) {
+    try { res = sanitizeDirections(await callModel(text, steps)); source = 'llm'; }
+    catch (e) { const m = '模型调用失败：' + e.message + ' → 已回退到演示规则引擎'; sysLine(m); pushItem({ k: 'sys', text: m }); console.warn('[AI]', e.message); }
+  }
+  if (!res) { const th = thinking(steps); await new Promise(r => setTimeout(r, 1300)); th.done(); res = sanitizeDirections(demoDirections(text)); cur.history.push({ role: 'user', content: text }, { role: 'assistant', content: JSON.stringify(Object.assign({ type: 'directions' }, res)) }); }
+  const it = { k: 'dirs', assumptions: res.assumptions, directions: res.directions, chosen: null, source, goal: text };
+  renderDirections(it); pushItem(it);
+  busy = false; sendBtn.disabled = false;
+}
+async function pickDirection(it, id, el) {
+  if (busy || it.chosen) return; busy = true; sendBtn.disabled = true;
+  const dir = it.directions.find(d => d.id === id); it.chosen = id; saveSessions();
+  el.remove(); renderDirections(it);
+  const msg = `选择方向 ${id}：${dir.name}`;
+  bubble('me', esc(msg)); pushItem({ k: 'me', text: msg });
+  const steps = ['展开玩法与菜单结构', '生成任务 / 产品介绍 / 规则', '配置奖励与运营节奏', '生成试玩链接'];
+  let camp = null, source = 'demo';
+  if (AIClient.configured()) {
+    try { const j = await callModel(msg + '\n' + JSON.stringify(dir), steps); camp = sanitizeCampaign(j.campaign || j, dir); source = 'llm'; }
+    catch (e) { const m = '模型调用失败：' + e.message + ' → 已回退到演示规则引擎'; sysLine(m); pushItem({ k: 'sys', text: m }); }
+  }
+  if (!camp) { const th = thinking(steps); await new Promise(r => setTimeout(r, 1300)); th.done(); camp = sanitizeCampaign(demoCampaign(dir).campaign, dir); }
+  Object.assign(camp, { id: 'c' + Date.now().toString(36), t: Date.now(), source, model: AIClient.label(), goal: it.goal, direction: dir.name });
+  renderCampaign(camp); pushItem({ k: 'camp', camp }); saveCamp(camp);
+  openPreview(camp, !matchMedia('(min-width:1000px)').matches);
+  busy = false; sendBtn.disabled = false;
+}
+
+/* ===================== 预览 ===================== */
+function openPreview(c, full, wide) {
+  const url = campaignURL(c);
+  if (!full && matchMedia('(min-width:1000px)').matches) {
+    $('pvEmpty').style.display = 'none'; const f = $('pvFrame'); f.style.display = 'block'; if (f.getAttribute('src') !== url) f.src = url;
+    $('pvTitle').textContent = c.title; $('pvOpen').innerHTML = `<a href="#" id="pvWide" style="color:#7af3ff;margin-right:10px">🖥 电脑版</a><a href="${esc(url)}" target="_blank" rel="noopener" style="color:#7af3ff">新窗口 ↗</a>`;
+    $('pvWide').onclick = (e) => { e.preventDefault(); openPreview(c, true, true); };
+    return;
+  }
+  $('overlay').classList.toggle('wide', !!wide);
+  $('ovFrame').src = url; $('ovTitle').textContent = c.title + (wide ? ' · 电脑版' : ''); $('ovNew').href = url; $('overlay').classList.add('on');
+}
+$('ovClose').onclick = () => { $('overlay').classList.remove('on'); $('ovFrame').src = 'about:blank'; };
+
+/* ===================== 侧边栏 ===================== */
+function renderNav() {
+  const fmtT = (t) => new Date(t).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+  $('sessList').innerHTML = sessions.length ? sessions.map(x => `<div class="sitem ${cur && x.id === cur.id ? 'on' : ''}" data-s="${x.id}"><span class="tt">${esc(x.title)}</span><small>${fmtT(x.t)} · ${x.items.filter(i => i.k === 'camp').length ? '已生成活动' : x.items.length ? '方向待选' : '空'}</small></div>`).join('') : '<p style="font-size:12px;color:var(--dim);padding:4px 8px">暂无</p>';
+  $('sessList').querySelectorAll('[data-s]').forEach(el => el.onclick = () => { cur = sessions.find(x => x.id === el.dataset.s); renderSession(); renderNav(); closeNav(); });
+  const l = loadCamps(); $('campCount').textContent = l.length || '';
+  $('campList').innerHTML = l.length ? l.map((c, i) => `<div class="sitem" data-c="${i}"><span class="tt">${c.source === 'llm' ? '🤖' : '🧪'} ${esc(c.title)}</span><small>${esc(C.formats[c.format].name)}</small></div>`).join('') : '<p style="font-size:12px;color:var(--dim);padding:4px 8px">选定方向后出现在这里</p>';
+  $('campList').querySelectorAll('[data-c]').forEach(el => el.onclick = () => { openPreview(l[+el.dataset.c], !matchMedia('(min-width:1000px)').matches); closeNav(); });
+  const t = Ops.tier(); $('meCard').innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><span><b>${Ops.state.points}</b> 积分</span><span style="color:${t.color};font-weight:800">${t.icon} ${t.name}</span></div><div style="color:var(--dim);margin-top:2px">今日剩余 ${Ops.playsLeft()} 场 · 我的玩家视角（演示）</div>`;
+  $('nBadge').textContent = Ops.claimableCount() || '';
+}
+const openNav = () => { $('nav').classList.add('open'); $('navMask').classList.add('on'); };
+const closeNav = () => { $('nav').classList.remove('open'); $('navMask').classList.remove('on'); };
+$('navBtn').onclick = openNav; $('navMask').onclick = closeNav;
+$('newChat').onclick = () => { if (cur && cur.items.length === 0) { closeNav(); return; } newSession(); closeNav(); };
+$('nMissions').onclick = () => { closeNav(); OpsUI.openMissions({ onClose: renderNav }); };
+$('nRules').onclick = () => { closeNav(); OpsUI.openRules(); };
+$('nWallet').onclick = () => { closeNav(); OpsUI.openWallet({ onChange: renderNav }); };
+$('nSettings').onclick = () => { closeNav(); openSettings(); };
+addEventListener('ops:change', renderNav);
+
+/* ===================== 设置面板 ===================== */
+function refreshPill() {
+  const live = AIClient.configured();
+  $('modelPill').classList.toggle('live', live);
+  $('modelLabel').textContent = live ? AIClient.label() : '演示引擎';
+  $('modelPill').title = live ? '已接入模型：' + AIClient.get().model : '未配置模型 Key，当前用演示规则引擎';
+}
+function openSettings() {
+  const s = AIClient.get();
+  const opts = AIClient.PRESETS.map(p => `<option value="${p.id}" ${p.id === s.preset ? 'selected' : ''}>${esc(p.label)}${p.note ? ' · ' + esc(p.note) : ''}</option>`).join('');
+  const html = `<div class="form">
+    <div class="ou-warn">⚠ API Key 只保存在本机浏览器 localStorage。前端页面放 Key 仅限演示，正式上线请走你自己的后端代理。</div>
+    <label>模型预设</label><select id="fPreset">${opts}</select>
+    <div class="hint" id="fPresetNote"></div>
+    <label>API Base URL（OpenAI 兼容）</label><input id="fBase" placeholder="https://api.openai.com/v1" value="${esc(s.base)}" autocomplete="off" />
+    <div class="hint">请求地址 = Base URL + /chat/completions</div>
+    <label>模型 ID</label><input id="fModel" placeholder="gpt-6.2-astra" value="${esc(s.model)}" autocomplete="off" />
+    <label>API Key</label><div class="kv"><input id="fKey" type="password" placeholder="sk-..." value="${esc(s.key)}" autocomplete="off" /><button class="btn ghost" id="fShow" type="button">显示</button></div>
+    <label>Temperature</label><input id="fTemp" type="number" min="0" max="2" step="0.1" value="${esc(s.temperature)}" />
+    <div class="switch"><input type="checkbox" id="fOn" ${s.enabled ? 'checked' : ''}/><span>启用模型（关闭则始终用演示规则引擎）</span></div>
+    <div class="hint" style="margin-top:10px">部分厂商不允许浏览器直连（CORS），调用会失败；失败时会显示原因并自动回退演示引擎。</div>
+    <div class="tstat" id="fStat"></div>
+    <div class="ou-row" style="margin-top:12px"><button class="btn ghost" id="fTest" type="button">测试连接</button><button class="btn" id="fSave" type="button">保存</button></div>
+    <details style="margin-top:12px"><summary style="font-size:12.5px;color:var(--dim);cursor:pointer">查看 AI 运营专家系统提示词</summary><pre style="white-space:pre-wrap;font-size:11.5px;color:#b9c8ec;margin-top:8px;max-height:260px;overflow:auto">${esc(SYSTEM_PROMPT)}</pre></details>
+  </div>`;
+  OpsUI.sheet('模型设置', html, (api) => {
+    const q = (id) => api.body.querySelector('#' + id);
+    const note = () => { const p = AIClient.PRESETS.find(x => x.id === q('fPreset').value); q('fPresetNote').textContent = p ? (p.id === 'custom' ? '自定义：手动填写 Base URL 与模型 ID' : `${p.label}｜${p.model}｜${p.note}`) : ''; };
+    note();
+    q('fPreset').onchange = () => { const p = AIClient.PRESETS.find(x => x.id === q('fPreset').value); if (p && p.id !== 'custom') { q('fBase').value = p.base; q('fModel').value = p.model; } note(); };
+    const markCustom = () => { const p = AIClient.PRESETS.find(x => x.id === q('fPreset').value); if (p && p.id !== 'custom' && (q('fBase').value !== p.base || q('fModel').value !== p.model)) { q('fPreset').value = 'custom'; note(); } };
+    q('fBase').oninput = markCustom; q('fModel').oninput = markCustom;
+    q('fShow').onclick = () => { const k = q('fKey'); k.type = k.type === 'password' ? 'text' : 'password'; q('fShow').textContent = k.type === 'password' ? '显示' : '隐藏'; };
+    const collect = () => ({ preset: q('fPreset').value, base: q('fBase').value.trim(), model: q('fModel').value.trim(), key: q('fKey').value.trim(), temperature: parseFloat(q('fTemp').value) || 0.7, enabled: q('fOn').checked });
+    q('fSave').onclick = () => { AIClient.set(collect()); refreshPill(); OpsUI.toast(AIClient.configured() ? '已保存，后续对话由 ' + AIClient.label() + ' 生成' : '已保存（未填 Key，使用演示引擎）'); api.close(); };
+    q('fTest').onclick = async () => {
+      const prev = AIClient.get(); AIClient.set(Object.assign(collect(), { enabled: true }));
+      q('fStat').style.color = '#8c9cc4'; q('fStat').textContent = '连接中…';
+      try { const r = await AIClient.chat([{ role: 'user', content: '只回复：OK' }], { maxTokens: 10, timeout: 15000 }); q('fStat').style.color = '#3dff9a'; q('fStat').textContent = '✓ 连接成功：' + r.slice(0, 40); }
+      catch (e) { q('fStat').style.color = '#ff6b8a'; q('fStat').textContent = '✗ ' + e.message; }
+      AIClient.set(prev);
+    };
+  });
+}
+
+
+/* ===================== 初始化 ===================== */
+const CHIPS = ['新品上市拉新', '门店引流', '品牌曝光裂变', 'Intel 新品芯片上线，要有 3D 打 Boss', '双 11 促活老用户', '线下体验店周末客流'];
+$('chips').innerHTML = CHIPS.map(c => `<button class="chip">${esc(c)}</button>`).join('');
+$('chips').querySelectorAll('.chip').forEach(b => b.onclick = () => send(b.textContent));
+function autoGrow() { inp.style.height = 'auto'; inp.style.height = Math.min(130, inp.scrollHeight) + 'px'; }
+inp.addEventListener('input', autoGrow);
+inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(); } });
+sendBtn.onclick = () => send();
+$('gearBtn').onclick = $('modelPill').onclick = openSettings;
+$('rulesBtn').onclick = () => OpsUI.openRules();
+$('walletBtn').onclick = () => OpsUI.openWallet({ onChange: renderNav, share: { title: C.campaignName, subtitle: '新芯出阵，制程为刃', cta: '扫码来玩芯片争霸！' } });
+OpsUI.banner();
+refreshPill();
+if (sessions.length && sessions[0].items.length === 0) cur = sessions[0]; else newSession();
+renderSession(); renderNav();
+window.__platform = { send, pickDirection, demoDirections, demoCampaign, sanitizeDirections, sanitizeCampaign, campaignURL, SYSTEM_PROMPT, get cur() { return cur; } };
+})();
+</script>
+</body>
+</html>
