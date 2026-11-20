@@ -141,35 +141,37 @@
   h4 .tag{margin-left:6px;vertical-align:middle}
 </style>
 <link rel="stylesheet" href="skin-plan.css" />
+<script src="shell.js"></script>
 </head>
 <body>
 <div class="bgfx"></div>
+<aside class="k-rail" id="kRail" aria-label="主导航"></aside>
+<div class="k-app">
+<header class="k-topbar"><div class="k-wordmark">运营游戏工坊<span>/ 平台规划</span></div><div class="k-top-actions"><span class="k-dot"></span><span class="upd">更新于 2026-11-20（台北时间）</span><a class="k-link" href="index.html">返回工坊 ↗</a></div></header>
 <div class="top">
-  <div class="bar"><div class="orb"></div><h1>平台规划 · 能力与打通</h1><a class="back" href="index.html">‹ 返回工坊</a></div>
-  <nav class="tabs" id="tabs">
+  <nav class="tabs k-tabs" id="tabs" aria-label="本页目录">
     <a href="#have">已做出来</a><a href="#need">需要支持</a><a href="#connect">怎么打通</a><a href="#strategy">④ 策划</a><a href="#value">⑦ 价值</a><a href="#give">需要你提供</a><a href="#measure">可测指标</a><a href="#detail">功能明细</a><a href="#sources">来源</a>
   </nav>
 </div>
 <main>
-  <div class="hero">
-    <h2>Kairos 运营 Game 平台：能力、缺口、打通</h2>
-    <p>三件事：现在已经能演示什么；哪些要数据、账号或接口支持，以及怎么实现；各平台之间怎么合规打通。更新于 2026-11-20（台北时间）。</p>
-    <div class="sum" id="sum"></div>
+  <div class="hero k-view-enter">
+    <div class="k-page-intro"><div><nav class="k-breadcrumb" aria-label="位置"><a href="index.html">工坊</a><span>/</span><span>平台规划</span></nav><span class="k-eyebrow">PLATFORM PLAN</span><h2>Kairos 运营 Game 平台：能力、缺口、打通</h2><p>三件事：现在已经能演示什么；哪些要数据、账号或接口支持，以及怎么实现；各平台之间怎么合规打通。更新于 2026-11-20（台北时间）。</p></div></div>
+    <div class="sum k-overview" id="sum"></div>
   </div>
 
-  <section class="card" id="have">
+  <section class="card" data-reveal id="have">
     <h3><span class="no">A</span>已经做出来的能力（现在可演示）</h3>
     <p class="lead">都能直接点开试。演示版的积分、抽奖等数据都存在浏览器本地，正式上线要接后端（见 B）。</p>
     <div class="caps" id="caps"></div>
   </section>
 
-  <section class="card" id="need">
+  <section class="card" data-reveal id="need">
     <h3><span class="no">B</span>能做，但需要支持的能力</h3>
     <p class="lead">每一项写清楚：需要什么、谁提供、怎么实现。支持一到位就能接上。</p>
     <div class="tw" id="tNeed"></div>
   </section>
 
-  <section class="card" id="connect">
+  <section class="card" data-reveal id="connect">
     <h3><span class="no">C</span>怎么打通（微信小程序 ↔ 抖音 / B站 / 小红书）</h3>
     <div class="conn">
       <div class="box"><b>内容平台</b>抖音视频 / 直播、B站视频 / 评论区、小红书笔记</div>
@@ -183,7 +185,7 @@
   </section>
 
 
-  <section class="card" id="strategy">
+  <section class="card" data-reveal id="strategy">
     <h3><span class="no">④</span>策划 / 运营方案</h3>
     <p class="pair">和 <a href="#value">⑦ 运营价值</a> 联动：每条写了它推动哪个指标（→⑦）。</p>
     <h4>已明确可做 <span class="tag ok">已明确</span></h4>
@@ -192,7 +194,7 @@
     <div class="tw" id="tStratGap"></div>
   </section>
 
-  <section class="card" id="value">
+  <section class="card" data-reveal id="value">
     <h3><span class="no">⑦</span>运营价值：互动、涨粉、播放、转发、品牌声量</h3>
     <p class="pair">指标来自 <a href="#strategy">④ 策划</a> 的动作；公开参考只写查得到来源的，查不到写「未找到」。</p>
     <h4>指标体系：口径与怎么采 <span class="tag ok">已明确</span></h4>
@@ -206,18 +208,18 @@
     <p class="note">本节公开参考来源：jizhil.com《2025 抖音完播率与互动率及格线》（第三方）https://www.jizhil.com/dydata/6124.html ；Playable《State of Gamification 2026》https://playable.com/campaign-pages/state-of-gamification-2026-guide/ ；抖音开放平台《侧边栏复访能力》https://developer.open-douyin.com/docs/resource/zh-CN/mini-game/operation1/user-ops/-retention/sidebar</p>
   </section>
 
-  <section class="card" id="give">
+  <section class="card" data-reveal id="give">
     <h3><span class="no">D</span>需要你提供的清单</h3>
     <ul class="chk" id="giveList"></ul>
   </section>
 
-  <section class="card" id="measure">
+  <section class="card" data-reveal id="measure">
     <h3><span class="no">E</span>能测什么（⑦ 运营价值）</h3>
     <div class="tw" id="tMeasure"></div>
     <p class="note">要跟传统运营比，需要运营同事填过往 2-3 场活动的成本、周期、人力、曝光、互动、涨粉，作为对照基线。</p>
   </section>
 
-  <section class="card" id="detail">
+  <section class="card" data-reveal id="detail">
     <h3><span class="no">F</span>功能明细（负责角色、工作量估计）</h3>
     <details class="more" id="detailBox">
       <summary>展开 50 个功能点的明细表</summary>
@@ -228,12 +230,13 @@
     </details>
   </section>
 
-  <section class="card" id="sources">
+  <section class="card" data-reveal id="sources">
     <h3><span class="no">G</span>来源</h3>
     <ol class="src" id="srcList"></ol>
   </section>
   <footer>运营游戏工坊 · 平台规划 ｜ <a href="index.html">返回工坊</a></footer>
 </main>
+</div>
 
 <script>
 (() => {
@@ -400,7 +403,7 @@ $('pseg').addEventListener('click', (e) => { const b = e.target.closest('button'
 drawFeat();
 
 $('sum').innerHTML = [['已做出来', CAPS.length + ' 项可演示'], ['需要支持', NEED.length + ' 项'], ['需要你提供', GIVE.length + ' 项'], ['功能明细', F.length + ' 个功能点']]
-  .map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+  .map(([k, v], i) => { const m = String(v).match(/^(\d+)\s*(.*)$/); return `<div class="k-ov-card k-reveal" style="--i:${i}"><span>${k}</span><strong>${m ? m[1] : v}</strong><small>${m ? m[2] : ''}</small></div>`; }).join('');
 
 /* ---------- G 来源 ---------- */
 const SRC = [["微信开放文档：获取 URL Link", "https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/url-link.html"], ["微信开放文档：获取 URL Scheme", "https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/url-scheme.html"], ["小红书小程序介绍（挂载场景、入驻材料、审核时效）", "https://miniapp.xiaohongshu.com/doc/DC137160"], ["抖音开放平台：小程序运营规则·第三方引流", "https://partner.open-douyin.com/docs/resource/zh-CN/mini-app/operation/management/specification/drainage"], ["抖音开放平台：侧边栏复访能力", "https://developer.open-douyin.com/docs/resource/zh-CN/mini-game/operation1/user-ops/-retention/sidebar"], ["中文内容平台发布规则大全 2026（第三方整理）", "https://omnigoai.com/zh/blog/chinese-platform-content-rules/"], ["B站组件配置说明（非官方）", "https://www.bilibili-ad.com/jd/1997.html"], ["抖音×B站 运营游戏拉新涨粉打通方案（上一份调研 Page）", "https://cursor.com/canvas/store-4ee9328a-ce71-4810-aad9-2fb0b0bd053e/84a2ecda-4afd-4e1b-b2c7-ff5687977b4a"]];
@@ -414,6 +417,14 @@ const io = new IntersectionObserver((es) => {
     const on = links.find((a) => a.classList.contains('on')); const tb = $('tabs'); if (on) tb.scrollTo({ left: on.offsetLeft - (tb.clientWidth - on.offsetWidth) / 2, behavior: 'smooth' }); } });
 }, { rootMargin: '-130px 0px -60% 0px' });
 secs.forEach((s) => s && io.observe(s));
+KShell.mountRail(document.getElementById('kRail'), { home: 'index.html', items: [
+  { href: 'index.html', icon: 'chat', label: 'AI 策划' },
+  { href: 'index.html#missions', icon: 'missions', label: '任务中心' },
+  { href: 'index.html#wallet', icon: 'wallet', label: '我的权益 · 抽奖 · 排行' },
+  { href: 'index.html#rules', icon: 'rules', label: '活动规则' },
+  { id: 'railPlan', icon: 'plan', label: '平台规划', active: true }] });
+document.getElementById('railPlan').onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+KShell.reveal(document);
 })();
 </script>
 </body>

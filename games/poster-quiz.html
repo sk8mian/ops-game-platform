@@ -2,48 +2,47 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
+<script src="../brand-vi.js" data-game="poster-quiz"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#121216" />
+<meta name="theme-color" content="#050816" />
 <title>你是哪颗芯？· 芯片人格测试</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%230068B5%27/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="../theme.css" />
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{min-height:100vh;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;padding:calc(46px + env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom))}
+  body{min-height:100vh;background:radial-gradient(700px 500px at 0% 0%,color-mix(in srgb,var(--vi-secondary) 30%,transparent),transparent 60%),radial-gradient(600px 500px at 100% 100%,color-mix(in srgb,var(--vi-accent) 22%,transparent),transparent 60%),var(--vi-bg);color:var(--vi-text);font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC",sans-serif;padding:calc(46px + env(safe-area-inset-top)) 18px calc(28px + env(safe-area-inset-bottom))}
   .wrap{max-width:460px;margin:0 auto}
   .view{display:none;animation:in .4s}
   .view.on{display:block}
   @keyframes in{from{opacity:0;transform:translateY(10px)}}
-  h1{font-size:40px;font-weight:650;text-align:center;color:var(--text);margin-top:18px}
-  .sub{text-align:center;color:var(--muted);margin-top:6px}
-  .hero{width:200px;height:200px;margin:28px auto;border-radius:36px;position:relative;background:var(--panel);animation:spin 8s linear infinite;box-shadow:none}
-  .hero:after{content:"?";position:absolute;inset:8px;border-radius:18px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:90px;font-weight:650;color:#fff;animation:spin 8s linear infinite reverse}
+  h1{font-size:40px;font-weight:900;text-align:center;background:linear-gradient(180deg,#fff,#c3b8ff 50%,var(--vi-accent-light));-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:18px}
+  .sub{text-align:center;color:#9fb3e8;margin-top:6px}
+  .hero{width:200px;height:200px;margin:28px auto;border-radius:calc(36px*var(--vi-radius-scale,1));position:relative;background:conic-gradient(from 0deg,var(--vi-primary),var(--vi-secondary),var(--vi-accent),var(--vi-gold),var(--vi-primary));animation:spin 8s linear infinite;box-shadow:0 0 60px color-mix(in srgb,var(--vi-secondary) 50%,transparent)}
+  .hero:after{content:"?";position:absolute;inset:8px;border-radius:calc(30px*var(--vi-radius-scale,1));background:#0a0f26;display:flex;align-items:center;justify-content:center;font-size:90px;font-weight:900;color:#fff;animation:spin 8s linear infinite reverse}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .big{width:100%;border:none;border-radius:11px;padding:15px;font-size:17px;font-weight:650;color:#16060a;background:var(--brand);cursor:pointer;margin-top:10px}
-  .ghost{width:100%;border:1px solid rgba(255,255,255,0.21);background:rgba(255,255,255,.06);color:var(--text);border-radius:10px;padding:12px;font-weight:700;cursor:pointer;margin-top:8px}
-  .prog{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:18px}
-  .prog i{display:block;height:100%;background:var(--brand);transition:width .3s}
-  .q{font-size:21px;font-weight:600;line-height:1.5;margin-bottom:16px}
-  .opt{display:block;width:100%;text-align:left;border:1px solid rgba(255,255,255,0.175);background:rgba(27,27,33,0.75);color:var(--text);border-radius:10px;padding:14px;font-size:15px;margin-bottom:10px;cursor:pointer;transition:.15s}
-  .opt:hover,.opt:active{border-color:var(--brand);background:rgba(255,77,106,0.066)}
+  .big{width:100%;border:none;border-radius:calc(16px*var(--vi-radius-scale,1));padding:15px;font-size:17px;font-weight:900;color:var(--vi-on-primary);background:linear-gradient(90deg,var(--vi-primary),var(--vi-secondary) 55%,var(--vi-accent));cursor:pointer;margin-top:10px}
+  .ghost{width:100%;border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:var(--vi-text);border-radius:calc(14px*var(--vi-radius-scale,1));padding:12px;font-weight:700;cursor:pointer;margin-top:8px}
+  .prog{height:6px;border-radius:calc(6px*var(--vi-radius-scale,1));background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:18px}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--vi-primary),var(--vi-accent));transition:width .3s}
+  .q{font-size:21px;font-weight:800;line-height:1.5;margin-bottom:16px}
+  .opt{display:block;width:100%;text-align:left;border:1px solid rgba(120,170,255,.25);background:color-mix(in srgb,var(--vi-surface) 75%,transparent);color:var(--vi-text);border-radius:calc(14px*var(--vi-radius-scale,1));padding:14px;font-size:15px;margin-bottom:10px;cursor:pointer;transition:.15s}
+  .opt:hover,.opt:active{border-color:var(--vi-primary);background:color-mix(in srgb,var(--vi-primary) 12%,transparent)}
   .rc{text-align:center}
   .rc canvas{width:220px;height:220px;margin:10px auto;display:block}
-  .pname{font-size:30px;font-weight:650;margin-top:6px}
-  .ptag{display:inline-block;margin-top:6px;font-size:12px;border:1px solid currentColor;border-radius:6px;padding:2px 10px}
-  .ai{margin-top:14px;text-align:left;background:rgba(27,27,33,0.75);border:1px solid rgba(255,255,255,0.14);border-radius:11px;padding:12px 14px;font-size:14px;line-height:1.7}
-  .ai small{display:block;color:var(--muted);font-size:11.5px;margin-top:6px}
+  .pname{font-size:30px;font-weight:900;margin-top:6px}
+  .ptag{display:inline-block;margin-top:6px;font-size:12px;border:1px solid currentColor;border-radius:99px;padding:2px 10px}
+  .ai{margin-top:14px;text-align:left;background:color-mix(in srgb,var(--vi-surface) 75%,transparent);border:1px solid rgba(120,170,255,.2);border-radius:calc(16px*var(--vi-radius-scale,1));padding:12px 14px;font-size:14px;line-height:1.7}
+  .ai small{display:block;color:var(--vi-muted);font-size:11.5px;margin-top:6px}
   .row{display:flex;gap:8px}
   .row button{flex:1}
-  .note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:12px}
+  .note{font-size:11.5px;color:var(--vi-muted);text-align:center;margin-top:12px}
   html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
   button,a{touch-action:manipulation}
   .tb{min-height:44px;min-width:56px}
 </style>
-<link rel="stylesheet" href="../skin-games.css" />
 </head>
 <body>
 <div class="wrap">
-  <section class="view on" id="vStart"><h1 id="title">你是哪颗芯？</h1><p class="sub" id="slogan">测出你的芯片人格</p><div class="hero"></div>
+  <section class="view on" id="vStart"><div data-vi-logo></div><h1 id="title">你是哪颗芯？</h1><p class="sub" id="slogan">测出你的芯片人格</p><div class="hero"></div>
     <button class="big" id="go">开始测试（5 题）</button><button class="ghost" id="rules">活动规则</button>
     <p class="note">完成测试 +<span id="qp"></span> 积分 · 分享海报 +<span id="sp"></span> 积分 · 结果仅供娱乐</p></section>
   <section class="view" id="vQ"><div class="prog"><i id="bar"></i></div><div class="q" id="q"></div><div id="opts"></div></section>
@@ -64,10 +63,10 @@
   document.title = $('title').textContent;
   $('qp').textContent = C.tasks.quizDone.points; $('sp').textContent = C.share.pointsPerShare;
   const PERSONA = {
-    P: { name: '性能猛兽', tag: 'P 核型 · 冲就完了', color: '#ff4d6a', glyph: '⚡', text: '你做事全力以赴，deadline 前爆发力惊人，是团队里的“满血大核”。' },
-    E: { name: '能效大师', tag: 'E 核型 · 稳定续航', color: '#73d7b1', glyph: '🍃', text: '你节奏稳、耗能低，总能把事情安静又漂亮地做完，续航王者。' },
-    N: { name: 'AI 先锋', tag: 'NPU 型 · 未来已来', color: '#ff4d6a', glyph: '🧠', text: '你对新东西天然敏感，第一个用上新工具的人，总在帮大家提效。' },
-    H: { name: '全能混合', tag: '混合架构 · 能屈能伸', color: '#f6c887', glyph: '✦', text: '你能快能稳，场景切换自如，是那种“交给他就放心”的人。' },
+    P: { name: '性能猛兽', tag: 'P 核型 · 冲就完了', color: VI.c.danger, glyph: '⚡', text: '你做事全力以赴，deadline 前爆发力惊人，是团队里的“满血大核”。' },
+    E: { name: '能效大师', tag: 'E 核型 · 稳定续航', color: VI.c.success, glyph: '🍃', text: '你节奏稳、耗能低，总能把事情安静又漂亮地做完，续航王者。' },
+    N: { name: 'AI 先锋', tag: 'NPU 型 · 未来已来', color: VI.c.primary, glyph: '🧠', text: '你对新东西天然敏感，第一个用上新工具的人，总在帮大家提效。' },
+    H: { name: '全能混合', tag: '混合架构 · 能屈能伸', color: VI.c.gold, glyph: '✦', text: '你能快能稳，场景切换自如，是那种“交给他就放心”的人。' },
   };
   const QS = [
     { q: '周一早上 9 点，你的状态是？', o: [['已经干完两件事', 'P'], ['咖啡在手，慢慢预热', 'E'], ['先让 AI 帮我排今天的计划', 'N'], ['看心情，随时切换', 'H']] },
@@ -85,9 +84,9 @@
   }
   function drawArt(p) {
     const cv = $('art'), g = cv.getContext('2d'), W = cv.width; g.clearRect(0, 0, W, W);
-    const bg = g.createRadialGradient(W / 2, W / 2, 20, W / 2, W / 2, W / 2); bg.addColorStop(0, p.color + '55'); bg.addColorStop(1, 'rgba(27,27,33,0.0)'); g.fillStyle = bg; g.fillRect(0, 0, W, W);
+    const bg = g.createRadialGradient(W / 2, W / 2, 20, W / 2, W / 2, W / 2); bg.addColorStop(0, p.color + '55'); bg.addColorStop(1, VI.rgba('bg', 0)); g.fillStyle = bg; g.fillRect(0, 0, W, W);
     g.save(); g.translate(W / 2, W / 2); g.rotate(-0.12);
-    g.fillStyle = '#1b1b21'; g.strokeStyle = p.color; g.lineWidth = 6; g.shadowColor = p.color; g.shadowBlur = 0; g.beginPath(); g.roundRect ? g.roundRect(-130, -130, 260, 260, 26) : g.rect(-130, -130, 260, 260); g.fill(); g.stroke();
+    g.fillStyle = '#0e1530'; g.strokeStyle = p.color; g.lineWidth = 6; g.shadowColor = p.color; g.shadowBlur = 30; g.beginPath(); g.roundRect ? g.roundRect(-130, -130, 260, 260, 26) : g.rect(-130, -130, 260, 260); g.fill(); g.stroke();
     g.shadowBlur = 0; g.fillStyle = '#d4a537'; for (let i = 0; i < 12; i++) { const o = -110 + i * 20; g.fillRect(o, -146, 8, 14); g.fillRect(o, 132, 8, 14); g.fillRect(-146, o, 14, 8); g.fillRect(132, o, 14, 8); }
     g.strokeStyle = p.color + '88'; g.lineWidth = 2; g.strokeRect(-80, -80, 160, 160);
     g.font = '96px system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = '#fff'; g.fillText(p.glyph, 0, -6);

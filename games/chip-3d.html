@@ -2,138 +2,139 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
+<script src="../brand-vi.js" data-game="chip-3d"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#030714" />
 <title>芯片争霸 3D · Intel 新品闯关</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230068B5'/%3E%3Crect x='8' y='8' width='16' height='16' rx='2' fill='%2300C7FD'/%3E%3C/svg%3E" />
-<link rel="stylesheet" href="../theme.css" />
 <style>
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);touch-action:none;user-select:none;-webkit-user-select:none;font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;color:var(--text)}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--vi-bg-deep);touch-action:none;user-select:none;-webkit-user-select:none;font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;color:var(--vi-text)}
   #gl{position:fixed;inset:0;width:100%;height:100%;display:block}
   .hud{position:fixed;inset:0;pointer-events:none;z-index:5;opacity:0;transition:opacity .3s}
   .hud.on{opacity:1}
   .hud-top{position:absolute;left:0;right:0;top:max(30px,calc(env(safe-area-inset-top) + 26px));padding:0 14px;display:flex;justify-content:space-between;align-items:flex-start}
-  .pill{background:rgba(27,27,33,0.62);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12px;line-height:1.35;box-shadow:none}
-  .pill b{font-size:18px;color:#fff;text-shadow:none}
-  .pill .lv{color:var(--brand-text);font-weight:700}
+  .pill{background:rgba(6,14,36,.62);border:1px solid color-mix(in srgb,var(--vi-primary) 35%,transparent);border-radius:calc(14px*var(--vi-radius-scale,1));padding:6px 10px;backdrop-filter:blur(6px);font-size:12px;line-height:1.35;box-shadow:0 0 18px color-mix(in srgb,var(--vi-primary) 15%,transparent)}
+  .pill b{font-size:18px;color:#fff;text-shadow:0 0 10px var(--vi-primary)}
+  .pill .lv{color:var(--vi-primary-light);font-weight:700}
   .right{display:flex;gap:8px;align-items:center;pointer-events:auto}
-  .hearts{font-size:16px;letter-spacing:2px;text-shadow:none}
-  .ibtn{pointer-events:auto;border:1px solid var(--line);background:rgba(27,27,33,0.62);color:#fff;border-radius:8px;height:34px;min-width:34px;padding:0 8px;font-size:15px;cursor:pointer}
+  .hearts{font-size:16px;letter-spacing:2px;text-shadow:0 0 8px var(--vi-danger)}
+  .ibtn{pointer-events:auto;border:1px solid color-mix(in srgb,var(--vi-primary) 40%,transparent);background:rgba(6,14,36,.62);color:#fff;border-radius:calc(12px*var(--vi-radius-scale,1));height:34px;min-width:34px;padding:0 8px;font-size:15px;cursor:pointer}
   .boss{position:absolute;left:50%;transform:translateX(-50%);top:max(84px,calc(env(safe-area-inset-top) + 80px));width:min(78vw,520px);text-align:center;display:none}
   .boss.on{display:block}
-  .boss .nm{font-size:13px;font-weight:600;letter-spacing:2px;margin-bottom:4px;text-shadow:none}
-  .boss .bar{height:9px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden;border:1px solid rgba(255,255,255,.2)}
-  .boss .bar i{display:block;height:100%;width:100%;background:var(--brand);transition:width .15s}
+  .boss .nm{font-size:13px;font-weight:800;letter-spacing:2px;margin-bottom:4px;text-shadow:0 0 10px currentColor}
+  .boss .bar{height:9px;border-radius:calc(9px*var(--vi-radius-scale,1));background:rgba(255,255,255,.1);overflow:hidden;border:1px solid rgba(255,255,255,.2)}
+  .boss .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--vi-danger),var(--vi-gold));transition:width .15s}
   .chips{position:absolute;left:14px;bottom:calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
-  .chip{font-size:11.5px;padding:4px 9px;border-radius:10px;background:rgba(27,27,33,0.62);border:1px solid var(--line);color:var(--text)}
-  .chip.sh{border-color:var(--green);color:#b9ffd9}
-  .npu{position:absolute;right:16px;bottom:calc(22px + env(safe-area-inset-bottom));width:84px;height:84px;border-radius:50%;pointer-events:auto;cursor:pointer;border:none;color:#fff;font-weight:650;font-size:13px;line-height:1.15;background:var(--panel);box-shadow:none}
-  .npu span{position:absolute;inset:7px;border-radius:50%;background:transparent;display:flex;align-items:center;justify-content:center;flex-direction:column}
-  .npu.ready{animation:pulse 1s infinite;box-shadow:none}
+  .chip{font-size:11.5px;padding:4px 9px;border-radius:calc(10px*var(--vi-radius-scale,1));background:rgba(6,14,36,.62);border:1px solid color-mix(in srgb,var(--vi-primary-light) 35%,transparent);color:var(--vi-primary-light)}
+  .chip.sh{border-color:var(--vi-success);color:#b9ffd9}
+  .npu{position:absolute;right:16px;bottom:calc(22px + env(safe-area-inset-bottom));width:84px;height:84px;border-radius:50%;pointer-events:auto;cursor:pointer;border:none;color:#fff;font-weight:900;font-size:13px;line-height:1.15;background:conic-gradient(var(--vi-gold) var(--p,0%),rgba(255,255,255,.08) 0);box-shadow:0 0 0 3px rgba(6,14,36,.9) inset,0 0 18px color-mix(in srgb,var(--vi-gold) 25%,transparent)}
+  .npu span{position:absolute;inset:7px;border-radius:50%;background:radial-gradient(circle,#22183f,#0a0a1e);display:flex;align-items:center;justify-content:center;flex-direction:column}
+  .npu.ready{animation:pulse 1s infinite;box-shadow:0 0 0 3px rgba(6,14,36,.9) inset,0 0 34px var(--vi-gold)}
   @keyframes pulse{50%{transform:scale(1.07)}}
   .center-msg{position:fixed;left:0;right:0;top:36%;text-align:center;z-index:6;pointer-events:none;opacity:0;transition:opacity .3s, transform .3s;transform:scale(.9)}
   .center-msg.on{opacity:1;transform:none}
-  .center-msg h2{font-size:30px;font-weight:650;letter-spacing:3px;text-shadow:none}
-  .center-msg p{font-size:14px;color:var(--muted);margin-top:8px}
-  .warn h2{color:var(--brand);animation:blink .35s infinite alternate}
+  .center-msg h2{font-size:30px;font-weight:900;letter-spacing:3px;text-shadow:0 0 20px currentColor}
+  .center-msg p{font-size:14px;color:#cfe0ff;margin-top:8px}
+  .warn h2{color:var(--vi-danger);animation:blink .35s infinite alternate}
   @keyframes blink{to{opacity:.35}}
-  .pts-pop{position:fixed;z-index:6;pointer-events:none;font-weight:650;font-size:14px;color:var(--amber);text-shadow:none;animation:pop 0.9s forwards}
+  .pts-pop{position:fixed;z-index:6;pointer-events:none;font-weight:900;font-size:14px;color:var(--vi-gold);text-shadow:0 0 8px #ffb300;animation:pop 0.9s forwards}
   @keyframes pop{to{transform:translateY(-36px);opacity:0}}
-  .screen{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:58px 18px calc(20px + env(safe-area-inset-bottom));background:transparent;overflow:auto}
+  .screen{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:58px 18px calc(20px + env(safe-area-inset-bottom));background:radial-gradient(ellipse at 50% 30%,rgba(10,30,80,.55),rgba(2,4,14,.88));backdrop-filter:blur(3px);overflow:auto}
   .screen.on{display:flex}
   .card{width:100%;max-width:440px;text-align:center}
-  .logo{font-size:12px;letter-spacing:4px;color:var(--brand-text);margin-bottom:6px}
-  .title{font-size:clamp(34px,10vw,52px);font-weight:650;line-height:1.05;color:var(--text);filter:none}
-  .sub{margin-top:8px;color:var(--brand-text);font-weight:700;letter-spacing:2px}
-  .how{margin:14px auto 0;font-size:13px;line-height:1.7;color:var(--muted);max-width:360px}
+  .vi-slot{margin-bottom:6px}
+  .logo{font-size:12px;letter-spacing:4px;color:var(--vi-primary-light);margin-bottom:6px}
+  .title{font-size:clamp(34px,10vw,52px);font-weight:900;line-height:1.05;background:linear-gradient(180deg,#fff,var(--vi-primary-light) 60%,#3a7bff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 18px color-mix(in srgb,var(--vi-primary) 50%,transparent))}
+  .sub{margin-top:8px;color:var(--vi-accent-light);font-weight:700;letter-spacing:2px}
+  .how{margin:14px auto 0;font-size:13px;line-height:1.7;color:#b9c8ec;max-width:360px}
   .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
-  .stat{background:rgba(27,27,33,0.7);border:1px solid rgba(255,255,255,0.154);border-radius:10px;padding:8px 4px}
+  .stat{background:rgba(10,20,52,.7);border:1px solid rgba(120,170,255,.22);border-radius:calc(14px*var(--vi-radius-scale,1));padding:8px 4px}
   .stat b{display:block;font-size:20px;color:#fff}
-  .stat span{font-size:11px;color:var(--muted)}
-  .bigbtn{display:block;width:100%;border:none;cursor:pointer;font-size:18px;font-weight:650;letter-spacing:2px;color:#16060a;padding:15px;border-radius:11px;background:var(--brand);box-shadow:none;margin-top:6px}
+  .stat span{font-size:11px;color:var(--vi-muted)}
+  .bigbtn{display:block;width:100%;border:none;cursor:pointer;font-size:18px;font-weight:900;letter-spacing:2px;color:var(--vi-on-primary);padding:15px;border-radius:calc(16px*var(--vi-radius-scale,1));background:linear-gradient(90deg,var(--vi-primary),var(--vi-secondary) 55%,var(--vi-accent));box-shadow:0 8px 30px color-mix(in srgb,var(--vi-primary) 35%,transparent);margin-top:6px}
   .bigbtn:active{transform:scale(.98)}
   .bigbtn[disabled]{filter:grayscale(1) brightness(.6)}
   .row{display:flex;gap:8px;margin-top:10px}
   .row button{flex:1}
-  .sbtn{border:1px solid rgba(255,255,255,0.21);background:rgba(255,255,255,.06);color:var(--text);border-radius:8px;padding:11px 6px;font-size:14px;font-weight:700;cursor:pointer}
-  .sbtn.hot{border-color:var(--amber);color:var(--amber);box-shadow:0 0 16px rgba(246,200,135,0.25)}
+  .sbtn{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:var(--vi-text);border-radius:calc(13px*var(--vi-radius-scale,1));padding:11px 6px;font-size:14px;font-weight:700;cursor:pointer}
+  .sbtn.hot{border-color:var(--vi-gold);color:var(--vi-gold);box-shadow:0 0 16px color-mix(in srgb,var(--vi-gold) 25%,transparent)}
   .tier{margin:12px 0 4px;font-size:13px}
-  .tbar{height:8px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
-  .tbar i{display:block;height:100%;background:var(--brand)}
-  .small{font-size:11.5px;color:var(--muted);margin-top:6px}
-  .res-title{font-size:40px;font-weight:650;text-shadow:none}
-  .breakdown{margin:12px 0;background:rgba(27,27,33,0.7);border:1px solid rgba(255,255,255,0.154);border-radius:10px;padding:10px 14px;text-align:left;font-size:13px;line-height:1.8}
+  .tbar{height:8px;border-radius:calc(8px*var(--vi-radius-scale,1));background:rgba(255,255,255,.08);overflow:hidden}
+  .tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--vi-primary),var(--vi-accent))}
+  .small{font-size:11.5px;color:var(--vi-muted);margin-top:6px}
+  .res-title{font-size:40px;font-weight:900;text-shadow:0 0 24px currentColor}
+  .breakdown{margin:12px 0;background:rgba(10,20,52,.7);border:1px solid rgba(120,170,255,.22);border-radius:calc(14px*var(--vi-radius-scale,1));padding:10px 14px;text-align:left;font-size:13px;line-height:1.8}
   .breakdown div{display:flex;justify-content:space-between}
-  .breakdown .tot{border-top:1px dashed rgba(255,255,255,0.21);margin-top:4px;padding-top:4px;font-weight:600;color:var(--amber);font-size:15px}
-  .back{position:fixed;left:12px;top:max(30px,calc(env(safe-area-inset-top) + 26px));z-index:21;font-size:12px;color:#8fb6ff;text-decoration:none;background:rgba(27,27,33,0.6);padding:5px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.175)}
-  .nogl{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:30px;z-index:50;background:var(--bg)}
+  .breakdown .tot{border-top:1px dashed rgba(120,170,255,.3);margin-top:4px;padding-top:4px;font-weight:800;color:var(--vi-gold);font-size:15px}
+  .back{position:fixed;left:12px;top:max(30px,calc(env(safe-area-inset-top) + 26px));z-index:21;font-size:12px;color:#8fb6ff;text-decoration:none;background:rgba(6,14,36,.6);padding:5px 10px;border-radius:calc(10px*var(--vi-radius-scale,1));border:1px solid rgba(120,170,255,.25)}
+  .nogl{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:30px;z-index:50;background:var(--vi-bg-deep)}
   /* ===== 主菜单 / 面板 / 暂停 ===== */
   .menu-card{max-width:460px}
   .menu-card .how{font-size:12.5px}
   .mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-  .mbtn{position:relative;border:1px solid rgba(255,255,255,0.175);background:rgba(27,27,33,0.72);color:var(--text);border-radius:10px;padding:10px 4px 8px;cursor:pointer;font-size:20px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s}
+  .mbtn{position:relative;border:1px solid rgba(120,170,255,.25);background:rgba(10,20,52,.72);color:var(--vi-text);border-radius:calc(14px*var(--vi-radius-scale,1));padding:10px 4px 8px;cursor:pointer;font-size:20px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:.15s}
   .mbtn b{font-size:12.5px;font-weight:700}
-  .mbtn:hover{border-color:var(--brand);background:rgba(255,77,106,0.066);transform:translateY(-1px)}
-  .badge{position:absolute;top:-6px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--brand);color:#fff;font-size:11px;font-style:normal;line-height:18px;padding:0 5px;box-shadow:none}
+  .mbtn:hover{border-color:var(--vi-primary);background:color-mix(in srgb,var(--vi-primary) 12%,transparent);transform:translateY(-1px)}
+  .badge{position:absolute;top:-6px;right:-4px;min-width:18px;height:18px;border-radius:calc(9px*var(--vi-radius-scale,1));background:var(--vi-danger);color:#fff;font-size:11px;font-style:normal;line-height:18px;padding:0 5px;box-shadow:0 0 10px var(--vi-danger)}
   .badge:empty{display:none}
-  .panel-card{max-width:520px;text-align:left;background:rgba(27,27,33,0.94);border:1px solid rgba(255,255,255,0.175);border-radius:14px;padding:16px;max-height:calc(100vh - 90px);overflow:auto;box-shadow:none}
+  .panel-card{max-width:520px;text-align:left;background:rgba(8,14,36,.94);border:1px solid rgba(120,170,255,.25);border-radius:calc(22px*var(--vi-radius-scale,1));padding:16px;max-height:calc(100vh - 90px);overflow:auto;box-shadow:0 0 40px color-mix(in srgb,var(--vi-primary) 12%,transparent)}
   .phead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-  .phead h3{flex:1;font-size:18px;color:var(--text)}
-  .pback{border:1px solid rgba(255,255,255,0.21);background:rgba(255,255,255,.06);color:var(--text);border-radius:11px;padding:7px 12px;font-size:13px;cursor:pointer}
-  .set-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px dashed rgba(255,255,255,0.105);font-size:14px}
-  .set-row small{display:block;color:var(--muted);font-size:11.5px}
+  .phead h3{flex:1;font-size:18px;background:linear-gradient(90deg,var(--vi-primary-light),var(--vi-accent-light));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pback{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.06);color:var(--vi-text);border-radius:calc(11px*var(--vi-radius-scale,1));padding:7px 12px;font-size:13px;cursor:pointer}
+  .set-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px dashed rgba(120,170,255,.15);font-size:14px}
+  .set-row small{display:block;color:var(--vi-muted);font-size:11.5px}
   .seg{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
-  .seg button{border:1px solid rgba(255,255,255,0.21);background:rgba(255,255,255,.05);color:var(--muted);border-radius:9px;padding:6px 10px;font-size:12.5px;cursor:pointer}
-  .seg button.on{background:var(--brand);color:#16060a;border-color:transparent;font-weight:600}
+  .seg button{border:1px solid rgba(120,170,255,.3);background:rgba(255,255,255,.05);color:#cfe0ff;border-radius:calc(9px*var(--vi-radius-scale,1));padding:6px 10px;font-size:12.5px;cursor:pointer}
+  .seg button.on{background:linear-gradient(90deg,var(--vi-primary),var(--vi-accent));color:var(--vi-on-primary);border-color:transparent;font-weight:800}
   .set-row input[type=range]{width:130px}
   .lbl{list-style:none;padding:0;margin:0}
-  .lbl li{display:flex;justify-content:space-between;padding:9px 6px;border-bottom:1px dashed rgba(255,255,255,0.084);font-size:14px}
-  .lbl li.me{color:var(--brand-text);font-weight:600;background:rgba(255,77,106,0.033);border-radius:8px}
-  .lbl li .rk{display:inline-block;width:26px;color:var(--muted)}
-  .lbl li:nth-child(1) .rk{color:var(--amber)}.lbl li:nth-child(2) .rk{color:#c9d6ea}.lbl li:nth-child(3) .rk{color:#d08a4f}
+  .lbl li{display:flex;justify-content:space-between;padding:9px 6px;border-bottom:1px dashed rgba(120,170,255,.12);font-size:14px}
+  .lbl li.me{color:var(--vi-primary-light);font-weight:800;background:color-mix(in srgb,var(--vi-primary) 6%,transparent);border-radius:calc(8px*var(--vi-radius-scale,1))}
+  .lbl li .rk{display:inline-block;width:26px;color:var(--vi-muted)}
+  .lbl li:nth-child(1) .rk{color:var(--vi-gold)}.lbl li:nth-child(2) .rk{color:#c9d6ea}.lbl li:nth-child(3) .rk{color:#d08a4f}
   .pause-card .bigbtn{margin-top:10px}
   .pause-card .sbtn{width:100%;margin-top:8px}
   /* ===== 道具 → 卖点知识卡 ===== */
-  .kcard{position:fixed;left:50%;bottom:calc(122px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;z-index:8;pointer-events:none;transition:.3s;display:flex;gap:10px;align-items:center;background:rgba(27,27,33,0.92);border:1px solid var(--amber);border-radius:11px;padding:9px 10px 9px 12px;box-shadow:0 0 24px rgba(246,200,135,0.35);max-width:92vw;font-size:13px;white-space:nowrap}
+  .kcard{position:fixed;left:50%;bottom:calc(122px + env(safe-area-inset-bottom));transform:translate(-50%,20px);opacity:0;z-index:8;pointer-events:none;transition:.3s;display:flex;gap:10px;align-items:center;background:rgba(10,16,40,.92);border:1px solid var(--vi-gold);border-radius:calc(16px*var(--vi-radius-scale,1));padding:9px 10px 9px 12px;box-shadow:0 0 24px color-mix(in srgb,var(--vi-gold) 35%,transparent);max-width:92vw;font-size:13px;white-space:nowrap}
   .kcard.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-  .kcard button{border:none;border-radius:10px;padding:6px 10px;font-weight:600;font-size:12.5px;cursor:pointer;color:#16060a;background:var(--amber)}
+  .kcard button{border:none;border-radius:calc(10px*var(--vi-radius-scale,1));padding:6px 10px;font-weight:800;font-size:12.5px;cursor:pointer;color:var(--vi-on-primary);background:var(--vi-gold)}
   /* ===== 产品介绍 ===== */
   .prod{position:fixed;inset:0;z-index:15;display:none;pointer-events:none}
   .prod.on{display:block}
   .ptop{position:absolute;top:max(34px,calc(env(safe-area-inset-top) + 30px));left:12px;right:12px;display:flex;gap:10px;align-items:flex-start;pointer-events:auto}
   .ptitle{flex:1;min-width:0}
-  .ptitle h2{font-size:21px;font-weight:650;color:var(--text)}
-  .ptitle p{font-size:12.5px;color:var(--muted);margin-top:2px}
-  .pdisc{display:inline-block;margin-top:5px;font-size:11px;color:var(--amber);border:1px dashed rgba(246,200,135,0.6);border-radius:8px;padding:2px 7px;background:rgba(246,200,135,0.1)}
+  .ptitle h2{font-size:21px;font-weight:900;background:linear-gradient(90deg,#fff,var(--vi-primary-light));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .ptitle p{font-size:12.5px;color:#cfe0ff;margin-top:2px}
+  .pdisc{display:inline-block;margin-top:5px;font-size:11px;color:#ffd27a;border:1px dashed rgba(255,190,60,.6);border-radius:calc(8px*var(--vi-radius-scale,1));padding:2px 7px;background:rgba(255,190,60,.1)}
   .ptools{position:absolute;right:12px;top:max(150px,calc(env(safe-area-inset-top) + 140px));display:flex;flex-direction:column;gap:8px;pointer-events:auto}
-  .ptools button{border:1px solid var(--line);background:rgba(27,27,33,0.72);color:var(--text);border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer}
-  .pprog{font-size:11.5px;color:var(--muted);text-align:center}
+  .ptools button{border:1px solid color-mix(in srgb,var(--vi-primary) 40%,transparent);background:rgba(6,14,36,.72);color:var(--vi-text);border-radius:calc(12px*var(--vi-radius-scale,1));padding:8px 10px;font-size:12px;cursor:pointer}
+  .pprog{font-size:11.5px;color:var(--vi-muted);text-align:center}
   .pcards{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px;overflow-x:auto;padding:4px 12px;pointer-events:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
   .pcards::-webkit-scrollbar{display:none}
-  .fcard{flex:none;width:74vw;max-width:300px;scroll-snap-align:center;background:rgba(27,27,33,0.84);border:1px solid rgba(255,255,255,0.175);border-radius:12px;padding:12px;cursor:pointer;transition:.2s;text-align:left;color:var(--text)}
+  .fcard{flex:none;width:74vw;max-width:300px;scroll-snap-align:center;background:rgba(8,14,36,.84);border:1px solid rgba(120,170,255,.25);border-radius:calc(18px*var(--vi-radius-scale,1));padding:12px;cursor:pointer;backdrop-filter:blur(8px);transition:.2s;text-align:left;color:var(--vi-text)}
   .fcard.on{border-color:var(--fc);box-shadow:0 0 22px var(--fcg)}
   .fcard h4{font-size:15px;display:flex;align-items:center;gap:6px}
-  .fcard h4 em{font-style:normal;font-size:11px;color:var(--green);margin-left:auto}
+  .fcard h4 em{font-style:normal;font-size:11px;color:var(--vi-success);margin-left:auto}
   .fcard .s{font-size:12px;color:var(--fc);font-weight:700;margin-top:2px}
-  .fcard p{font-size:12.5px;line-height:1.6;color:var(--text-2);margin-top:6px}
-  .fcard .spec{margin-top:6px;font-size:12px;font-family:ui-monospace,Menlo,monospace;color:var(--brand-text);background:rgba(0,0,0,.3);border-radius:8px;padding:4px 7px;display:inline-block}
-  .fcard .d{font-size:10.5px;color:var(--amber);margin-top:6px}
+  .fcard p{font-size:12.5px;line-height:1.6;color:#cdd8f4;margin-top:6px}
+  .fcard .spec{margin-top:6px;font-size:12px;font-family:ui-monospace,Menlo,monospace;color:#9ff;background:rgba(0,0,0,.3);border-radius:calc(8px*var(--vi-radius-scale,1));padding:4px 7px;display:inline-block}
+  .fcard .d{font-size:10.5px;color:var(--vi-warning);margin-top:6px}
   /* ===== 电脑版：侧边 HUD ===== */
   .side{display:none}
   body.desk .side{display:flex;flex-direction:column;gap:10px;position:absolute;top:84px;width:250px;pointer-events:none}
   body.desk #sideL{left:20px} body.desk #sideR{right:20px}
-  .scard{background:rgba(27,27,33,0.66);border:1px solid var(--line);border-radius:11px;padding:12px 14px;font-size:13px;line-height:1.6;box-shadow:none}
-  .scard h5{font-size:12.5px;color:var(--brand-text);margin-bottom:6px;letter-spacing:1px}
-  .scard .bigpts{font-size:30px;font-weight:650;color:#fff;text-shadow:none}
-  .scard .mrow{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-  .scard .mbar{height:5px;border-radius:5px;background:rgba(255,255,255,.08);margin:3px 0 7px;overflow:hidden}
-  .scard .mbar i{display:block;height:100%;background:var(--brand)}
-  .scard kbd{display:inline-block;min-width:22px;text-align:center;border:1px solid rgba(255,255,255,0.28);border-bottom-width:2px;border-radius:6px;padding:0 5px;margin-right:4px;font-size:11.5px;font-family:inherit;color:#fff;background:rgba(255,255,255,.06)}
+  .scard{background:rgba(6,14,36,.66);border:1px solid color-mix(in srgb,var(--vi-primary) 25%,transparent);border-radius:calc(16px*var(--vi-radius-scale,1));padding:12px 14px;backdrop-filter:blur(8px);font-size:13px;line-height:1.6;box-shadow:0 0 18px color-mix(in srgb,var(--vi-primary) 10%,transparent)}
+  .scard h5{font-size:12.5px;color:var(--vi-primary-light);margin-bottom:6px;letter-spacing:1px}
+  .scard .bigpts{font-size:30px;font-weight:900;color:#fff;text-shadow:0 0 12px var(--vi-primary)}
+  .scard .mrow{display:flex;justify-content:space-between;font-size:12px;color:#cfe0ff}
+  .scard .mbar{height:5px;border-radius:calc(5px*var(--vi-radius-scale,1));background:rgba(255,255,255,.08);margin:3px 0 7px;overflow:hidden}
+  .scard .mbar i{display:block;height:100%;background:linear-gradient(90deg,var(--vi-primary),var(--vi-accent))}
+  .scard kbd{display:inline-block;min-width:22px;text-align:center;border:1px solid rgba(160,200,255,.4);border-bottom-width:2px;border-radius:calc(6px*var(--vi-radius-scale,1));padding:0 5px;margin-right:4px;font-size:11.5px;font-family:inherit;color:#fff;background:rgba(255,255,255,.06)}
   body.desk .hud-top .pill,body.desk .chips{display:none}
   body.desk .hud-top{justify-content:flex-end}
   body.desk .npu{width:108px;height:108px;right:42px;bottom:42px}
-  body.desk .screen.menu{justify-content:flex-start;padding-left:7vw;background:linear-gradient(90deg,rgba(5,5,8,0.94),rgba(5,5,8,0.62) 42%,rgba(5,5,8,0.0) 72%)}
+  body.desk .screen.menu{justify-content:flex-start;padding-left:7vw;background:linear-gradient(90deg,rgba(2,4,14,.94),rgba(2,4,14,.62) 42%,rgba(2,4,14,0) 72%)}
   body.desk .screen.menu .card{text-align:left}
   body.desk .screen.menu .how{margin-left:0}
   body.desk .kcard{bottom:50px}
@@ -153,7 +154,7 @@
   body.desk .screen.menu>.card{margin:auto 0}
   .panel-card{overscroll-behavior:contain}
   .pcards{touch-action:pan-x;overscroll-behavior:contain}
-  .ibtn{height:44px;min-width:44px;border-radius:10px;font-size:17px}
+  .ibtn{height:44px;min-width:44px;border-radius:calc(14px*var(--vi-radius-scale,1));font-size:17px}
   .pback{min-height:44px;min-width:44px;padding:0 14px}
   .seg button{min-height:44px;min-width:44px;padding:0 12px}
   .ptools button{min-height:44px;padding:0 12px}
@@ -171,12 +172,12 @@
   .ptop{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right))}
   .ptools{right:max(12px,env(safe-area-inset-right))}
   /* ===== 虚拟摇杆（左手，浮动）+ NPU 大按钮（右手） ===== */
-  .joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 96px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:132px;height:132px;margin:0 0 0 -66px;border-radius:50%;pointer-events:none;border:2px solid var(--line);background:transparent;box-shadow:none;opacity:0;transition:opacity .15s;display:none}
+  .joy{position:fixed;z-index:6;left:calc(env(safe-area-inset-left) + 96px);bottom:calc(env(safe-area-inset-bottom) + 30px);width:132px;height:132px;margin:0 0 0 -66px;border-radius:50%;pointer-events:none;border:2px solid color-mix(in srgb,var(--vi-primary) 50%,transparent);background:radial-gradient(circle,color-mix(in srgb,var(--vi-primary) 12%,transparent),rgba(6,14,36,.4) 70%);box-shadow:0 0 24px color-mix(in srgb,var(--vi-primary) 25%,transparent);opacity:0;transition:opacity .15s;display:none}
   body.touch.stick .joy{display:block}
   .joy.ghost{opacity:.42}
   .joy.ghost::after{content:'左手拖动';position:absolute;left:0;right:0;top:100%;margin-top:4px;text-align:center;font-size:11px;color:#9fdcff;letter-spacing:1px}
   .joy.on{opacity:1;margin:-66px 0 0 -66px;bottom:auto}
-  .joy i{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:transparent;box-shadow:none;will-change:transform}
+  .joy i{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#aaf8ff,#00a6d6 60%,#05507a);box-shadow:0 0 18px var(--vi-primary);will-change:transform}
   body.touch .npu{width:100px;height:100px;font-size:15px;bottom:calc(30px + env(safe-area-inset-bottom))}
   body.touch .npu:active{transform:scale(.94)}
   body.touch.stick .chips{left:50%;transform:translateX(-50%);align-items:center;bottom:calc(30px + env(safe-area-inset-bottom))}
@@ -207,28 +208,27 @@
   .grab{display:none}
   @media (max-width:759px){
     #panelScreen,#pauseScreen{align-items:flex-end;padding:0 0 0 0}
-    #panelScreen .panel-card,#pauseScreen .pause-card{margin:auto 0 0;max-width:none;width:100%;border-radius:14px 24px 0 0;max-height:88vh;overflow:auto;padding:8px 16px calc(18px + env(safe-area-inset-bottom));background:rgba(27,27,33,0.97);border:1px solid rgba(255,255,255,0.175);border-bottom:none;box-shadow:none;animation:sheetUp .28s cubic-bezier(.2,.9,.3,1.1);transition:transform .2s}
+    #panelScreen .panel-card,#pauseScreen .pause-card{margin:auto 0 0;max-width:none;width:100%;border-radius:calc(24px*var(--vi-radius-scale,1)) calc(24px*var(--vi-radius-scale,1)) 0 0;max-height:88vh;overflow:auto;padding:8px 16px calc(18px + env(safe-area-inset-bottom));background:rgba(8,14,36,.97);border:1px solid rgba(120,170,255,.25);border-bottom:none;box-shadow:0 -10px 50px color-mix(in srgb,var(--vi-primary) 15%,transparent);animation:sheetUp .28s cubic-bezier(.2,.9,.3,1.1);transition:transform .2s}
     .grab{display:block;width:100%;height:24px;position:relative;touch-action:none;cursor:grab}
-    .grab::before{content:'';position:absolute;left:50%;top:8px;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:rgba(255,255,255,.3)}
+    .grab::before{content:'';position:absolute;left:50%;top:8px;width:44px;height:5px;margin-left:-22px;border-radius:calc(3px*var(--vi-radius-scale,1));background:rgba(255,255,255,.3)}
     #pauseScreen .res-title{font-size:28px!important}
   }
   @keyframes sheetUp{from{transform:translateY(70px);opacity:.4}}
 </style>
-<link rel="stylesheet" href="../skin-games.css" />
 </head>
 <body>
 <canvas id="gl"></canvas>
 
 <div class="hud" id="hud">
   <div class="hud-top">
-    <div class="pill"><span class="lv" id="hLv">第 1 关</span><br><b id="hPts">0</b> 积分 <span id="hCombo"></span><br><span style="color:var(--muted)" id="hPlays"></span></div>
+    <div class="pill"><span class="lv" id="hLv">第 1 关</span><br><b id="hPts">0</b> 积分 <span id="hCombo"></span><br><span style="color:var(--vi-muted)" id="hPlays"></span></div>
     <div class="right"><span class="hearts" id="hHp">❤❤❤</span><button class="ibtn" id="muteBtn" aria-label="静音">🔊</button><button class="ibtn" id="pauseBtn" aria-label="暂停">⏸</button></div>
   </div>
   <div class="boss" id="bossUI"><div class="nm" id="bossName">BOSS</div><div class="bar"><i id="bossBar"></i></div></div>
   <div class="chips" id="chips"></div>
   <button class="npu" id="npuBtn"><span><small>NPU</small>爆发</span></button>
   <div class="side" id="sideL">
-    <div class="scard"><h5 id="dLv">第 1 关</h5><div><span class="bigpts" id="dPts">0</span> 积分</div><div class="hearts" id="dHp"></div><div style="color:var(--muted)" id="dPlays"></div></div>
+    <div class="scard"><h5 id="dLv">第 1 关</h5><div><span class="bigpts" id="dPts">0</span> 积分</div><div class="hearts" id="dHp"></div><div style="color:var(--vi-muted)" id="dPlays"></div></div>
     <div class="scard"><h5>⚙ 芯片状态</h5><div id="dChips"></div></div>
     <div class="scard"><h5>✅ 今日任务</h5><div id="dMissions"></div></div>
   </div>
@@ -242,6 +242,7 @@
 <div class="center-msg" id="cmsg"><h2></h2><p></p></div>
 
 <div class="screen menu on" id="startScreen"><div class="card menu-card"><div class="mc-info">
+  <div class="vi-slot"><span data-vi-logo></span></div>
   <div class="logo" id="sLogo">INTEL · NEW CHIP LAUNCH</div>
   <div class="title" id="sTitle">芯片争霸 3D</div>
   <div class="sub" id="sSub">新芯出阵，制程为刃</div>
@@ -263,13 +264,13 @@
 </div></div></div>
 
 <div class="screen" id="pauseScreen"><div class="card pause-card"><div class="grab" aria-hidden="true"></div>
-  <div class="res-title" style="color:var(--brand-text);font-size:34px">已暂停</div>
+  <div class="res-title" style="color:var(--vi-primary-light);font-size:34px">已暂停</div>
   <p class="how" id="pInfo"></p>
   <button class="bigbtn" id="pResume">▶ 继续游戏</button>
   <button class="sbtn" id="pMissions">✅ 任务</button>
   <button class="sbtn" id="pProduct">💠 产品介绍</button>
   <button class="sbtn" id="pSettings">⚙️ 设置</button>
-  <button class="sbtn" id="pQuit" style="color:var(--brand-text)">结束本局并结算积分</button>
+  <button class="sbtn" id="pQuit" style="color:#ff8fa0">结束本局并结算积分</button>
 </div></div>
 
 <div class="screen" id="panelScreen"><div class="card panel-card"><div class="grab" aria-hidden="true"></div><div class="phead"><button class="pback" id="panelBack">‹ 返回</button><h3 id="panelTitle"></h3></div><div id="panelBody"></div></div></div>
@@ -292,7 +293,7 @@
 </div></div>
 
 <a class="back" id="backLink" href="../index.html">‹ 平台</a>
-<div class="nogl" id="nogl"><div><h2>当前浏览器不支持 WebGL</h2><p style="margin-top:10px;color:var(--muted)">请换用最新版 Chrome / Safari / 微信内置浏览器打开。</p></div></div>
+<div class="nogl" id="nogl"><div><h2>当前浏览器不支持 WebGL</h2><p style="margin-top:10px;color:var(--vi-muted)">请换用最新版 Chrome / Safari / 微信内置浏览器打开。</p></div></div>
 
 <script src="../vendor/three.bundle.min.js"></script>
 <script src="../ops-config.js"></script>
@@ -320,17 +321,17 @@ const CONFIG = {
   loseTitle: '过热宕机…',
   shareCta: '扫码来挑战我的新芯战力！',
   posterNote: '战力对比仅供娱乐，非真实性能排行 · 演示活动',
-  colors: { primary: '#00c7fd', intel: '#0068b5', accent: '#ff4fd8', gold: '#ffd166' },
+  colors: { primary: VI.c.primary, intel: VI.c.deep, accent: VI.c.accent, gold: VI.c.gold },
   process: ['Intel 7', 'Intel 4', 'Intel 3', 'Intel 20A', 'Intel 18A'],
   levels: {
-    1: { title: '第 1 关 · 制程黎明', flavor: '先进封装初试锋芒', tint: '#00c7fd' },
+    1: { title: '第 1 关 · 制程黎明', flavor: '先进封装初试锋芒', tint: VI.c.primary },
     2: { title: '第 2 关 · 能效战场', flavor: '光追洪流来袭，稳住护盾', tint: '#22ffb0' },
     3: { title: '第 3 关 · 算力终局', flavor: '新芯对决东方巨阵', tint: '#ffb84d' },
   },
   bosses: {
     1: { name: '红色多核战车', color: '#ff3b5c', warn: '多核齐射阵列已锁定', hp: 240, tip: '扇形齐射，贴边绕行；顶部核心阵列会直线开火。' },
     2: { name: '绿色显卡巨兽', color: '#3dff7a', warn: '高能光束正在预热', hp: 340, tip: '地面出现预警光带时立刻换道；风扇会甩出螺旋弹。' },
-    3: { name: '东方麒麟', color: '#ffd166', warn: '终局算力体已苏醒', hp: 460, tip: '只有头部受全额伤害；半血后会俯冲，看到预警横向闪开。' },
+    3: { name: '东方麒麟', color: VI.c.gold, warn: '终局算力体已苏醒', hp: 460, tip: '只有头部受全额伤害；半血后会俯冲，看到预警横向闪开。' },
   },
   waveSeconds: 24,
   playerHp: 3,
@@ -340,12 +341,12 @@ const CONFIG = {
     tagline: '示例：为 AI PC 而生的新一代处理器',
     disclaimer: '示例文案，请替换为官方参数',
     features: [
-      { id: 'cpu', icon: '🧠', title: 'CPU · 混合架构', short: '性能核 + 能效核', text: '示例：X 个性能核 + Y 个能效核，智能调度，重负载和轻办公两不误。', spec: '示例：最高 X.X GHz · XX 线程', tile: 'compute', color: '#00c7fd' },
+      { id: 'cpu', icon: '🧠', title: 'CPU · 混合架构', short: '性能核 + 能效核', text: '示例：X 个性能核 + Y 个能效核，智能调度，重负载和轻办公两不误。', spec: '示例：最高 X.X GHz · XX 线程', tile: 'compute', color: VI.c.primary },
       { id: 'gpu', icon: '🎮', title: 'GPU · 新一代核显', short: '光追 · AI 超分', text: '示例：新一代核显架构，支持硬件光追与 AI 超分，轻薄本也能畅玩。', spec: '示例：X 个图形核心', tile: 'graphics', color: '#a78bfa' },
-      { id: 'npu', icon: '⚡', title: 'NPU · AI 引擎', short: '端侧 AI 加速', text: '示例：独立 NPU 承担持续性 AI 负载，本地跑模型更省电、更私密。', spec: '示例：XX TOPS', tile: 'soc', color: '#ffd166' },
-      { id: 'process', icon: '🔬', title: '制程工艺', short: '先进制程（示例）', text: '示例：先进制程 + 背面供电 + 新型晶体管，带来更高密度与能效。', spec: '示例：Intel 18A', tile: 'base', color: '#3dff9a' },
+      { id: 'npu', icon: '⚡', title: 'NPU · AI 引擎', short: '端侧 AI 加速', text: '示例：独立 NPU 承担持续性 AI 负载，本地跑模型更省电、更私密。', spec: '示例：XX TOPS', tile: 'soc', color: VI.c.gold },
+      { id: 'process', icon: '🔬', title: '制程工艺', short: '先进制程（示例）', text: '示例：先进制程 + 背面供电 + 新型晶体管，带来更高密度与能效。', spec: '示例：Intel 18A', tile: 'base', color: VI.c.success },
       { id: 'efficiency', icon: '🍃', title: '能效表现', short: '更长续航', text: '示例：低功耗岛设计，日常办公续航更长、风扇更安静。', spec: '示例：续航提升 XX%', tile: 'io', color: '#5effc4' },
-      { id: 'ai', icon: '🤖', title: 'AI 算力', short: 'CPU + GPU + NPU 协同', text: '示例：三大引擎协同调度，平台总 AI 算力可达 XXX TOPS。', spec: '示例：平台总算力 XXX TOPS', tile: 'all', color: '#ff4fd8' },
+      { id: 'ai', icon: '🤖', title: 'AI 算力', short: 'CPU + GPU + NPU 协同', text: '示例：三大引擎协同调度，平台总 AI 算力可达 XXX TOPS。', spec: '示例：平台总算力 XXX TOPS', tile: 'all', color: VI.c.accent },
     ],
     /* 游戏道具 → 卖点卡（捡到道具时弹出「了解」） */
     powerupLink: { proc: 'process', core: 'cpu', shield: 'efficiency', npu: 'npu' },
@@ -398,7 +399,7 @@ renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 
 const scene = new T.Scene();
-const BG = new T.Color('#121216');
+const BG = new T.Color(VI.c.bgDeep);
 scene.background = BG;
 scene.fog = new T.Fog(BG, 40, 150);
 const camera = new T.PerspectiveCamera(60, 1, 0.1, 400);
@@ -406,7 +407,7 @@ const camera = new T.PerspectiveCamera(60, 1, 0.1, 400);
 const composer = new T.EffectComposer(renderer);
 const renderPass = new T.RenderPass(scene, camera);
 composer.addPass(renderPass);
-const bloom = new T.UnrealBloomPass(new T.Vector2(256, 256), 0.55, 0.45, 0.32);
+const bloom = new T.UnrealBloomPass(new T.Vector2(256, 256), 0.85, 0.5, 0.28);
 composer.addPass(bloom);
 composer.addPass(new T.OutputPass());
 
@@ -431,19 +432,19 @@ const sun = new T.DirectionalLight('#bfe6ff', 1.6); sun.position.set(-8, 20, 10)
 /* ---------------- 晶圆 / 电路板地面 ---------------- */
 function circuitTexture(tint) {
   const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
-  g.fillStyle = '#121216'; g.fillRect(0, 0, 512, 512);
+  g.fillStyle = VI.c.bgDeeper; g.fillRect(0, 0, 512, 512);
   g.strokeStyle = 'rgba(80,140,255,.10)'; g.lineWidth = 1;
   for (let i = 0; i <= 512; i += 32) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 512); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(512, i); g.stroke(); }
   g.lineCap = 'round';
   for (let k = 0; k < 46; k++) {
     let x = Math.round(rand(0, 16)) * 32, y = Math.round(rand(0, 16)) * 32;
-    g.strokeStyle = Math.random() < .25 ? '#ff4d6a' : tint; g.globalAlpha = rand(.35, .95); g.lineWidth = Math.random() < .3 ? 3 : 1.6;
+    g.strokeStyle = Math.random() < .25 ? VI.c.accent : tint; g.globalAlpha = rand(.35, .95); g.lineWidth = Math.random() < .3 ? 3 : 1.6;
     g.beginPath(); g.moveTo(x, y);
     for (let s = 0; s < 4; s++) { const d = Math.floor(rand(0, 4)); const L = Math.round(rand(1, 4)) * 32; if (d === 0) x += L; else if (d === 1) y += L; else if (d === 2) { x += L; y += L; } else { y -= L; x += L; } g.lineTo(x, y); }
     g.stroke(); g.fillStyle = g.strokeStyle; g.beginPath(); g.arc(x, y, 3.5, 0, 7); g.fill();
   }
   g.globalAlpha = 1;
-  for (let k = 0; k < 7; k++) { const x = Math.round(rand(1, 14)) * 32, y = Math.round(rand(1, 14)) * 32, w = 32 * Math.round(rand(1, 3)); g.fillStyle = '#1b1b21'; g.fillRect(x, y, w, w); g.strokeStyle = tint; g.globalAlpha = .7; g.lineWidth = 2; g.strokeRect(x, y, w, w); g.globalAlpha = 1; for (let p = 4; p < w; p += 8) { g.fillStyle = '#c9a54a'; g.fillRect(x + p, y - 4, 3, 4); g.fillRect(x + p, y + w, 3, 4); } }
+  for (let k = 0; k < 7; k++) { const x = Math.round(rand(1, 14)) * 32, y = Math.round(rand(1, 14)) * 32, w = 32 * Math.round(rand(1, 3)); g.fillStyle = VI.c.surface2; g.fillRect(x, y, w, w); g.strokeStyle = tint; g.globalAlpha = .7; g.lineWidth = 2; g.strokeRect(x, y, w, w); g.globalAlpha = 1; for (let p = 4; p < w; p += 8) { g.fillStyle = '#c9a54a'; g.fillRect(x + p, y - 4, 3, 4); g.fillRect(x + p, y + w, 3, 4); } }
   const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.colorSpace = T.SRGBColorSpace; t.anisotropy = 4; return t;
 }
 let groundTex = circuitTexture(CONFIG.colors.primary);
@@ -454,7 +455,7 @@ ground.rotation.x = -Math.PI / 2; ground.position.set(0, -2.2, -110); scene.add(
 
 /* 两侧元器件城市（InstancedMesh） */
 const CITY_N = 140;
-const cityMat = new T.MeshStandardMaterial({ color: '#1b1b21', metalness: 0.7, roughness: 0.35 });
+const cityMat = new T.MeshStandardMaterial({ color: '#0b1430', metalness: 0.7, roughness: 0.35 });
 const city = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), cityMat, CITY_N);
 const capMat = new T.MeshBasicMaterial({ color: '#ffffff', toneMapped: false });
 const caps = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), capMat, CITY_N);
@@ -481,7 +482,7 @@ for (let i = 0; i < DUST_N; i++) { dustPos[i * 3] = rand(-45, 45); dustPos[i * 3
 dustGeo.setAttribute('position', new T.BufferAttribute(dustPos, 3));
 function dotTexture() { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(.35, 'rgba(255,255,255,.55)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); return new T.CanvasTexture(c); }
 const DOT = dotTexture();
-const dust = new T.Points(dustGeo, new T.PointsMaterial({ size: 0.28, map: DOT, color: '#7af3ff', transparent: true, opacity: .7, depthWrite: false, blending: T.AdditiveBlending }));
+const dust = new T.Points(dustGeo, new T.PointsMaterial({ size: 0.28, map: DOT, color: VI.c.primaryLight, transparent: true, opacity: .7, depthWrite: false, blending: T.AdditiveBlending }));
 scene.add(dust);
 
 /* ---------------- 粒子 ---------------- */
@@ -582,7 +583,7 @@ const player = new T.Group();
   player.add(pins);
   const edge = new T.LineSegments(new T.EdgesGeometry(new T.BoxGeometry(2.62, 0.24, 2.62)), new T.LineBasicMaterial({ color: new T.Color(CONFIG.colors.primary).multiplyScalar(2), toneMapped: false })); player.add(edge);
   [-0.7, 0.7].forEach(x => { const e = new T.Mesh(new T.SphereGeometry(0.22, 12, 8), glow(CONFIG.colors.primary, 3)); e.position.set(x, 0, 1.4); player.add(e); });
-  const shield = new T.Mesh(new T.SphereGeometry(2.1, 32, 16), new T.MeshBasicMaterial({ color: new T.Color('#3dff9a').multiplyScalar(1.4), transparent: true, opacity: .22, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
+  const shield = new T.Mesh(new T.SphereGeometry(2.1, 32, 16), new T.MeshBasicMaterial({ color: new T.Color(VI.c.success).multiplyScalar(1.4), transparent: true, opacity: .22, depthWrite: false, blending: T.AdditiveBlending, toneMapped: false }));
   shield.visible = false; shield.name = 'shield'; player.add(shield);
   const pl = new T.PointLight(CONFIG.colors.primary, 10, 10); pl.position.y = 1.2; player.add(pl);
 })();
@@ -638,7 +639,7 @@ function spawnEnemy(type) {
 }
 function killEnemy(e, i) {
   scene.remove(e.g); G.enemies.splice(i, 1);
-  const col = e.type === 'elite' ? '#ffd166' : CONFIG.bosses[G.level].color;
+  const col = e.type === 'elite' ? VI.c.gold : CONFIG.bosses[G.level].color;
   burst(e.x, 0, e.z, col, e.type === 'elite' ? 46 : 22, e.type === 'elite' ? 14 : 9, 0.8); ring(e.x, e.z, col, e.type === 'elite' ? 6 : 3.5, 0.45);
   Audio.boom(false); shake(e.type === 'elite' ? 0.35 : 0.12);
   if (e.type === 'elite') { G.run.elites++; addPts(PT.perElite, e.x, 1, e.z); } else { G.run.kills++; addPts(PT.perKill, e.x, 1, e.z); }
@@ -647,7 +648,7 @@ function killEnemy(e, i) {
 }
 
 /* ---------------- 道具 ---------------- */
-const PU_TYPES = { proc: { label: '制程升级', color: '#00e0ff' }, core: { label: '核心 +1', color: '#ff4fd8' }, shield: { label: '能效护盾', color: '#3dff9a' }, npu: { label: 'NPU 充能', color: '#ffd166' } };
+const PU_TYPES = { proc: { label: '制程升级', color: VI.c.primary }, core: { label: '核心 +1', color: VI.c.accent }, shield: { label: '能效护盾', color: VI.c.success }, npu: { label: 'NPU 充能', color: VI.c.gold } };
 const puGeo = new T.IcosahedronGeometry(0.75, 0), puCore = new T.SphereGeometry(0.38, 12, 10);
 let puCycle = 0;
 function spawnPU(type, x, z) {
@@ -762,7 +763,7 @@ function bossAI(dt) {
       b.atk -= dt * rate;
       if (b.atk <= 0) { b.atk = 0.11; const a = b.t * 3.1; eShot(b.x, b.z + 1.5, a, 11, col, { s: .8 }); eShot(b.x, b.z + 1.5, a + Math.PI, 11, '#ff8a3d', { s: .8 }); if (b.phase2) eShot(b.x, b.z + 1.5, -a * 0.7, 9, '#ffe9a8', { s: .7 }); }
       b.atk2 -= dt * rate;
-      if (b.atk2 <= 0) { b.atk2 = 3.4; for (let i = 0; i < 5; i++) eShot(b.x, b.z, angTo(b.x, b.z) + (i - 2) * 0.35, 8, '#ff3030', { s: 1.4, homing: 2.2 }); if (b.phase2 && b.dive <= 0 && Math.random() < .5) { b.dive = 2.2; b.diveX = G.px; flash('⚠ 麒麟俯冲', '#ff4f7b', 900); Audio.warn(); } }
+      if (b.atk2 <= 0) { b.atk2 = 3.4; for (let i = 0; i < 5; i++) eShot(b.x, b.z, angTo(b.x, b.z) + (i - 2) * 0.35, 8, '#ff3030', { s: 1.4, homing: 2.2 }); if (b.phase2 && b.dive <= 0 && Math.random() < .5) { b.dive = 2.2; b.diveX = G.px; flash('⚠ 麒麟俯冲', VI.c.danger, 900); Audio.warn(); } }
     }
   }
   b.g.position.set(b.x, 0.5 + Math.sin(b.t * 2) * 0.3, b.z);
@@ -813,25 +814,25 @@ function fire() {
 }
 function hurtPlayer() {
   if (G.inv > 0 || G.state !== 'play' || GOD) return;
-  if (G.shield > 0) { G.shield = 0; G.inv = 1; burst(G.px, 0, G.pz, '#3dff9a', 40, 10, .6); ring(G.px, G.pz, '#3dff9a', 6, .5); Audio.hit(); updateChips(); return; }
-  G.hp--; G.inv = 1.6; G.hitThisLevel = true; shake(0.9); Audio.hurt(); buzz(G.hp <= 0 ? [80, 60, 160] : 70); burst(G.px, 0, G.pz, '#ff4f7b', 50, 12, .7);
+  if (G.shield > 0) { G.shield = 0; G.inv = 1; burst(G.px, 0, G.pz, VI.c.success, 40, 10, .6); ring(G.px, G.pz, VI.c.success, 6, .5); Audio.hit(); updateChips(); return; }
+  G.hp--; G.inv = 1.6; G.hitThisLevel = true; shake(0.9); Audio.hurt(); buzz(G.hp <= 0 ? [80, 60, 160] : 70); burst(G.px, 0, G.pz, VI.c.danger, 50, 12, .7);
   if (G.proc > 0) { G.proc--; } updateChips(); updateHUD();
   if (G.hp <= 0) gameOver(false);
 }
 function useNPU() {
   if (G.state !== 'play' || G.npu < 100) return;
   G.npu = 0; Audio.npu(); shake(1.1); buzz([30, 40, 90]);
-  ring(G.px, G.pz, '#ffd166', 40, 0.9); ring(G.px, G.pz, '#ffffff', 26, 0.6); burst(G.px, 0, G.pz, '#ffd166', 120, 30, 1);
-  eBullets.list.forEach(b => burst(b.x, 0, b.z, '#ffd166', 2, 4, .4)); eBullets.clear();
+  ring(G.px, G.pz, VI.c.gold, 40, 0.9); ring(G.px, G.pz, '#ffffff', 26, 0.6); burst(G.px, 0, G.pz, VI.c.gold, 120, 30, 1);
+  eBullets.list.forEach(b => burst(b.x, 0, b.z, VI.c.gold, 2, 4, .4)); eBullets.clear();
   for (let i = G.enemies.length - 1; i >= 0; i--) { const e = G.enemies[i]; e.hp -= 30; if (e.hp <= 0) killEnemy(e, i); }
   if (G.boss) damageBoss(Math.round(G.boss.maxHp * 0.12), G.boss.x, G.boss.z);
-  flash('NPU 爆发！', '#ffd166', 900);
+  flash('NPU 爆发！', VI.c.gold, 900);
 }
 
 /* ---------------- 关卡流程 ---------------- */
 let flashT;
 function flash(title, color, ms, sub) {
-  const el = $('cmsg'); el.classList.remove('warn'); el.querySelector('h2').textContent = title; el.querySelector('h2').style.color = color || '#7af3ff'; el.querySelector('p').textContent = sub || '';
+  const el = $('cmsg'); el.classList.remove('warn'); el.querySelector('h2').textContent = title; el.querySelector('h2').style.color = color || VI.c.primaryLight; el.querySelector('p').textContent = sub || '';
   el.classList.add('on'); clearTimeout(flashT); flashT = setTimeout(() => el.classList.remove('on'), ms || 1000);
 }
 function startLevel(lv) {
@@ -845,14 +846,14 @@ function startLevel(lv) {
   $('dBoss').innerHTML = `<b style="color:${CONFIG.bosses[lv].color}">${CONFIG.bosses[lv].name}</b><br>${CONFIG.bosses[lv].tip}`;
   if (G.phase === 'warning') { bossWarning(); } else flash(L.title, L.tint, 1800, L.flavor);
 }
-function bossWarning() { G.phase = 'warning'; G.phaseT = 0; const B = CONFIG.bosses[G.level]; const el = $('cmsg'); flash('WARNING', '#ff4f7b', 2400, B.name + ' · ' + B.warn); el.classList.add('warn'); Audio.warn(); }
+function bossWarning() { G.phase = 'warning'; G.phaseT = 0; const B = CONFIG.bosses[G.level]; const el = $('cmsg'); flash('WARNING', VI.c.danger, 2400, B.name + ' · ' + B.warn); el.classList.add('warn'); Audio.warn(); }
 function levelClear() {
   G.run.levels++; addPts(PT.perLevelClear);
   let msg = '通关 +' + PT.perLevelClear;
   if (!G.hitThisLevel) { G.run.nohit++; addPts(PT.noHitBonus); msg += ' · 零受伤 +' + PT.noHitBonus; }
   Audio.win();
-  if (G.level >= 3) { flash('全部通关！', '#ffd166', 1800, msg); setTimeout(() => gameOver(true), 1900); G.phase = 'done'; return; }
-  flash('关卡完成', '#3dff9a', 2000, msg); G.phase = 'clear'; G.phaseT = 0;
+  if (G.level >= 3) { flash('全部通关！', VI.c.gold, 1800, msg); setTimeout(() => gameOver(true), 1900); G.phase = 'done'; return; }
+  flash('关卡完成', VI.c.success, 2000, msg); G.phase = 'clear'; G.phaseT = 0;
 }
 
 /* ---------------- 输入 ---------------- */
@@ -1057,7 +1058,7 @@ function applyQuality() {
   // DPR 上限 2；自动档：低端/掉帧 1.25，手机 1.75，电脑 2
   const pr = q === 'low' ? 1 : q === 'mid' ? Math.min(dpr, 1.5) : q === 'high' ? Math.min(dpr, 2) : Math.min(dpr, (lowered || LOWEND) ? 1.25 : MOBILE ? 1.75 : 2);
   const weak = q === 'low' || (q === 'auto' && (lowered || LOWEND));
-  PFX = weak ? 0.5 : 1; bloom.strength = weak ? 0.4 : 0.55; if (typeof dustGeo !== 'undefined') dustGeo.setDrawRange(0, weak ? Math.floor(DUST_N / 2) : DUST_N);
+  PFX = weak ? 0.5 : 1; bloom.strength = weak ? 0.6 : 0.85; if (typeof dustGeo !== 'undefined') dustGeo.setDrawRange(0, weak ? Math.floor(DUST_N / 2) : DUST_N);
   renderer.setPixelRatio(pr); composer.setPixelRatio(pr); bloom.enabled = q !== 'low'; resize();
 }
 function loop() {
@@ -1083,7 +1084,7 @@ function refreshMenus() {
   $('startBtn').disabled = left <= 0; $('startBtn').textContent = left > 0 ? `开始游戏（消耗 1 场）` : '今日场次已用完 · 分享可加场';
   const cc = Ops.claimableCount(); $('mBadge').textContent = $('eBadge').textContent = cc || '';
   const ck = Ops.checkinStatus(); $('sCheck').textContent = ck.done ? '已签到 ✓' : '签到 +' + OPS.checkin.rewards[Math.min(ck.nextDay, 7) - 1];
-  const tierTxt = `<span style="color:${t.color};font-weight:600">${t.icon} ${t.name}</span> · ${n ? `再得 ${n.min - s.lifetime} 积分升级 ${n.icon}${n.name}` : '已满级'}`;
+  const tierTxt = `<span style="color:${t.color};font-weight:800">${t.icon} ${t.name}</span> · ${n ? `再得 ${n.min - s.lifetime} 积分升级 ${n.icon}${n.name}` : '已满级'}`;
   $('sTier').innerHTML = tierTxt; $('eTier').innerHTML = tierTxt;
   $('sTbar').style.width = $('eTbar').style.width = Math.round(Ops.tierProgress() * 100) + '%';
   $('hPlays').textContent = $('dPlays').textContent = '今日剩余 ' + left + ' 场';
@@ -1120,18 +1121,18 @@ function gameOver(win) {
   win ? Audio.win() : Audio.lose();
   const R = G.run, res = Ops.settleGame(R.points, { kills: R.kills + R.elites, bossKills: R.bosses, levelClears: R.levels, allClear: win ? 1 : 0, procMax: R.procMax });
   $('hud').classList.remove('on'); $('backLink').style.display = '';
-  $('eTitle').textContent = win ? CONFIG.winTitle : CONFIG.loseTitle; $('eTitle').style.color = win ? '#ffd166' : '#ff4f7b';
+  $('eTitle').textContent = win ? CONFIG.winTitle : CONFIG.loseTitle; $('eTitle').style.color = win ? VI.c.gold : VI.c.danger;
   $('eSub').textContent = win ? `三关 Boss 全部拿下，${CONFIG.process[G.proc]} 制程封神！` : `止步第 ${G.level} 关 · ${CONFIG.bosses[G.level].name}。换条走线再冲！`;
   const row = (a, b) => `<div><span>${a}</span><span>${b}</span></div>`;
   $('eBreak').innerHTML =
     row(`击落杂讯 ×${R.kills}`, '+' + R.kills * PT.perKill) + row(`击落精英 ×${R.elites}`, '+' + R.elites * PT.perElite) + row(`拾取道具 ×${R.pus}`, '+' + R.pus * PT.perPowerup + (R.pus ? '+' : '')) +
     row(`击败 Boss ×${R.bosses}`, '+' + R.bosses * PT.perBoss) + row(`通关 ×${R.levels}`, '+' + R.levels * PT.perLevelClear) + row(`零受伤关卡 ×${R.nohit}`, '+' + R.nohit * PT.noHitBonus) +
     `<div class="tot"><span>本局积分</span><span>${R.points}</span></div>` +
-    row('实际入账', `<b style="color:var(--green)">+${res.granted}</b>`) +
-    (res.cappedByGame ? row('', `<span style="color:var(--amber)">单局上限 ${PT.perGameCap}</span>`) : '') + (res.cappedByDay ? row('', `<span style="color:var(--amber)">已触达每日上限 ${PT.dailyCap}</span>`) : '') +
+    row('实际入账', `<b style="color:var(--vi-success)">+${res.granted}</b>`) +
+    (res.cappedByGame ? row('', `<span style="color:var(--vi-warning)">单局上限 ${PT.perGameCap}</span>`) : '') + (res.cappedByDay ? row('', `<span style="color:var(--vi-warning)">已触达每日上限 ${PT.dailyCap}</span>`) : '') +
     (res.welcome ? row('好友邀请新人礼', '+' + res.welcome) : '') +
     row('可用积分', Ops.state.points) +
-    (Ops.claimableCount() ? row('✅ 可领取任务', `<b style="color:var(--amber)">${Ops.claimableCount()} 个</b>`) : '');
+    (Ops.claimableCount() ? row('✅ 可领取任务', `<b style="color:var(--vi-gold)">${Ops.claimableCount()} 个</b>`) : '');
   $('eNote').textContent = `抽奖 ${Ops.drawCost()} 积分/次 · 分享 +${OPS.plays.perShare} 场 +${OPS.share.pointsPerShare} 积分 · ${OPS.demoBanner}`;
   refreshMenus();
   setTimeout(() => $('endScreen').classList.add('on'), 400);
@@ -1227,14 +1228,14 @@ const tiles = {};
 (function buildShowcase() {
   showScene.add(new T.HemisphereLight('#8fb8ff', '#120624', 1.1));
   const key = new T.DirectionalLight('#ffffff', 2.2); key.position.set(5, 9, 6); showScene.add(key);
-  const rim = new T.PointLight('#ff4fd8', 40, 30); rim.position.set(-6, 3, -5); showScene.add(rim);
-  const rim2 = new T.PointLight('#00e0ff', 40, 30); rim2.position.set(6, 2, -4); showScene.add(rim2);
+  const rim = new T.PointLight(VI.c.accent, 40, 30); rim.position.set(-6, 3, -5); showScene.add(rim);
+  const rim2 = new T.PointLight(VI.c.primary, 40, 30); rim2.position.set(6, 2, -4); showScene.add(rim2);
   // 底座光环
-  const disc = new T.Mesh(new T.CircleGeometry(7, 64), new T.MeshBasicMaterial({ map: circuitTexture('#00c7fd'), transparent: true, opacity: 0.35, toneMapped: false })); disc.rotation.x = -Math.PI / 2; disc.position.y = -1.2; showScene.add(disc);
-  [5.2, 6.4].forEach((r, i) => { const ring = new T.Mesh(new T.TorusGeometry(r, 0.04, 8, 96), glow(i ? '#ff4fd8' : '#00e0ff', 2)); ring.rotation.x = Math.PI / 2; ring.position.y = -1.15; showScene.add(ring); });
+  const disc = new T.Mesh(new T.CircleGeometry(7, 64), new T.MeshBasicMaterial({ map: circuitTexture(VI.c.primary), transparent: true, opacity: 0.35, toneMapped: false })); disc.rotation.x = -Math.PI / 2; disc.position.y = -1.2; showScene.add(disc);
+  [5.2, 6.4].forEach((r, i) => { const ring = new T.Mesh(new T.TorusGeometry(r, 0.04, 8, 96), glow(i ? VI.c.accent : VI.c.primary, 2)); ring.rotation.x = Math.PI / 2; ring.position.y = -1.15; showScene.add(ring); });
   const sp = new Float32Array(300 * 3); for (let i = 0; i < 300; i++) { const a = rand(0, Math.PI * 2), r = rand(4, 12); sp[i * 3] = Math.cos(a) * r; sp[i * 3 + 1] = rand(-1, 7); sp[i * 3 + 2] = Math.sin(a) * r; }
   const sg = new T.BufferGeometry(); sg.setAttribute('position', new T.BufferAttribute(sp, 3));
-  showScene.add(new T.Points(sg, new T.PointsMaterial({ size: 0.12, map: DOT, color: '#7af3ff', transparent: true, depthWrite: false, blending: T.AdditiveBlending })));
+  showScene.add(new T.Points(sg, new T.PointsMaterial({ size: 0.12, map: DOT, color: VI.c.primaryLight, transparent: true, depthWrite: false, blending: T.AdditiveBlending })));
   // 封装基板
   const sub = new T.Mesh(new T.BoxGeometry(6, 0.3, 6), new T.MeshStandardMaterial({ color: '#0b3a2a', metalness: .4, roughness: .45, emissive: '#04281a', emissiveIntensity: .8 })); showRoot.add(sub);
   const pins = new T.InstancedMesh(new T.BoxGeometry(0.12, 0.06, 0.32), metal('#d4a537', '#5a3c00', .5), 4 * 30); let k = 0;
@@ -1242,11 +1243,11 @@ const tiles = {};
   showRoot.add(pins);
   for (let i = 0; i < 18; i++) { const cap = new T.Mesh(new T.BoxGeometry(0.22, 0.14, 0.12), metal('#c9a54a')); cap.position.set(rand(-2.7, 2.7), 0.22, Math.random() < .5 ? rand(2.5, 2.8) : rand(-2.8, -2.5)); showRoot.add(cap); }
   // 基础晶圆层（制程）
-  const baseTex = circuitTexture('#3dff9a'); baseTex.repeat.set(2, 2);
-  tiles.base = new T.Mesh(new T.BoxGeometry(4.6, 0.18, 4.6), new T.MeshStandardMaterial({ color: '#10202a', map: baseTex, emissive: '#3dff9a', emissiveMap: baseTex, emissiveIntensity: .3, metalness: .6, roughness: .35 }));
-  tiles.base.position.y = 0.24; tiles.base.userData = { y0: 0.24, y1: 0.5, color: '#3dff9a' }; showRoot.add(tiles.base);
+  const baseTex = circuitTexture(VI.c.success); baseTex.repeat.set(2, 2);
+  tiles.base = new T.Mesh(new T.BoxGeometry(4.6, 0.18, 4.6), new T.MeshStandardMaterial({ color: '#10202a', map: baseTex, emissive: VI.c.success, emissiveMap: baseTex, emissiveIntensity: .3, metalness: .6, roughness: .35 }));
+  tiles.base.position.y = 0.24; tiles.base.userData = { y0: 0.24, y1: 0.5, color: VI.c.success }; showRoot.add(tiles.base);
   // 功能模块（tile）
-  const T4 = [['compute', 'CPU', 2.4, 2.2, -0.95, -0.95, '#00c7fd'], ['graphics', 'GPU', 1.75, 2.2, 1.3, -0.95, '#a78bfa'], ['soc', 'NPU · SoC', 2.4, 1.75, -0.95, 1.25, '#ffd166'], ['io', 'I/O · 低功耗岛', 1.75, 1.75, 1.3, 1.25, '#5effc4']];
+  const T4 = [['compute', 'CPU', 2.4, 2.2, -0.95, -0.95, VI.c.primary], ['graphics', 'GPU', 1.75, 2.2, 1.3, -0.95, '#a78bfa'], ['soc', 'NPU · SoC', 2.4, 1.75, -0.95, 1.25, VI.c.gold], ['io', 'I/O · 低功耗岛', 1.75, 1.75, 1.3, 1.25, '#5effc4']];
   T4.forEach(([id, lab, w, d, x, z, col]) => {
     const top = labelTex(lab.split(' ')[0], lab.includes('·') ? lab.split('· ')[1] : '', col, 256, 256);
     const mat = new T.MeshStandardMaterial({ color: '#0d1426', map: top, emissive: col, emissiveMap: top, emissiveIntensity: .5, metalness: .5, roughness: .3 });
