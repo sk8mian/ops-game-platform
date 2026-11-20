@@ -91,6 +91,8 @@
   .navlinks button:hover{border-color:rgba(0,224,255,.5)}
   .navlinks i{position:absolute;top:-6px;right:-4px;min-width:17px;height:17px;border-radius:9px;background:#ff4f7b;color:#fff;font-size:10.5px;font-style:normal;line-height:17px;padding:0 4px}
   .navlinks i:empty{display:none}
+  .navlinks a.planlink{grid-column:1/-1;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--text);border:1px solid rgba(0,224,255,.35);background:rgba(0,224,255,.08);border-radius:10px;padding:8px 4px;font-size:12.5px;min-height:36px}
+  .navlinks a.planlink:hover{border-color:rgba(0,224,255,.7)}
   .menu-btn{display:flex}
   @media (min-width:1200px){.menu-btn{display:none}}
   @media (max-width:1199px){.nav{position:fixed;left:0;top:0;bottom:0;z-index:9060;border-radius:0 22px 22px 0;transform:translateX(-105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);padding-top:calc(40px + env(safe-area-inset-top));background:#0a0f26;width:min(300px,84vw)}
@@ -163,7 +165,7 @@
     .chip{min-height:44px;display:flex;align-items:center}
     .btn{min-height:44px}
     .send{width:52px;height:50px}
-    .navlinks button{min-height:44px}
+    .navlinks button,.navlinks a.planlink{min-height:44px}
     .sitem,.litem{min-height:44px;justify-content:center}
     details.spec summary{min-height:44px;display:flex;align-items:center}
     textarea{font-size:16px}
@@ -205,7 +207,7 @@
       <h4>我的活动 <span id="campCount"></span></h4>
       <div class="scroll" id="campList" style="max-height:28%"></div>
       <div class="me-card" id="meCard"></div>
-      <div class="navlinks"><button id="nMissions">✅ 任务中心<i id="nBadge"></i></button><button id="nRules">📜 活动规则</button><button id="nWallet">🎁 我的权益</button><button id="nSettings">⚙ 模型设置</button></div>
+      <div class="navlinks"><button id="nMissions">✅ 任务中心<i id="nBadge"></i></button><button id="nRules">📜 活动规则</button><button id="nWallet">🎁 我的权益</button><button id="nSettings">⚙ 模型设置</button><a class="planlink" href="plan.html">🗺 平台规划</a></div>
     </nav>
     <div class="navmask" id="navMask"></div>
     <section class="chat">

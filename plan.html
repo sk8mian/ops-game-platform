@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#050816" />
+<title>平台规划 · Kairos 运营 Game 平台：模块细化与缺口清单</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23070b1a'/%3E%3Cpath d='M9 22l7-12 7 12z' fill='none' stroke='%2300e0ff' stroke-width='2.4'/%3E%3C/svg%3E" />
+<style>
+  :root{--bg:#050816;--panel:rgba(16,22,48,.72);--line:rgba(120,170,255,.16);--cyan:#00e0ff;--pink:#ff4fd8;--violet:#7c8cff;--text:#e8f0ff;--dim:#8c9cc4;--ok:#3dff9a;--mid:#ffcf6e;--bad:#ff6b8b}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth;scroll-padding-top:120px}
+  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;line-height:1.6;-webkit-text-size-adjust:100%}
+  .bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+    radial-gradient(600px 400px at 10% -10%,rgba(0,224,255,.18),transparent 60%),
+    radial-gradient(700px 500px at 110% 10%,rgba(255,79,216,.14),transparent 60%),
+    radial-gradient(800px 600px at 50% 120%,rgba(124,140,255,.16),transparent 60%)}
+  .bgfx:after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(120,170,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(120,170,255,.05) 1px,transparent 1px);background-size:32px 32px}
+  .top{position:sticky;top:0;z-index:5;background:rgba(5,8,22,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 0}
+  .bar{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:10px}
+  .orb{width:34px;height:34px;border-radius:11px;flex:none;background:conic-gradient(from 200deg,var(--cyan),var(--violet),var(--pink),var(--cyan));box-shadow:0 0 18px rgba(0,224,255,.4);position:relative}
+  .orb:after{content:"AI";position:absolute;inset:3px;border-radius:9px;background:#0a0f26;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#bff6ff}
+  .bar h1{font-size:16px;font-weight:800;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .back{color:var(--text);text-decoration:none;border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:12px;min-height:40px;padding:0 12px;font-size:13px;display:flex;align-items:center;white-space:nowrap}
+  .back:hover{border-color:rgba(0,224,255,.5)}
+  .tabs{max-width:1240px;margin:8px auto 0;display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs a{flex:none;color:#bfd0f5;text-decoration:none;font-size:13px;border:1px solid var(--line);border-radius:99px;padding:7px 12px;background:rgba(255,255,255,.04);min-height:36px;display:flex;align-items:center}
+  .tabs a.on{color:#041022;background:linear-gradient(90deg,var(--cyan),var(--violet));border-color:transparent;font-weight:700}
+  @media (hover:hover){.tabs a:hover{color:#fff;border-color:rgba(0,224,255,.6)}}
+  main{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:18px 16px calc(40px + env(safe-area-inset-bottom))}
+  .hero{background:linear-gradient(160deg,rgba(0,224,255,.12),rgba(255,79,216,.08) 60%,rgba(124,140,255,.1));border:1px solid rgba(0,224,255,.35);border-radius:22px;padding:18px;margin-bottom:18px}
+  .hero h2{font-size:22px;font-weight:900;background:linear-gradient(90deg,#fff,#7af3ff);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.35}
+  .hero p{color:#c6d4f5;font-size:14px;margin-top:6px}
+  .p0{margin-top:12px;display:grid;gap:8px}
+  .p0 div{background:rgba(255,107,139,.08);border:1px solid rgba(255,107,139,.35);border-radius:12px;padding:8px 12px;font-size:13.5px}
+  .p0 b{color:var(--bad);margin-right:6px}
+  section.card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:18px;margin-bottom:18px;backdrop-filter:blur(12px)}
+  h3{font-size:18px;font-weight:900;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  h3 .no{font-size:12px;color:#041022;background:linear-gradient(90deg,var(--cyan),var(--pink));border-radius:8px;padding:1px 8px;font-weight:900}
+  h4{font-size:15px;margin:18px 0 6px;color:#7af3ff}
+  .lead{color:var(--dim);font-size:13.5px;margin-bottom:10px}
+  .note{font-size:12.5px;color:var(--dim);margin-top:8px}
+  .warn{background:rgba(255,190,60,.08);border:1px dashed rgba(255,190,60,.45);border-radius:12px;padding:10px 12px;font-size:13.5px;margin-top:10px}
+  .info{background:rgba(0,224,255,.07);border:1px solid rgba(0,224,255,.3);border-radius:12px;padding:10px 12px;font-size:13.5px;margin:6px 0 10px}
+  .seg{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+  .seg button{border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);border-radius:99px;padding:8px 14px;font-size:13px;cursor:pointer;min-height:40px}
+  .seg button.on{background:linear-gradient(90deg,var(--cyan),var(--violet));color:#041022;font-weight:800;border-color:transparent}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;color:#7af3ff;font-size:12.5px;font-weight:700;padding:8px 10px;border-bottom:1px solid rgba(0,224,255,.3);white-space:nowrap}
+  td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  td:first-child{font-weight:700;color:#fff}
+  tr:last-child td{border-bottom:none}
+  .tag{display:inline-block;font-size:12px;font-weight:800;border-radius:99px;padding:1px 9px;white-space:nowrap}
+  .ok{color:var(--ok);border:1px solid rgba(61,255,154,.5)}.mid{color:var(--mid);border:1px solid rgba(255,207,110,.5)}.bad{color:var(--bad);border:1px solid rgba(255,107,139,.5)}
+  .tw{overflow-x:auto}
+  .arch{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 12px}
+  .arch .pt{border-radius:16px;padding:12px;border:1px solid var(--line);background:rgba(5,8,22,.5)}
+  .arch .pt h5{font-size:14px;margin-bottom:4px}
+  .arch .pt p{font-size:12.5px;color:#c6d4f5}
+  .arch .pt small{display:block;margin-top:6px;font-size:12px;color:var(--dim)}
+  .c0{border-color:rgba(0,224,255,.5)!important}.c1{border-color:rgba(255,79,216,.5)!important}.c2{border-color:rgba(124,140,255,.6)!important}.c3{border-color:rgba(61,255,154,.5)!important}
+  .flow{font-size:13px;color:#c6d4f5;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .flow b{color:#ff9be9}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+  .steps div{border:1px solid var(--line);border-radius:12px;padding:10px;background:rgba(5,8,22,.45);font-size:13px}
+  .steps b{display:block;color:#7af3ff;margin-bottom:2px}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;font-size:13.5px;margin:6px 0 10px}
+  .kv dt{color:#7af3ff;font-weight:700}
+  .bars{display:grid;gap:8px;margin:10px 0}
+  .brow{display:grid;grid-template-columns:190px 1fr 70px;gap:10px;align-items:center;font-size:13px}
+  .btrack{height:12px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+  .bfill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--violet))}
+  .bfill.hi{background:linear-gradient(90deg,var(--pink),var(--violet))}
+  .bv{text-align:right;color:#fff;font-weight:700}
+  .roi{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:10px}
+  .roi label{font-size:12.5px;color:var(--dim);display:flex;flex-direction:column;gap:4px}
+  .roi input{background:rgba(5,8,22,.6);border:1px solid var(--line);border-radius:10px;color:var(--text);font-size:16px;padding:10px;min-height:44px;width:100%}
+  .roi input:focus{outline:none;border-color:rgba(0,224,255,.6)}
+  .out{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+  .out div{border:1px solid rgba(0,224,255,.35);border-radius:14px;padding:10px 12px;background:rgba(0,224,255,.06)}
+  .out span{display:block;font-size:12px;color:var(--dim)}
+  .out b{font-size:18px}
+  .btn{appearance:none;border:none;cursor:pointer;font-weight:800;font-size:14px;color:#041022;padding:10px 16px;border-radius:13px;background:linear-gradient(90deg,var(--cyan),var(--violet) 55%,var(--pink));min-height:44px;margin-top:10px}
+  .btn.ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--line)}
+  ul.dots{padding-left:18px;font-size:13.5px}
+  ul.dots li{margin:3px 0}
+  ol.src{padding-left:22px;font-size:13px;columns:2;column-gap:28px}
+  ol.src li{margin:3px 0;break-inside:avoid}
+  ol.src a{color:#7af3ff;word-break:break-all}
+  ol.src small{color:var(--dim)}
+  footer{text-align:center;color:var(--dim);font-size:12px;margin-top:6px}
+  footer a{color:#7af3ff}
+  /* 手机：表格转卡片 */
+  @media (max-width:760px){
+    .bar h1{font-size:14.5px}
+    .hero h2{font-size:19px}
+    section.card{padding:14px;border-radius:18px}
+    .arch,.steps{grid-template-columns:1fr 1fr}
+    .roi{grid-template-columns:1fr 1fr}.out{grid-template-columns:1fr 1fr}
+    .brow{grid-template-columns:1fr 54px}.brow .btrack{grid-column:1/-1;grid-row:2}
+    .kv{grid-template-columns:1fr}.kv dt{margin-top:6px}
+    ol.src{columns:1}
+    table.cards thead{display:none}
+    table.cards,table.cards tbody,table.cards tr,table.cards td{display:block;width:100%}
+    table.cards tr{border:1px solid var(--line);border-radius:14px;padding:8px 12px;margin-bottom:10px;background:rgba(5,8,22,.45)}
+    table.cards td{border:none;padding:4px 0;display:grid;grid-template-columns:86px 1fr;gap:8px}
+    table.cards td:before{content:attr(data-l);color:var(--dim);font-size:12px;font-weight:600;padding-top:1px}
+    table.cards td:first-child{grid-template-columns:1fr;font-size:14.5px;padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:4px}
+    table.cards td:first-child:before{display:none}
+    table.cards td>.tag{justify-self:start}
+  }
+  @media (max-width:380px){.arch,.steps{grid-template-columns:1fr}}
+
+  .seg2{margin-top:-2px}
+  .roles td:nth-child(2){white-space:nowrap}
+  .sum{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:10px 0 4px}
+  .sum div{border:1px solid rgba(0,224,255,.35);border-radius:14px;padding:10px 12px;background:rgba(0,224,255,.06)}
+  .sum span{display:block;font-size:12px;color:var(--dim)}.sum b{font-size:18px}
+  .phase{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .phase>div{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(5,8,22,.5)}
+  .phase h5{font-size:15px;color:#fff;margin-bottom:2px}.phase .when{font-size:12px;color:#7af3ff}
+  .phase p{font-size:13px;margin-top:6px;color:#c6d4f5}.phase p b{color:#ff9be9;font-weight:700}
+  @media (max-width:760px){.sum{grid-template-columns:1fr 1fr}.phase{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bgfx"></div>
+<div class="top">
+  <div class="bar"><div class="orb"></div><h1>平台规划 · 功能点与分工实施</h1><a class="back" href="index.html">‹ 返回工坊</a></div>
+  <nav class="tabs" id="tabs">
+    <a href="#overview">总览</a><a href="#features">功能点×分工</a><a href="#roles">角色分工</a><a href="#phases">实施阶段</a><a href="#deploy">部署与跳转</a><a href="#verify">技术验证</a><a href="#metrics">指标</a><a href="#compare">对比表</a><a href="#roi">ROI 测算</a><a href="#needs">需要提供</a><a href="#trial">试跑</a><a href="#sources">来源</a>
+  </nav>
+</div>
+<main>
+  <div class="hero">
+    <h2>Kairos 运营 Game 平台：功能点 × 分工实施</h2>
+    <p>平台要实现哪些功能、拆成哪些模块和功能点，每一项由谁做、怎么做、多少工作量、怎么验收。现状按代码实际判断；工作量与周期都是估计。整理于 2026-11-20（台北时间）。</p>
+    <div class="sum" id="sum"></div>
+    <div class="p0">
+      <div><b>P0-1</b>后端服务、防刷、服务端抽奖（现在全在浏览器本地，可被改）</div>
+      <div><b>P0-2</b>抖音 / B站 / 微信平台登录（换 openid）</div>
+      <div><b>P0-3</b>合规改造：去掉分享即得、关注即得，Boss 换中性反派</div>
+      <div><b>P0-4</b>数据埋点和渠道归因</div>
+      <div><b>P0-5</b>抖音小程序外壳 + 企业主体资质</div>
+    </div>
+  </div>
+
+  <section class="card" id="overview">
+    <h3><span class="no">1</span>平台结构总览</h3>
+    <p class="lead">四个部分 + 平台底座；④ 策划方案与 ⑦ 运营价值双向联动。</p>
+    <div class="arch">
+      <div class="pt c0"><h5>一 游戏本身</h5><p>① 游戏内容 · ② 产品介绍科普 · ③ 游戏内运营（邀请/分享/抽奖）</p><small>完成度：<span class="tag ok">演示可用</span></small></div>
+      <div class="pt c1"><h5>二 策划方案</h5><p>④ 产品/运营策略、激活方案，分抖音/B站/小红书</p><small>完成度：<span class="tag mid">只有通用方案</span></small></div>
+      <div class="pt c2"><h5>三 部署与跨平台跳转</h5><p>⑤ 部署与挂载 · ⑥ 跨生态跳转与回流</p><small>完成度：<span class="tag bad">未开始</span></small></div>
+      <div class="pt c3"><h5>四 运营价值</h5><p>⑦ 互动、涨粉、播放、转发 → 品牌声量</p><small>完成度：<span class="tag bad">未开始</span></small></div>
+    </div>
+    <div class="flow"><b>④ → ①③</b> 定玩法、定规则 ｜ <b>④ ⇄ ⑦</b> 定目标、复盘反哺 ｜ <b>①②③ → ⑤⑥</b> 打包上线 ｜ <b>⑤⑥ → ⑦</b> 数据回流 ｜ <b>平台底座</b> 账号 · 后端 · 防刷 · 配置后台 · 埋点 · 模型接入</div>
+  </section>
+
+  <section class="card" id="features">
+    <h3><span class="no">2</span>功能点 × 分工实施表</h3>
+    <p class="lead">现状按代码判断：已有＝能跑且行为正确；部分＝能演示但不能上线；缺失＝代码里没有。负责角色第一个为牵头人；人天是估计。</p>
+    <div class="seg" id="seg"></div>
+    <div class="seg seg2" id="pseg"></div>
+    <div class="tw" id="featTable"></div>
+  </section>
+
+  <section class="card" id="roles">
+    <h3><span class="no">3</span>角色与分工总览</h3>
+    <p class="lead">核心团队建议 7-9 人：产品 1、运营策划 1-2、游戏前端 2、后端 2、AI 1、测试 1；视觉和平台对接可半职或兼任；法务和品牌方按需参与。</p>
+    <div class="tw" id="tRoles"></div>
+  </section>
+
+  <section class="card" id="phases">
+    <h3><span class="no">4</span>实施阶段（估计）</h3>
+    <div class="phase" id="phaseBox"></div>
+    <p class="note">时间和人天都是估计；最大变数是资质下发和平台审核时长。</p>
+  </section>
+
+  <section class="card" id="deploy">
+    <h3><span class="no">5</span>部署与跨平台跳转（⑤⑥）</h3>
+    <p class="lead">A 在各端怎么部署和挂载；B 各方向能不能跳；C 微信小程序怎么影响内容平台用户。</p>
+    <h4>A 部署与挂载</h4><div class="tw" id="tDeploy"></div>
+    <p class="note">建议：抖音先用小程序 web-view 套现有 H5 验证；B站和小红书看试跑结果再决定是否做原生版。小红书营销小游戏类目和具体挂载规则待确认。</p>
+    <h4>B 跨生态跳转矩阵</h4><div class="tw" id="tJump"></div>
+    <div class="warn">没有合规的「一键互跳」。可行的串联方式只有三种：各端各做原生版本；用口令或搜索词让用户自己走一步；用跨端账号绑定把数据拼起来。</div>
+    <h4>C 用微信小程序影响内容平台用户</h4><div class="tw" id="tInfluence"></div>
+  </section>
+
+  <section class="card" id="verify">
+    <h3><span class="no">6</span>技术验证清单</h3>
+    <div class="tw" id="tVerify"></div>
+  </section>
+
+  <section class="card" id="metrics">
+    <h3><span class="no">7</span>运营价值指标体系（⑦）</h3>
+    <p class="lead">同一指标在不同来源的分母不同，对比前先统一口径；第三方、海外数据只当方向参考。</p>
+    <div class="tw" id="tMetrics"></div>
+  </section>
+
+  <section class="card" id="compare">
+    <h3><span class="no">8</span>传统运营 vs 游戏化</h3>
+    <p class="lead">内部数字等运营同事填、试跑记录；降本、提速、影响力增幅等两列都有数再算。</p>
+    <div class="tw" id="tCompare"></div>
+  </section>
+
+  <section class="card" id="roi">
+    <h3><span class="no">9</span>ROI 测算器</h3>
+    <p class="lead">填一场活动（过往或试跑）的数字，自动算单位成本。只在本机计算，不上传。</p>
+    <div class="roi">
+      <label>总成本（元）<input id="rCost" type="number" inputmode="decimal" min="0" placeholder="制作+投放+奖品"></label>
+      <label>参与人数<input id="rPlayers" type="number" inputmode="numeric" min="0"></label>
+      <label>互动次数<input id="rEngage" type="number" inputmode="numeric" min="0"></label>
+      <label>净增粉丝<input id="rFans" type="number" inputmode="numeric" min="0"></label>
+      <label>播放量<input id="rViews" type="number" inputmode="numeric" min="0"></label>
+    </div>
+    <div class="out" id="rOut"></div>
+    <button class="btn ghost" id="rReset">清空</button>
+  </section>
+
+  <section class="card" id="needs">
+    <h3><span class="no">10</span>需要你提供的东西</h3>
+    <div class="tw" id="tNeeds"></div>
+    <h4>白板待确认</h4>
+    <ul class="dots">
+      <li>「3/7 MVS」：疑似第 3 项与第 7 项联动或某个指标，原意待确认。</li>
+      <li>「D2T」：含义待确认。</li>
+      <li>「Game Creation」：可能是「AI 生成游戏」能力，归 ① 还是 ④ 待确认。</li>
+      <li>白板右侧「节点（春节高流量）、互动数据、搜索 #话题、日常抖音挂载」「第二形式：视频、图文」「Audience 泛人群」已放进 ④ 和 ⑦。</li>
+    </ul>
+  </section>
+
+  <section class="card" id="trial">
+    <h3><span class="no">11</span>试跑建议</h3>
+    <div class="tw" id="tTrial"></div>
+  </section>
+
+  <section class="card" id="sources">
+    <h3><span class="no">12</span>来源</h3>
+    <ol class="src" id="srcList"></ol>
+  </section>
+  <footer>运营游戏工坊 · 平台规划 ｜ <a href="index.html">返回工坊</a></footer>
+</main>
+
+<script>
+(() => {
+'use strict';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const TAG = { '已有': 'ok', '部分': 'mid', '缺失': 'bad', '可以': 'ok', '有限': 'mid', '不行': 'bad', '基本不行': 'bad', '高': 'ok', '中': 'mid', '低到中': 'mid' };
+const cell = (v) => (v && typeof v === 'object') ? `<span class="tag ${v.c}">${esc(v.t)}</span>` : esc(v);
+const tg = (t) => ({ t, c: TAG[t] || 'mid' });
+function table(el, cols, rows) {
+  $(el).innerHTML = `<table class="cards"><thead><tr>${cols.map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${
+    rows.map((r) => `<tr>${r.map((v, i) => `<td data-l="${esc(cols[i])}">${cell(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+/* ---------- 功能点数据：[模块, 功能点, 功能说明, 现状, 负责角色, 怎么做, 依赖, 人天(估计), 优先级, 验收标准] ---------- */
+const F = [["①", "3D 闯关玩法", "3 关 + Boss、道具、摇杆 + NPU 键、画质自动降级", "已有", "游戏前端/3D、测试", "保留现有 three.js 实现，补真机性能档位与错误上报", "真机测试机型", 3, "P1", "中端安卓 ≥30fps、iPhone ≥55fps，无白屏"], ["①", "中性反派版本", "Boss 改为「算力瓶颈 / 功耗怪兽 / 发热魔王」等中性角色", "缺失", "游戏前端/3D、UI/视觉、法务", "改关卡配置里的名称、配色、台词，重做 Boss 外观", "法务意见", 3, "P0", "法务书面通过，无竞品影射"], ["①", "品牌换皮配置", "名称、配色、Logo、KV、角色图可替换", "部分", "游戏前端/3D、UI/视觉", "把代码里的 CONFIG 改成后台下发的 JSON + 素材地址，启动时加载", "运营配置后台", 4, "P1", "不改代码，30 分钟内换完一套品牌皮肤"], ["①", "AI 生成关卡内容", "按 brief 生成关卡主题、Boss、台词、道具文案、难度", "部分", "AI/算法、游戏前端/3D", "扩展活动 JSON 的 game 字段，游戏按 ?cfg= 应用；输出过品牌禁用词校验", "模型接入代理", 5, "P1", "3 个不同 brief 生成的游戏文案和难度都不同，0 违禁词"], ["①", "轻量模板：人格测试 / 打卡券", "5 题测试 + 海报；签到 + 换券", "已有", "游戏前端/3D", "保留；人格测试的 AI 解读改走后端代理", "模型接入代理", 2, "P2", "解读 5 秒内返回"], ["①", "合规拉人玩法模板", "组队 PK、集卡、超频进度条", "缺失", "产品、游戏前端/3D、后端", "按调研 Page 的合规版本做，奖励只挂在「玩了」上", "后端服务、平台登录", 10, "P2", "过法务和平台规则自审"], ["②", "3D 产品展示与卖点卡", "可旋转 3D 芯片 + 6 张卖点卡，道具拾取弹卖点", "已有", "游戏前端/3D、商务/品牌方", "把示例文案换成官方参数，过法务", "芯片官方参数", 1, "P0", "所有卖点与官方资料一致，法务签字"], ["②", "新概念科普卡", "如「智能 PC」是什么、能做什么，3-5 张短卡", "缺失", "运营策划、UI/视觉、游戏前端/3D", "插在产品介绍和关卡之间，统一概念词", "品牌概念词定义", 2, "P1", "科普卡读完率可统计"], ["②", "AI 讲解员问答", "玩家问参数、对比、场景", "缺失", "AI/算法、后端", "只基于官方资料检索回答，超范围拒答", "官方 FAQ、模型接入代理", 5, "P2", "50 条测试题准确率 ≥90%，不编参数"], ["②", "转化出口", "看完介绍去官网 / 商城 / 门店预约", "缺失", "产品、平台对接", "按端配置：抖音用官方组件，微信跳商城小程序，H5 用外链", "各端规则", 2, "P1", "每端出口可点击、可统计"], ["③", "积分 / 场次 / 签到 / 任务 / 铜银金", "每日场次、7 日签到、任务中心、三档权益", "已有", "后端、游戏前端/3D", "规则引擎迁到服务端，前端只展示", "后端服务", 5, "P0", "改浏览器本地数据不影响积分"], ["③", "服务端抽奖与发奖", "按概率和库存抽奖，发奖、核销、概率公示", "部分", "后端、法务、商务/品牌方", "服务端抽奖 + 库存扣减 + 发奖记录，前端只播动画", "正式奖品与概率", 5, "P0", "10 万次模拟分布与公示一致，库存不超发"], ["③", "合规版分享 / 邀请", "分享不带奖励；被邀人完成首局才发奖", "部分", "产品、后端、法务", "删掉分享即得；新 openid + 首局完成才计，服务端去重", "平台登录", 4, "P0", "自审清单全过，刷邀请被拦截"], ["③", "关注引导", "结算页放各端原生关注组件，不给奖励", "缺失", "平台对接", "抖音一键关注组件、B站关注 UP 接口；已关注时隐藏", "各端企业号", 2, "P1", "关注点击和成功数可统计"], ["③", "搜索引导任务", "任务中心提示去平台搜品牌词 / 话题", "缺失", "运营策划、游戏前端/3D", "只展示文字，不放链接，不发奖", "搜索词表", 1, "P2", "文案过平台审核"], ["③", "真实排行榜 / 好友榜", "日榜、总榜、好友榜", "部分", "后端、平台对接", "服务端榜单 + 抖音排行榜 / B站关注链", "平台登录", 4, "P1", "榜单实时，异常分数被剔除"], ["④", "AI 运营专家出 3 个方向", "说需求，返回 3 张方向卡", "已有", "AI/算法", "改走后端代理调 GPT-6.2 Astra，失败回退演示引擎", "模型接入代理", 2, "P1", "10 个真实 brief 都返回合法结构"], ["④", "活动配置与设计规格", "菜单、任务、规则、奖励、运营节奏", "已有", "AI 平台自动生成", "保持；补导出", "—", 0, "P2", "—"], ["④", "方案导出", "导出 PDF / Word / 在线文档", "缺失", "产品、后端", "按模板渲染导出", "—", 2, "P2", "导出排版完整，可直接发给客户"], ["④", "分平台策划方案", "抖音 / B站 / 小红书各一版：入口、机制、合规改法、达人配合", "缺失", "AI 平台自动生成、运营策划", "提示词接入各端规则库，自动出三版，运营审核", "平台规则库", 4, "P1", "每版都含入口、机制、合规项，运营通过率 ≥80%"], ["④", "分阶段投放思路", "可参考过往 B站分阶段投放思路：心智→场景→收割", "缺失", "运营策划、AI 平台自动生成", "方案里按三阶段写目标和指标", "—", 2, "P2", "每个方案含三阶段目标"], ["④", "KPI 目标设定", "按目标和预算给指标区间", "部分", "运营策划、AI/算法", "用内部历史数据给区间，不再写死", "过往复盘数据", 3, "P1", "每个 KPI 写明依据"], ["④", "节点日历", "春节、开学、618、双 11、发布会、展会", "缺失", "运营策划、AI 平台自动生成", "建年度节点库，方案自动推荐节点和倒排期", "品牌年度节奏", 3, "P1", "方案自动带节点和时间轴"], ["④", "第二形式内容生成", "短视频脚本 / 分镜、图文笔记、封面、录屏模板", "缺失", "AI/算法、UI/视觉、运营策划", "模型出脚本和图文，视觉出模板，游戏一键录屏", "品牌素材、模型接入代理", 8, "P1", "每个活动出 ≥6 条可用脚本，采纳率 ≥50%"], ["④", "话题 / 搜索词运营", "话题名、搜索词、评论区话术、挂载计划", "缺失", "运营策划", "方案自动给出，运营挑选", "品牌词表", 2, "P2", "每个活动有话题和词表"], ["④", "预算与 ROI 测算", "输入预算和目标，估参与、涨粉、单位成本", "缺失", "产品、后端", "平台内置测算器，读历史均值", "投放成本数据", 3, "P1", "与实际结果偏差可回填"], ["⑤", "H5 生产托管", "国内云 + 备案域名 + CDN", "部分", "后端、商务/品牌方", "现为 GitHub Pages 演示，迁到国内云", "域名与备案主体", 3, "P1", "国内 4G 首屏 ≤3 秒"], ["⑤", "抖音小程序外壳", "原生壳负责登录、关注、分享卡，内嵌现有 H5", "缺失", "平台对接、游戏前端/3D", "web-view 加载 H5，壳与 H5 用消息通信", "企业主体、小程序账号", 6, "P0", "过审上线，H5 在壳内正常运行"], ["⑤", "端适配层", "一套规则引擎，按端切登录、分享、关注", "缺失", "游戏前端/3D、后端", "抽象 login / share / follow 接口，分别实现 web / 抖音 / B站 / 微信", "—", 5, "P0", "同一套代码跑通 2 个端"], ["⑤", "内容挂载配置", "企业号视频锚点、直播间、个人页、达人组件", "缺失", "运营策划、平台对接", "按投放排期在各端后台配置挂载", "企业号", 2, "P0", "试跑视频全部挂上入口"], ["⑤", "抖音 / B站小游戏原生版", "组队卡、排行榜、侧边栏复访", "缺失", "游戏前端/3D、平台对接", "three.js 小游戏适配层，UI 画到 canvas", "软著；版号需确认", 20, "P2", "过审上线"], ["⑤", "小红书 / 微信小程序", "小红书挂笔记、商家主页；微信做私域", "缺失", "平台对接", "试跑后再决定是否开", "专业号、企业主体", 10, "P2", "过审上线"], ["⑥", "口令码回流", "视频口播口令，任一端输入领一次性权益并记渠道", "缺失", "后端、运营策划", "口令生成、兑换、渠道记录、限频", "后端服务", 3, "P1", "口令归因准确，批量兑换被拦"], ["⑥", "微信 URL Link", "短信、线下、外部网页打开微信小程序", "缺失", "后端、平台对接", "服务端生成 URL Link，按渠道带参数", "微信企业主体", 1, "P2", "链接可打开，渠道可区分"], ["⑥", "跨端账号绑定", "手机号授权作统一 ID", "缺失", "后端、法务", "各端手机号能力 + 隐私协议 + 用户明示同意", "各端能力申请", 5, "P2", "授权文案过审，两端识别为同一用户"], ["⑤⑥", "合规自审清单", "上线前逐条对照各平台规范", "部分", "法务、产品", "抖音 / B站 / 微信 / 小红书规范做成清单，每次上线签核", "—", 2, "P0", "每次上线都有签核记录"], ["⑦", "数据埋点", "进入、开局、完局、分享、邀请成功、关注、抽奖", "缺失", "后端、游戏前端/3D", "定义事件表，上报到自建或第三方统计", "埋点方案", 4, "P0", "关键事件完整率 ≥98%"], ["⑦", "渠道归因", "按视频、达人、直播间、口令区分来源", "缺失", "后端、运营策划", "每个投放位生成渠道参数", "渠道清单", 2, "P0", "每个参与者都能追到来源"], ["⑦", "平台数据回收", "各端后台的播放、互动、涨粉", "缺失", "运营策划、平台对接", "试跑期手工导出，后期接开放接口", "企业号后台权限", 2, "P1", "每日数据入库"], ["⑦", "数据看板", "参与漏斗、K 值、涨粉、单位成本", "缺失", "后端、UI/视觉", "基于埋点做实时看板", "数据埋点", 5, "P1", "每日自动更新"], ["⑦", "对照基线", "传统活动 vs 游戏化", "缺失", "运营策划", "运营同事填过往活动数据", "过往复盘数据", 2, "P0", "对比表内部列填满"], ["⑦", "复盘报告自动生成", "活动结束自动出复盘，回写到策划", "缺失", "AI 平台自动生成、运营策划", "读看板数据生成报告，运营补结论", "数据看板", 3, "P2", "活动结束 1 天内出复盘"], ["底座", "账号与平台登录", "抖音 / B站 / 微信登录换 openid", "缺失", "后端、平台对接", "各端 login 拿 code，服务端换 openid，签发会话", "各端 AppID", 4, "P0", "各端登录成功率 ≥99%"], ["底座", "后端服务与数据库", "积分、邀请、抽奖、活动配置接口", "缺失", "后端", "Node 服务或云函数 + 数据库", "云资源", 8, "P0", "峰值并发压测通过"], ["底座", "防刷与风控", "局分校验、限频、邀请去重、异常名单", "缺失", "后端、测试", "局分按时长和击杀数合理区间校验 + 请求签名", "后端服务", 5, "P0", "脚本刷分、刷邀请都被拦截"], ["底座", "运营配置后台", "表单化改规则、奖品、文案、素材，版本发布", "缺失", "后端、游戏前端/3D、UI/视觉、产品", "Web 后台 + 配置版本管理，游戏读取发布版", "后端服务", 10, "P1", "运营不改代码完成一次活动配置"], ["底座", "模型接入代理", "Key 放服务端，代理调用，限流、日志、多模型切换", "部分", "后端、AI/算法", "现在 Key 存浏览器；改成服务端代理", "模型 Key", 3, "P1", "前端无 Key，切模型不用发版"], ["底座", "多活动管理与权限", "活动列表、版本、审批、角色权限", "部分", "后端、产品", "「我的活动」从本机存储迁到服务端", "运营配置后台", 5, "P2", "多人协作不冲突"], ["底座", "测试与真机兼容", "iOS / 安卓 / 微信 / 抖音内置浏览器", "部分", "测试", "已有 Playwright 模拟测试；补真机矩阵和回归用例", "测试机", 5, "P0", "回归用例全过，真机无阻断问题"]];
+const PARTS = { '一 游戏本身': ['①', '②', '③'], '二 策划方案': ['④'], '三 部署与跳转': ['⑤', '⑥', '⑤⑥'], '四 运营价值': ['⑦'], '平台底座': ['底座'] };
+const fname = (f) => f[0] === '底座' ? f[1] : f[0] + ' ' + f[1];
+const days = (d) => d > 0 ? d + ' 人天' : '—';
+const sumP = (p) => F.filter((f) => f[8] === p).reduce((a, f) => a + f[7], 0);
+const cntP = (p) => F.filter((f) => f[8] === p).length;
+$('sum').innerHTML = [['功能点', F.length + ' 个'], ['P0 必须', cntP('P0') + ' 项 · ' + sumP('P0') + ' 人天'], ['P1 应该', cntP('P1') + ' 项 · ' + sumP('P1') + ' 人天'], ['P2 可以', cntP('P2') + ' 项 · ' + sumP('P2') + ' 人天']]
+  .map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+let part = Object.keys(PARTS)[0], pf = '全部';
+function drawFeat() {
+  $('seg').innerHTML = Object.keys(PARTS).map((k) => `<button data-k="${esc(k)}" class="${k === part ? 'on' : ''}">${esc(k)}</button>`).join('');
+  $('pseg').innerHTML = ['全部', 'P0', 'P1', 'P2'].map((k) => `<button data-p="${k}" class="${k === pf ? 'on' : ''}">${k === '全部' ? '全部优先级' : k}</button>`).join('');
+  const rows = F.filter((f) => PARTS[part].includes(f[0]) && (pf === '全部' || f[8] === pf));
+  table('featTable', ['功能点', '功能说明', '现状', '负责角色', '怎么做', '依赖', '工作量（估计）', '优先级', '验收标准'],
+    rows.map((f) => [fname(f), f[2], tg(f[3]), f[4], f[5], f[6], days(f[7]), f[8], f[9]]));
+}
+$('seg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { part = b.dataset.k; drawFeat(); } });
+$('pseg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { pf = b.dataset.p; drawFeat(); } });
+drawFeat();
+
+/* ---------- 角色 ---------- */
+const ROLES = [
+  ['产品', '合规分享规则、方案导出、ROI 测算、配置后台需求、合规自审', '1', '全程全职'],
+  ['运营策划', '策划模板审核、节点日历、话题词、内容挂载、渠道清单、对照基线', '1-2', '试跑期 2 人，之后 1 人'],
+  ['游戏前端/3D', '中性反派、换皮、AI 关卡、端适配、抖音外壳、埋点前端', '2', 'MVP 2 人；做原生小游戏时加 1 人'],
+  ['后端', '登录、服务端规则、防刷、抽奖、埋点、看板、配置后台、口令码', '2', '工作量最大，MVP 的关键路径'],
+  ['AI/算法', '模型代理、AI 关卡、讲解员、第二形式内容、KPI 区间', '1', '平台化阶段为主'],
+  ['UI/视觉', '反派形象、换皮模板、科普卡、看板、后台界面、内容模板', '1', 'MVP 半职，之后按活动'],
+  ['测试', '真机矩阵、防刷压测、回归用例', '1', 'MVP 后半程全职'],
+  ['法务', '反派审核、抽奖公示、邀请规则、账号绑定隐私、上线签核', '按需', '每次上线约 1-2 天'],
+  ['商务/品牌方', '官方参数、奖品与预算、企业主体与域名', '1 名对接人', '按需'],
+  ['平台对接', '抖音外壳、关注组件、榜单、挂载配置、URL Link、平台沟通', '1', '可由后端兼任；MVP 期全职'],
+  ['AI 平台自动生成', '设计规格、分平台方案、节点建议、复盘初稿', '—', '由运营审核把关'],
+];
+table('tRoles', ['角色', '参与功能点', '主要负责', '建议人数', '投入（估计）'],
+  ROLES.map((r) => [r[0], F.filter((f) => f[4].split('、').includes(r[0])).length + ' 项', r[1], r[2], r[3]]));
+
+/* ---------- 阶段 ---------- */
+const PH = [
+  ['MVP 试跑', '第 1-6 周', 'P0', '中性反派 + 官方参数版游戏；服务端积分、抽奖、合规邀请；抖音小程序外壳；埋点与渠道归因；对照基线；合规签核', '第 2 周后端联调；第 3 周提审；第 4-5 周抖音试跑 14 天；第 6 周复盘'],
+  ['平台化', '第 7-14 周', 'P1', '运营配置后台、模型接入代理、AI 关卡、分平台方案、第二形式内容、节点日历、数据看板、口令码、真实榜单、国内托管', '第 10 周运营不改代码配出一场活动；第 12-14 周 B站第二场试跑'],
+  ['规模化', '第 15 周起', 'P2', '抖音 / B站原生小游戏、小红书 / 微信小程序、跨端账号绑定、合规拉人模板、AI 讲解员、自动复盘、多活动权限', '每月并行 2-3 场活动；新活动从需求到上线 2 周内（目标）'],
+];
+$('phaseBox').innerHTML = PH.map(([n, w, p, d, m]) => `<div><h5>${n}</h5><span class="when">${w} · ${p} ${cntP(p)} 项 · 约 ${sumP(p)} 人天</span><p><b>交付物</b><br>${esc(d)}</p><p><b>里程碑</b><br>${esc(m)}</p></div>`).join('');
+/* ---------- 3 部署与跳转 ---------- */
+table('tDeploy', ['平台', '载体', '开发者平台', '主体与资质', '审核', '内容挂载入口'], [
+  ['抖音', '抖音小程序（web-view 可嵌 H5）/ 抖音小游戏', 'developer.open-douyin.com', 'web-view 仅非个人主体；小游戏要软著，版号视情况（待确认）；品牌/IP 要授权书', '代码审核 + 运营规范', '企业号视频自主挂载、UGC 挂载、直播间、个人页、星图锚点组件'],
+  ['B站', 'B站小游戏（支持 WebGL）；小程序对品牌开放程度待确认', 'miniapp.bilibili.com', '未查到明确清单，按软著 + 版号准备，需问 B站商务', '侧边栏复访为必接项', '官方场景值只有游戏中心、分享、侧边栏；视频侧靠花火共创、三连评论区组件（非官方资料）'],
+  ['小红书', '小红书小程序', 'miniapp.xiaohongshu.com', '营业执照 + 法人认证；类目资质；工信部备案', '主体认证 1-3 个工作日；POI 组件 3-5 个工作日；上线后巡检', '账号、笔记、直播间、商业化投放、商家主页（最多 3 个菜单）、POI、私信群聊、侧边栏'],
+  ['微信', '微信小程序 / 小游戏 / H5', 'mp.weixin.qq.com', 'URL Scheme / URL Link 仅非个人主体', '代码审核 + 运营规范', '公众号菜单与文章、企微、线下码、短信与外部网页（URL Link）'],
+]);
+table('tJump', ['方向', '能否直跳', '可用方式', '限制与风险', '依据'], [
+  ['站外（短信、浏览器、邮件）→ 微信小程序', tg('可以'), 'URL Scheme（weixin://）、URL Link（https 链接）', '仅非个人主体；每天生成上限 50 万条、打开上限 600 万次；安卓和微信内先到官方中间页；系统可能弹框询问', '微信官方文档'],
+  ['抖音 App 内 → 微信', tg('不行'), '只能在端外：包装或线下二维码、用户自己去微信搜小程序名', '抖音禁止带商业推广的外链、二维码和第三方平台账号；小程序/小游戏禁止导向第三方平台。「外链工具」靠规避风控，封号风险高，不用', '抖音运营规则；社区自律公约第 34 条（第三方整理）'],
+  ['微信 → 抖音 App', tg('基本不行'), '文字引导：抖音号、品牌词、话题名，用户自己去搜', '微信内网页一般不能唤起第三方 App；小程序内引导去其他平台是否违规待确认', '待确认'],
+  ['B站 App 内 → 微信', tg('有限'), '三连推广评论区组件可一跳微信小程序（据代理商资料）', 'B站社区规则禁止站外引流；组件能力非官方文档，需问 B站商务', 'bilibili-ad.com（非官方）'],
+  ['微信 → B站 App', tg('基本不行'), '文字引导搜 UP 主名、BV 号；B站链接在微信内只能以网页打开', '唤起 B站 App 的行为待确认', '待确认'],
+  ['小红书 App 内 → 微信', tg('不行'), '无', '社区规范禁止网址、二维码、联系方式等导流（3.2.2），后果是限流到封号', '小红书社区规范（第三方整理）'],
+  ['微信 → 小红书 App', tg('基本不行'), '文字引导搜笔记标题、话题、专业号', '小红书小程序有 xhsdiscover://miniapp/ 链接格式，外部能否唤起待确认', '小红书小程序文档'],
+  ['抖音 ↔ B站', tg('不行'), '只在内容侧串联：同一 IP、同一活动周期分别投放，各挂原生小程序', '两边都禁止导向第三方平台', '上一份调研 Page'],
+  ['内容平台 → 自家小程序（站内）', tg('可以'), '抖音视频/直播/主页锚点；B站花火、三连组件；小红书笔记、直播、商家主页', '各平台要企业主体，挂载有审核', '各平台官方文档'],
+]);
+table('tInfluence', ['玩法', '怎么做', '可行性', '合规红线', '要验证什么'], [
+  ['搜索任务', '小程序里给出「去抖音/B站搜 品牌词 或 #话题#」的文字提示，不放链接；搜索词由运营给出', tg('中'), '不能给搜索行为发奖（无法核验）；微信对引导去其他平台的态度待确认', '小程序审核是否放行；用平台搜索指数看整体效果'],
+  ['话题投稿 / UGC 征集', '内容平台开官方话题；用户投稿后在小程序提交作品链接，审核后按作品质量发固定奖', tg('中'), '奖励挂在作品质量上，不挂在转发、点赞数；按平台要求标活动标识', '开放接口能否核验作品归属；人工审核成本'],
+  ['平台原生 UGC（更推荐）', '抖音录屏分享带锚点、UGC 挂载；B站小游戏分享到动态带话题；小红书小程序发笔记接口', tg('高'), '分享本身不发奖；内容不夸大承诺', '小红书发笔记接口对营销小游戏类目是否可用'],
+  ['口令码回流', '视频或直播里口播活动口令，用户在任一端小程序输入，领一次性固定权益并记录渠道', tg('高'), '口令不能是联系方式或其变体；权益不和关注挂钩', '批量刷口令的风控'],
+  ['跨端账号绑定', '手机号授权作统一 ID，或在 H5 里走抖音开放平台网页授权', tg('低到中'), '用户明示同意，按个人信息保护要求告知用途；抖音手机号能力需申请', '各端手机号与网页授权申请条件'],
+  ['关注引导', '微信端只展示「抖音号 / B站 UP 主名」文字；关注在各端用原生组件完成', tg('中'), '任何一端都不能用奖励换关注', '—'],
+  ['线下物料', '包装、门店海报印各端原生码', tg('高'), '抖音小游戏内禁止外部二维码，线下物料不受此限', '各端码的生成方式'],
+]);
+
+/* ---------- 4 技术验证 ---------- */
+table('tVerify', ['验证项', '由谁验证', '方法', '通过标准'], [
+  ['抖音小程序 web-view 跑 3D 游戏', '游戏前端/3D + 测试', '企业主体开测试号，真机测 iPhone 和中低端安卓', '帧率稳定 30fps 以上，无白屏'],
+  ['模型输出稳定性（GPT-6.2 Astra）', 'AI/算法', '10 个真实 brief 各跑 3 次', '全部返回合法结构，无违禁词'],
+  ['微信 URL Link 在抖音/B站/小红书内置浏览器的表现', '平台对接 + 测试', '三个 App 内分别点开链接', '记录被拦截还是可打开（预期被拦截）'],
+  ['小程序内引导搜索文案能否过审', '平台对接 + 法务', '微信、抖音各提审一版带文案的小程序', '审核通过，无整改通知'],
+  ['作品归属核验', '后端 + 平台对接', '查抖音、B站开放接口能否按授权读取用户作品', '能自动核验，或确认只能人工'],
+  ['跨端手机号绑定', '后端 + 法务', '各端申请手机号能力，走一遍授权', '两端拿到同一号码，授权文案过审'],
+  ['口令码与防刷', '后端 + 测试', '同设备、同 IP、同账号多次兑换和刷分压测', '限频和拦截生效'],
+  ['B站评论区组件承接到游戏', '平台对接', '用一条 UP 商单测试评论区组件跳 H5 / 小游戏', '组件点击可统计，能进入游戏'],
+  ['B站小游戏 / 评论组件对品牌开放', '商务/品牌方 + 平台对接', '问 B站商务或代理', '拿到书面答复'],
+  ['小游戏版号是否豁免', '商务/品牌方 + 法务', '问抖音、B站平台或代理', '拿到书面答复'],
+  ['小红书小程序营销类目与发笔记接口', '平台对接 + 商务/品牌方', '开放平台后台查类目，问小红书商务', '确认可用'],
+]);
+
+/* ---------- 5 指标 ---------- */
+table('tMetrics', ['指标', '定义与口径', '公开 / 内部参考', '来源'], [
+  ['曝光', '内容或入口被展示的次数；按平台后台口径，不跨平台相加', '未找到公开数据', '—'],
+  ['播放', '视频有效播放次数（VV）；B站另看 CPVV', 'B站称「花飞」策略下超 20% 稿件 CPVV 成本减半', 'B站×秒针白皮书（摘要）'],
+  ['互动率', '（点赞 + 评论 + 转发）÷ 播放；分母必须写明', '抖音 3%-5% 及格、5% 以上优秀（第三方）；TikTok 电商按曝光 5.0%', 'jizhil.com；Socialinsider 2025'],
+  ['分享率', '分享人数 ÷ 参与人数（游戏内）或分享数 ÷ 播放（视频）', '抖音视频 1% 以上算传播性强（第三方）；腾讯某 H5 分享率 10.96%（2018 单案例）', 'jizhil.com；游戏葡萄'],
+  ['参与率', '开始第一局人数 ÷ 进入人数', '开始游戏的人里 81%-92% 会玩完（海外平台自有数据，是完成率）', 'Playable 2026'],
+  ['人均时长', '单次会话时长中位数和人均总时长', '海外营销游戏平均每次 66 秒；腾讯《忘忧镇》H5 人均 15 分钟（单案例）', 'Playable 2026；游戏葡萄'],
+  ['裂变系数 K', 'K = 人均发出邀请数 × 邀请转化率（被邀人完成首局才算）', '未找到可信公开数据', '—'],
+  ['涨粉', '新增关注 − 取关；关注转化率 = 新增关注 ÷ 参与人数', '未找到公开数据', '—'],
+  ['复访 / 留存', '次日、7 日回到游戏的比例', '抖音官方：接侧边栏复访后次留平均提升 12% 以上、7 留提升 8% 以上', '抖音开放平台'],
+  ['成本', '人均参与成本、CPE = 总成本 ÷ 互动次数、CPF = 总成本 ÷ 净增粉', '未找到公开 CPE、CPF 基准', '—'],
+  ['声量', 'B站口径：评论、分享、弹幕、投币、收藏、点赞、有效触达；加话题播放和搜索量', '只有口径，没有数值', 'B站×秒针白皮书（摘要）'],
+]);
+
+/* ---------- 6 对比 ---------- */
+const T = '待运营同事填', S = '待试跑记录';
+table('tCompare', ['维度', '传统运营（内部）', '游戏化（内部）', '公开参考', '来源'], [
+  ['策划周期', T, S, 'H5 小游戏：模板 7-15 天；中等定制 2-4 周；全定制 1-3 个月', '搜狐（开发商报价文章）'],
+  ['制作成本', T, S, '轻量营销类 3 万-8 万元；3D 闯关类 20 万-50 万元', '搜狐（开发商报价文章）'],
+  ['人力', T, S, '未找到公开数据', '—'],
+  ['互动率', T, S, '见第 7 节', '—'],
+  ['涨粉', T, S, '未找到公开数据', '—'],
+  ['播放', T, S, '未找到可对比的公开数据', '—'],
+  ['转发', T, S, '见第 7 节分享率', '—'],
+  ['声量', T, S, '未找到公开数据', '—'],
+]);
+
+/* ---------- 7 ROI ---------- */
+const ids = ['rCost', 'rPlayers', 'rEngage', 'rFans', 'rViews'];
+const num = (id) => { const v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; };
+function calc() {
+  const c = num('rCost');
+  const f = (d, k) => (c > 0 && d > 0) ? (c / d * (k || 1)).toLocaleString('zh-CN', { maximumFractionDigits: 2 }) + ' 元' : '—';
+  $('rOut').innerHTML = [['人均参与成本', f(num('rPlayers'))], ['CPE 每次互动', f(num('rEngage'))], ['CPF 每个粉丝', f(num('rFans'))], ['千次播放成本', f(num('rViews'), 1000)]]
+    .map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+}
+ids.forEach((id) => $(id).addEventListener('input', calc));
+$('rReset').addEventListener('click', () => { ids.forEach((id) => { $(id).value = ''; }); calc(); });
+calc();
+
+/* ---------- 9 需要提供 ---------- */
+table('tNeeds', ['#', '要什么', '具体内容', '找谁', '用在哪'], [
+  ['1', '过往活动复盘数据', '近 2-3 场活动的策划周期、制作费、投放费、人力、曝光、播放、互动、转发、涨粉', '运营 / 投放同事', '第 8 节对比表、KPI 目标'],
+  ['2', '企业主体与平台账号', '营业执照主体、抖音企业号和小程序账号、B站企业号；是否做小红书、微信', '品牌方 / 商务', '部署 P0'],
+  ['3', '法务意见', 'Boss 影射竞品是否可用；抽奖概率公示、奖品合规', '法务', '游戏内容 P0'],
+  ['4', '芯片官方参数与素材', '型号、参数、卖点、新概念统一用词、Logo、KV', 'Intel 品牌方', '产品介绍、概念科普'],
+  ['5', '可投入的团队', '现有产品、运营、前端、后端、AI、视觉、测试各几人可投入，平台对接谁兼', '你 / 团队负责人', '第 3、4 节'],
+  ['6', '正式奖品与预算', '奖品清单、数量、概率、总预算', '品牌市场 + 财务', '抽奖上线'],
+  ['7', '试跑节点与目标', '哪个节点、哪个平台、目标 KPI', '运营负责人', '第 11 节'],
+  ['8', '白板看不清的词', '「3/7 MVS」「D2T」「Game Creation」原意', '你', '白板待确认'],
+  ['9', '模型接入', 'Astra 的 API Key 或接入文档', '技术', 'AI 运营专家实测'],
+  ['10', '平台确认', '版号是否豁免；B站小游戏是否对品牌开放；评论组件跳微信', '平台商务或代理', '技术验证'],
+]);
+
+/* ---------- 10 试跑 ---------- */
+table('tTrial', ['试跑', '平台与载体', '玩法', '主要验证', '前提'], [
+  ['试跑 1（MVP，先做）', '抖音小程序 web-view + 企业号视频挂载 + 1-2 个星图达人', '3D 芯片争霸中性反派版 + 合规邀请 + 一键关注组件', '参与率、首局完成率、关注转化率、K、CPE/CPF', '企业主体、小程序过审、后端与埋点'],
+  ['试跑 2（平台化阶段）', 'B站：UP 主共创 + 评论区组件 + 小游戏（若开放）或 H5', '打 Boss 挑战 / 人格测试 + 新概念科普 + 搜索引导', '评论组件点击、进入与首局完成、关注 UP 转化、话题投稿数', 'B站开放情况确认'],
+]);
+
+/* ---------- 11 来源 ---------- */
+const SRC = [
+  ['抖音×B站 运营游戏拉新涨粉打通方案（上一份调研 Page）', 'https://cursor.com/canvas/store-4ee9328a-ce71-4810-aad9-2fb0b0bd053e/84a2ecda-4afd-4e1b-b2c7-ff5687977b4a'],
+  ['微信开放文档：获取 URL Link', 'https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/url-link.html'],
+  ['微信开放文档：获取 URL Scheme', 'https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/url-scheme.html'],
+  ['小红书小程序介绍（挂载场景、入驻材料、审核时效）', 'https://miniapp.xiaohongshu.com/doc/DC137160'],
+  ['小红书小程序开放平台首页', 'https://miniapp.xiaohongshu.com/'],
+  ['抖音开放平台：小程序运营规则·第三方引流', 'https://partner.open-douyin.com/docs/resource/zh-CN/mini-app/operation/management/specification/drainage'],
+  ['抖音开放平台：侧边栏复访能力', 'https://developer.open-douyin.com/docs/resource/zh-CN/mini-game/operation1/user-ops/-retention/sidebar'],
+  ['中文内容平台发布规则大全 2026（第三方整理）', 'https://omnigoai.com/zh/blog/chinese-platform-content-rules/'],
+  ['B站组件配置说明（非官方）', 'https://www.bilibili-ad.com/jd/1997.html'],
+  ['2025 抖音完播率与互动率及格线（第三方）', 'https://www.jizhil.com/dydata/6124.html'],
+  ['Socialinsider 2025 电商社媒基准报告（摘要）', 'https://www.sgpjbg.com/labelsyh/2025dianshangxingyeshejiaomeitijizhunbaogao/1/7463025.html'],
+  ['B站×秒针 内容资产经营白皮书（摘要）', 'https://www.sgpjbg.com/labelsyh/neirongzichankexuejingying/1/6731046.html'],
+  ['2025 bilibili 营销通案（摘要）', 'https://www.sgpjbg.com/info/4aeb25c8b778d500faa76157ebea6b34.html'],
+  ['Playable：State of Gamification 2026', 'https://playable.com/campaign-pages/state-of-gamification-2026-guide/'],
+  ['游戏葡萄：腾讯游戏 4 个营销案例复盘（2018，转载）', 'https://freewechat.com/a/MjM5OTc2ODUxMw==/2649740812/1'],
+  ['搜狐：H5 小游戏开发价格与周期（开发商文章）', 'https://www.sohu.com/a/991584316_121482751'],
+  ['搜狐：H5 小游戏开发费用档位（开发商文章）', 'https://www.sohu.com/a/977877967_121801683'],
+];
+$('srcList').innerHTML = SRC.map(([t, u]) => `<li>${esc(t)}${u ? `<br><a href="${esc(u)}" target="_blank" rel="noopener">${esc(u)}</a>` : ''}</li>`).join('');
+
+/* ---------- 导航高亮 ---------- */
+const links = [...document.querySelectorAll('#tabs a')];
+const secs = links.map((a) => document.querySelector(a.getAttribute('href')));
+const io = new IntersectionObserver((es) => {
+  es.forEach((e) => { if (e.isIntersecting) { links.forEach((a) => a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id));
+    const on = links.find((a) => a.classList.contains('on')); const tb = $('tabs'); if (on) tb.scrollTo({ left: on.offsetLeft - (tb.clientWidth - on.offsetWidth) / 2, behavior: 'smooth' }); } });
+}, { rootMargin: '-130px 0px -60% 0px' });
+secs.forEach((s) => s && io.observe(s));
+})();
+</script>
+</body>
+</html>
