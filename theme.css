@@ -1,0 +1,45 @@
+/* =============================================================================
+ * 运营游戏工坊 · 视觉规范（theme.css）
+ * 设计语言参考 kairos-campaign-insight：石墨深底、单一珊瑚红强调色、1px 细线、
+ * 小圆角、系统字体、等宽数字、无霓虹发光。详见 /workspace/refs/kairos-design/DESIGN.md
+ * ========================================================================== */
+:root{
+  color-scheme:dark;
+  --bg:#121216;--panel:#1b1b21;--panel2:#222229;--panel3:#2b2b33;
+  --text:#f3f3f6;--text-2:#d4d4dc;--muted:#a6a6b4;--subtle:#777785;--line:#33333e;
+  --brand:#ff4d6a;--brand-text:#ff8095;--brand-soft:#ff4d6a17;--on-brand:#16060a;
+  --blue:#76baff;--green:#73d7b1;--amber:#f6c887;
+  --shadow:0 18px 50px #0005;
+  --font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif;
+  --mono:'SF Mono',Consolas,'Roboto Mono',monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --r-xs:4px;--r-sm:5px;--r-md:8px;--r-lg:11px;--r-xl:16px;--r-2xl:18px;
+  /* 旧变量别名（各页面原有 CSS 仍在引用） */
+  --cyan:var(--brand);--pink:var(--brand-text);--violet:var(--blue);--dim:var(--muted);
+  --ok:var(--green);--mid:var(--amber);--bad:var(--brand);
+}
+html,body{background:var(--bg);color:var(--text)}
+body{font-family:var(--font);-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 0}
+button,input,select,textarea{font-family:inherit}
+::selection{background:var(--brand-soft);color:var(--text)}
+:focus-visible{outline:2px solid var(--brand-text);outline-offset:3px}
+/* 去掉赛博背景：渐变光斑、网格扫描线 */
+.bgfx,.bgfx:after,.scan,.scanlines,.grid-bg{display:none!important;background:none!important}
+/* 通用组件 */
+.k-eyebrow{font-size:11px;letter-spacing:2px;color:var(--brand-text);font-weight:650;text-transform:uppercase}
+.k-num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.k-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg)}
+.k-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel2);padding:3px 8px;border-radius:var(--r-sm);font-size:11px;white-space:nowrap}
+.k-btn{background:var(--brand);color:var(--on-brand);font-weight:650;border:1px solid var(--brand);padding:12px 20px;border-radius:var(--r-md);min-height:44px}
+.k-btn.ghost{background:var(--panel);color:var(--text);border-color:var(--line)}
+@media (hover:hover){.k-btn:hover{filter:brightness(1.08)}.k-btn.ghost:hover{border-color:var(--brand)}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* 运营组件（ops-ui.js 注入）：分段式页签、次级按钮，与规范对齐 */
+html .ou-tabs{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px;gap:2px}
+html .ou-tab{border:none;background:none;color:var(--muted);border-radius:5px;font-weight:500}
+html .ou-tab.on{background:var(--panel3);color:var(--text);border:none}
+html .ou-tab i{background:var(--brand);color:var(--on-brand);font-style:normal;font-family:var(--mono)}
+html .ou-claim:not([disabled]){background:var(--brand);color:var(--on-brand)}
+html .ou-sheet{box-shadow:var(--shadow)}
+html .ou-mask{background:#050508b8}
+html .ou-root{--ou-line:#33333e;--ou-card:#1b1b21;--ou-bg:#121216;font-family:var(--font)}

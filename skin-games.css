@@ -1,0 +1,7 @@
+/* 三个游戏的外层 UI / HUD / 菜单 · Kairos 视觉规范 */
+body{font-family:var(--font)}
+.title,.hero h1,h1{letter-spacing:-.8px}
+/* 门店券：任务按钮用次级样式，主按钮保留珊瑚红 */
+.task .tb{background:var(--panel2);color:var(--brand-text);border:1px solid var(--line)}
+@media (hover:hover){.task .tb:hover{border-color:var(--brand)}}
+.coupon{background:var(--panel2);border:1px solid color-mix(in srgb,var(--brand) 35%,transparent);color:var(--text)}

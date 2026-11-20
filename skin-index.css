@@ -1,0 +1,72 @@
+/* index.html · Kairos 视觉规范皮肤（平台壳、AI 对话、侧栏、预览） */
+html,body{font-family:var(--font);font-size:14px}
+header{border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+.orb{background:none;box-shadow:none;width:auto;height:auto;border-radius:0}
+.orb:after{position:static;display:inline;inset:auto;background:none;color:var(--brand);font:750 16px/1 var(--font);letter-spacing:2px}
+.brand h1{font-size:17px;font-weight:700;letter-spacing:1px}
+.brand p{color:var(--subtle);font-size:11px;letter-spacing:.3px}
+.hbtn{background:var(--panel);border-color:var(--line);border-radius:8px;font-size:12px;color:var(--text)}
+@media (hover:hover){.hbtn:hover{border-color:var(--brand)}}
+.model-pill i{width:5px;height:5px;background:var(--amber);box-shadow:none}
+.model-pill.live i{background:var(--green);box-shadow:none}
+.chat,.nav{background:var(--panel);border-color:var(--line);border-radius:11px}
+.side .phone{background:var(--panel);border:1px solid var(--line);border-radius:11px;box-shadow:none}
+.phone iframe{border-radius:8px;background:var(--bg)}
+.phone .empty{background:var(--panel2);border-radius:8px;color:var(--muted)}
+.phone .bar{color:var(--muted);font-size:11px;letter-spacing:1px}
+.av{background:var(--brand-soft);color:var(--brand-text);border:1px solid color-mix(in srgb,var(--brand) 35%,transparent);border-radius:8px;font-family:var(--mono)}
+.bub{background:var(--panel2);border-color:var(--line);border-radius:11px;border-top-left-radius:4px;font-size:14px}
+.me .bub{background:var(--panel3);border-color:var(--line);border-radius:11px;border-top-right-radius:4px}
+.bub b{color:var(--text)}
+.bub .hl{color:var(--brand-text);font-weight:600}
+.sys{color:var(--amber);background:color-mix(in srgb,var(--amber) 7%,transparent);border:1px solid color-mix(in srgb,var(--amber) 25%,transparent);border-radius:8px}
+.think span.on{color:var(--text)}.think span.on:before{color:var(--brand)}
+.composer{background:var(--panel);border-top-color:var(--line)}
+.chip{background:var(--panel2);border-color:var(--line);color:var(--text-2);border-radius:5px;font-size:12px}
+@media (hover:hover){.chip:hover{border-color:var(--brand);color:var(--brand-text);background:var(--panel2)}}
+textarea{background:var(--bg);border-color:var(--line);border-radius:8px}
+textarea:focus{border-color:var(--brand);box-shadow:none}
+.send{background:var(--brand);color:var(--on-brand);border-radius:8px}
+.btn{background:var(--brand);color:var(--on-brand);border-radius:8px;font-weight:650;box-shadow:none;border:1px solid var(--brand)}
+.btn.ghost{background:var(--panel);color:var(--text);border:1px solid var(--line)}
+@media (hover:hover){.btn:hover{filter:brightness(1.08)}.btn.ghost:hover{border-color:var(--brand);filter:none}}
+/* 侧栏 */
+.nav h4{color:var(--subtle);font-size:11px;letter-spacing:2px;font-weight:600}
+.sitem{border-radius:6px}
+.sitem.on{background:var(--brand-soft);border-color:transparent;color:var(--brand-text)}
+.me-card{background:var(--panel2);border-color:var(--line);border-radius:8px}
+.me-card b{font-family:var(--mono);font-weight:550}
+.navlinks button,.navlinks a.planlink{background:var(--panel2);border-color:var(--line);border-radius:8px;color:var(--text-2)}
+@media (hover:hover){.navlinks button:hover,.navlinks a.planlink:hover{border-color:var(--brand);color:var(--brand-text)}}
+.navlinks i{background:var(--brand);color:var(--on-brand);font-family:var(--mono)}
+@media (max-width:1199px){.nav{background:var(--bg);border-radius:0 11px 11px 0}.nav.open{box-shadow:var(--shadow)}.navmask{background:#050508b8}}
+/* 活动卡 / 方向卡 */
+.ccard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;box-shadow:none}
+.ccard:before{display:none}
+.ctag{border-radius:5px;border-color:var(--line);background:var(--panel3);color:var(--muted)}
+.ctitle{color:var(--text);font-weight:650;letter-spacing:-.4px}
+.cslogan{color:var(--brand-text);font-weight:500}
+.cbox{background:var(--panel);border-color:var(--line);border-radius:8px}
+.cbox h5{color:var(--muted);font-weight:500;letter-spacing:.5px}
+.dcard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;transition:border-color .24s var(--ease),transform .24s var(--ease)}
+@media (hover:hover){.dcard:hover{border-color:var(--brand);box-shadow:none;transform:translateY(-2px)}}
+.dcard.rec{border-color:color-mix(in srgb,var(--amber) 45%,transparent)}
+.dcard.chosen{border-color:var(--green);box-shadow:none}
+.dcard .dl{background:var(--brand-soft);color:var(--brand-text);border-radius:5px;font-family:var(--mono);border:1px solid color-mix(in srgb,var(--brand) 35%,transparent)}
+.dcard .dn{color:var(--text);font-weight:650}
+.dcard .pill{border-radius:5px;border-color:var(--line);color:var(--muted);background:var(--panel3)}
+.dcard .pill.rec{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 30%,transparent)}
+.dcard .pill.eff{color:var(--brand-text);border-color:color-mix(in srgb,var(--brand) 30%,transparent)}
+.dcard .concept{color:var(--text);font-weight:600}
+.dcard .k{color:var(--brand-text);font-weight:500}
+.dcard .tags span{border-radius:4px;background:var(--panel3);color:var(--muted)}
+.assume{background:var(--panel);border:1px solid var(--line);border-left:2px solid var(--brand);border-radius:6px;color:var(--muted)}
+details.spec{background:var(--panel);border-color:var(--line);border-radius:8px}
+details.spec summary{color:var(--brand-text);font-weight:500}
+details.spec h6{color:var(--text);font-weight:600}
+.overlay .ob{background:var(--bg);border-bottom:1px solid var(--line)}
+@media (min-width:1000px){.overlay{background:#050508b8}.overlay .frame{border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}}
+.form input,.form select{background:var(--bg);border-radius:8px}
+.form input:focus,.form select:focus{border-color:var(--brand)}
+.ddots button.on i{background:var(--brand)}
+.dcard .k{color:var(--muted);font-weight:500}
