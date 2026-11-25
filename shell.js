@@ -10,6 +10,7 @@
     wallet: '<rect x="3" y="9" width="18" height="12" rx="2"/><path d="M12 9v12M3 13.5h18M12 9C10 5 6 5 6 7.2S9 9 12 9s6 .4 6-1.8S14 5 12 9"/>',
     rules: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/>',
     plan: '<path d="m3 17 6-6 4 3 8-10M3 21h18"/>',
+    team: '<circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.5"/><path d="M3.5 18c.5-3.2 2.6-5 5.5-5s5 1.8 5.5 5M14 18c.3-2 1.5-3.2 3.5-3.2 2 0 3.3 1.2 3.5 3.2"/>',
     home: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
     theme: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/>',
     gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>'

@@ -9,7 +9,7 @@
  * ⚠ 本演示不收集手机号、身份证等个人信息，不涉及支付，不发放真实奖品。
  * ========================================================================== */
 window.OPS_CONFIG = {
-  version: '2026.11-demo',
+  version: '2026.11.25-demo',
   campaignName: '芯片争霸 · Intel 新品上市季',
   demoBanner: '演示用，正式活动需后端防刷与发奖',
   storageKey: 'ops_demo_state_v1',
@@ -96,13 +96,15 @@ window.OPS_CONFIG = {
   strategy: {
     phases: [
       { name: '预热期（D-7 ~ D-1）', text: '发布会倒计时 + 签到攒积分，提前锁定种子用户；分享海报带邀请码。' },
-      { name: '爆发期（D0 ~ D+7）', text: '新品上线当天开放全部 3 关，Boss 战掉落双倍积分；每日排行榜前 10 送示例数字权益。' },
+      { name: '爆发期（D0 ~ D+7）', text: '新品上线开放 3 关与组队战：队长拉人，全队打共同 Boss、冲里程碑；人越多进度越快。' },
       { name: '长尾期（D+8 ~ D+30）', text: '抽奖持续开放，银/金权益拉复访；把高分玩家导向官方商城/门店核销。' },
     ],
-    kpis: ['参与人数 / 新增', '人均局数与时长', '分享率与 K 因子（每人带来的新玩家）', '抽奖参与率', '券核销率 / 进店量'],
+    kpis: ['参与人数 / 新增', '人均局数与时长', '组队率 / 平均队伍人数 / 组队 K 因子', '组队 vs 单人完成率', '抽奖参与率', '券核销率 / 进店量'],
     antiAbuse: [
       '正式版积分由服务端按局校验（时长、击杀数合理区间、签名）',
       '同设备/同账号每日上限，邀请需好友真实完成首局才计',
+      '组队进度只计队员实际完局或完成任务，点开邀请链接、分享、关注都不计；正式版服务端校验对局',
+
       '抽奖结果服务端生成，前端只播动画；奖品库存与发放在后端',
     ],
   },
@@ -112,7 +114,7 @@ window.OPS_CONFIG = {
    *   games 完成局数 | kills 击落数 | bossKills 击败 Boss 数 | levelClears 通关关数 | allClear 全通关次数
    *   procMax 本局最高制程档位（0=Intel 7 … 4=18A，取最大值）| shares 分享次数 | checkins 签到次数
    *   checkinStreak 连续签到天数（取最大值）| draws 抽奖次数 | productViewed 看完产品介绍
-   *   codeRedeems 输入平台口令次数 | worksApproved 投稿作品审核通过数
+   *   codeRedeems 输入平台口令次数 | worksApproved 投稿作品审核通过数 | teamGames 组队状态下完局数
    * action: 'code' / 'post' 的任务在任务中心里直接带输入框（口令 / 作品链接）。
    * 合规：奖励只挂在「完成动作」（找到口令、发布作品）上，不挂在分享、关注上。
    * 任务奖励积分不占「每日游戏积分上限」。 */
@@ -122,6 +124,7 @@ window.OPS_CONFIG = {
       { id: 'd_kill50', name: '杂讯清道夫',     desc: '累计击落 50 个杂讯',  metric: 'kills',    target: 50, points: 50 },
       { id: 'd_code',   name: '平台口令',       desc: '去抖音 / B站官方号视频里找到今日口令并输入', metric: 'codeRedeems', target: 1, points: 40, action: 'code' },
       { id: 'd_check',  name: '每日签到',       desc: '完成今日签到',         metric: 'checkins', target: 1,  points: 20 },
+      { id: 'd_team1',  name: '组队完成 1 局',  desc: '在队伍中打完 1 局（只点开邀请链接不算）', metric: 'teamGames', target: 1, points: 40 },
     ],
     weekly: [
       { id: 'w_play10', name: '本周勤练',       desc: '本周完成 10 局',       metric: 'games',     target: 10, points: 200 },
@@ -163,6 +166,49 @@ window.OPS_CONFIG = {
     couponName: '示例：到店体验满 300 减 50 券',
     couponValidDays: 7,
     storeName: '示例：Intel 体验店（XX 广场店）',
+  },
+
+
+  /* ---------- 12. 组队（拉人一起玩）----------
+   * ⚠ 演示用，正式活动需后端防刷、实时同步、发奖。规则都只改这一段。
+   * 合规口径：奖励只挂在队员实际打完一局 / 完成任务上，不挂分享、关注、点击链接。
+   * 只打开邀请链接不算贡献。人越多，有效进度加成越高。 */
+  team: {
+    minMembers: 2,
+    maxMembers: 5,                 // 队伍上限，默认 3–5 人（此处上限 5）
+    linkParam: 'team',             // 邀请链接参数：?team=队伍码
+    codeLen: 6,
+    /* 有效进度 = 原始贡献之和 × sizeBonus[当前人数]；下标 0 不用，1 人无加成 */
+    sizeBonus: [1, 1, 1.2, 1.45, 1.75, 2.1],
+    /* 计贡献的实际行为（打开链接 / 分享 / 关注不计） */
+    contrib: {
+      game: 1,                     // 打完一局
+      quizDone: 1,                 // 完成人格测试
+      storeScan: 1,                // 到店打卡
+    },
+    milestones: [
+      { id: 'tm1', progress: 3,  points: 80,  name: '组队起步' },
+      { id: 'tm2', progress: 8,  points: 200, name: '齐心出阵' },
+      { id: 'tm3', progress: 18, points: 400, name: '全队制霸' },
+    ],
+    bossHp: 12000,                 // 3D 闯关：队伍共同 Boss 血量（全队伤害累计）
+    bossReward: 150,               // 共同打掉后全队共享积分
+    mock: {
+      names: ['模拟队友·小核', '模拟队友·能效', '模拟队友·封装'],
+      joinDelayMs: 1200,
+      contribEveryMs: 2400,
+    },
+    leaderboard: {
+      size: 8,
+      mock: [
+        { name: '封装车间战队', members: 5, progress: 24.6 },
+        { name: '能效比同盟', members: 4, progress: 18.2 },
+        { name: '校园芯火队', members: 5, progress: 15.9 },
+        { name: '门店体验组', members: 3, progress: 11.4 },
+        { name: 'UP 主后援团', members: 4, progress: 9.8 },
+      ],
+    },
+    compliance: '奖励挂在队员实际游戏行为（打完一局、完成任务），不挂分享 / 关注 / 点击。演示用，正式活动需后端防刷。',
   },
 
   /* ---------- 11. 平台可推荐的玩法模板 ---------- */

@@ -118,7 +118,7 @@
   let toastT;
   function toast(msg, ms) { injectStyles(); let t = document.querySelector('.ou-toast'); if (!t) { t = document.createElement('div'); t.className = 'ou-toast'; document.body.appendChild(t); } t.innerHTML = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms || 2200); }
 
-  const EYEBROW = {"活动规则": "RULES", "任务中心": "MISSIONS", "我的权益": "WALLET", "积分抽奖": "LUCKY DRAW", "分享得加场": "SHARE", "模型设置": "SETTINGS"};
+  const EYEBROW = {"活动规则": "RULES", "任务中心": "MISSIONS", "我的权益": "WALLET", "积分抽奖": "LUCKY DRAW", "分享得加场": "SHARE", "模型设置": "SETTINGS", "我的队伍": "TEAM"};
   function sheet(title, html, onMount) {
     injectStyles();
     const m = document.createElement('div'); m.className = 'ou-mask ou-root';

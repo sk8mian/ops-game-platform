@@ -204,7 +204,7 @@
       <h4>我的活动 <span id="campCount"></span></h4>
       <div class="scroll" id="campList" style="max-height:28%"></div>
       <div class="me-card" id="meCard"></div>
-      <div class="navlinks"><button id="nMissions">✅ 任务中心<i id="nBadge"></i></button><button id="nRules">📜 活动规则</button><button id="nWallet">🎁 我的权益</button><button id="nSettings">⚙ 模型设置</button><a class="planlink" href="plan.html">🗺 平台规划</a></div>
+      <div class="navlinks"><button id="nMissions">✅ 任务中心<i id="nBadge"></i></button><button id="nTeam">👥 组队</button><button id="nRules">📜 活动规则</button><button id="nWallet">🎁 我的权益</button><button id="nSettings">⚙ 模型设置</button><a class="planlink" href="plan.html">🗺 平台规划</a></div>
     </nav>
     <div class="navmask" id="navMask"></div>
     <section class="chat">
@@ -224,6 +224,7 @@
 <script src="ops-config.js"></script>
 <script src="ops-engine.js"></script>
 <script src="ops-ui.js"></script>
+<script src="ops-team.js"></script>
 <script src="ai-client.js"></script>
 <script>
 (() => {
@@ -558,6 +559,7 @@ const closeNav = () => { $('nav').classList.remove('open'); $('navMask').classLi
 $('navBtn').onclick = openNav; $('navMask').onclick = closeNav;
 $('newChat').onclick = () => { if (cur && cur.items.length === 0) { closeNav(); return; } newSession(); closeNav(); };
 $('nMissions').onclick = () => { closeNav(); OpsUI.openMissions({ onClose: renderNav }); };
+$('nTeam').onclick = () => { closeNav(); (window.OpsTeam ? OpsTeam.open() : OpsUI.openTeam()); };
 $('nRules').onclick = () => { closeNav(); OpsUI.openRules(); };
 $('nWallet').onclick = () => { closeNav(); OpsUI.openWallet({ onChange: renderNav }); };
 $('nSettings').onclick = () => { closeNav(); openSettings(); };
@@ -622,6 +624,7 @@ KShell.mountRail($('kRail'), { home: 'index.html', items: [
   { id: 'railChat', icon: 'chat', label: 'AI 策划', active: true },
   { id: 'railMissions', icon: 'missions', label: '任务中心', badge: 'rBadge' },
   { id: 'walletBtn', icon: 'wallet', label: '我的权益 · 抽奖 · 排行' },
+  { id: 'railTeam', icon: 'team', label: '组队' },
   { id: 'rulesBtn', icon: 'rules', label: '活动规则' },
   { href: 'plan.html', icon: 'plan', label: '平台规划' }], bottom: [{ id: 'gearBtn', icon: 'gear', label: '模型设置' }] });
 }
@@ -629,15 +632,16 @@ __mountShell();
 $('gearBtn').onclick = $('modelPill').onclick = openSettings;
 $('rulesBtn').onclick = () => OpsUI.openRules();
 $('walletBtn').onclick = () => OpsUI.openWallet({ onChange: renderNav, share: { title: C.campaignName, subtitle: '新芯出阵，制程为刃', cta: '扫码来玩芯片争霸！' } });
-/* 平台规划页的深链：#missions / #wallet / #rules 直接打开对应面板 */
-function openFromHash() { const h = location.hash; if (document.querySelector('.ou-root.on')) return; if (h === '#missions') OpsUI.openMissions({ onClose: renderNav }); else if (h === '#wallet') $('walletBtn').click(); else if (h === '#rules') OpsUI.openRules(); }
+/* 平台规划页的深链：#missions / #team / #wallet / #rules 直接打开对应面板 */
+function openFromHash() { const h = location.hash; if (document.querySelector('.ou-root.on')) return; if (h === '#missions') OpsUI.openMissions({ onClose: renderNav }); else if (h === '#team') (window.OpsTeam ? OpsTeam.open() : OpsUI.openTeam && OpsUI.openTeam()); else if (h === '#wallet') $('walletBtn').click(); else if (h === '#rules') OpsUI.openRules(); }
 setTimeout(openFromHash, 300); window.addEventListener('hashchange', openFromHash);
 OpsUI.banner();
 { const bn = document.querySelector('.ou-banner'); if (bn) { bn.title = bn.textContent; $('topActions').prepend(bn); } }
 $('railChat').onclick = () => { closeNav(); msgs.scrollTo({ top: 0, behavior: 'smooth' }); };
 $('railMissions').onclick = () => $('nMissions').click();
+$('railTeam').onclick = () => { closeNav(); (window.OpsTeam ? OpsTeam.open() : OpsUI.openTeam()); };
 /* 当前打开的面板 ↔ 左栏高亮；面板关闭回到「AI 策划」 */
-{ const map = { '任务中心': 'railMissions', '我的权益': 'walletBtn', '积分抽奖': 'walletBtn', '分享得加场': 'walletBtn', '活动规则': 'rulesBtn', '模型设置': 'gearBtn' };
+{ const map = { '任务中心': 'railMissions', '我的队伍': 'railTeam', '组队': 'railTeam', '我的权益': 'walletBtn', '积分抽奖': 'walletBtn', '分享得加场': 'walletBtn', '活动规则': 'rulesBtn', '模型设置': 'gearBtn' };
   new MutationObserver(() => { const sh = document.querySelectorAll('.ou-mask .ou-sheet'); const last = sh[sh.length - 1]; KShell.setActive($('kRail'), last ? (map[last.getAttribute('aria-label')] || 'railChat') : 'railChat'); }).observe(document.body, { childList: true }); }
 refreshPill();
 if (sessions.length && sessions[0].items.length === 0) cur = sessions[0]; else newSession();

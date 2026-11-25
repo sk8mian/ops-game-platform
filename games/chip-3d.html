@@ -225,6 +225,10 @@
     <div class="right"><span class="hearts" id="hHp">❤❤❤</span><button class="ibtn" id="muteBtn" aria-label="静音">🔊</button><button class="ibtn" id="pauseBtn" aria-label="暂停">⏸</button></div>
   </div>
   <div class="boss" id="bossUI"><div class="nm" id="bossName">BOSS</div><div class="bar"><i id="bossBar"></i></div></div>
+  <div class="team-hud" id="teamHud" hidden>
+    <div class="nm"><span id="teamBossNm">队伍共同打 Boss</span><span>全队伤害</span></div>
+    <div class="bar"><i id="teamBossBar"></i></div>
+  </div>
   <div class="chips" id="chips"></div>
   <button class="npu" id="npuBtn"><span><small>NPU</small>爆发</span></button>
   <div class="side" id="sideL">
@@ -299,6 +303,7 @@
 <script src="../ops-config.js"></script>
 <script src="../ops-engine.js"></script>
 <script src="../ops-ui.js"></script>
+<script src="../ops-team.js"></script>
 <script>
 (() => {
 'use strict';
@@ -787,6 +792,7 @@ function damageBoss(n, x, z) {
   const b = G.boss; if (!b || b.entering || b.dying) return false;
   const half = b.hp > b.maxHp * 0.55; b.hp -= n; b.flash = 1; if (half && b.hp <= b.maxHp * 0.55 && b.hp > 0) snap(); if (Math.random() < .25) burst(x, 0.5, z, CONFIG.bosses[b.lv].color, 2, 6, .25);
   $('bossBar').style.width = Math.max(0, b.hp / b.maxHp * 100) + '%';
+  if (window.Ops && Ops.teamAddDamage) { G.run.bossDmg = (G.run.bossDmg || 0) + n; Ops.teamAddDamage(n); if (window.OpsTeam) OpsTeam.syncHud(); }
   if (b.hp <= 0) killBoss();
   return true;
 }
@@ -1100,7 +1106,7 @@ function startGame() {
   if (DEBUG_LEVEL > 1) { G.proc = Math.min(4, DEBUG_LEVEL); G.cores = DEBUG_LEVEL + 1; }
   hudPts = hudHp = hudNpu = -1; if (TOUCH) { try { screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait').catch(() => {}); } catch (e) {} }
   lastSnapshot = null;
-  $('startScreen').classList.remove('on'); $('endScreen').classList.remove('on'); $('hud').classList.add('on'); $('backLink').style.display = 'none';
+  $('startScreen').classList.remove('on'); $('endScreen').classList.remove('on'); $('hud').classList.add('on'); if (window.OpsTeam) OpsTeam.syncHud(); $('backLink').style.display = 'none';
   refreshMenus(); updateChips(); startLevel(DEBUG_LEVEL); updateDeskMissions(); joyGhost();
 }
 let lastSnapshot = null;
