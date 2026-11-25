@@ -22,7 +22,7 @@
   .ot-hint{font-size:12px;color:var(--ou-dim,var(--muted,#a6a6b4));margin:6px 0}
   .ot-join{display:flex;gap:8px;margin:8px 0}
   .ot-join input{flex:1;min-width:0;min-height:44px;border-radius:7px;border:1px solid var(--ou-line,var(--line,#33333e));background:var(--ou-panel2,var(--panel2,#222229));color:inherit;padding:0 12px;font-size:16px}
-  .team-hud{position:relative;margin:6px 12px 0;padding:8px 10px;border:1px solid var(--vi-line,rgba(120,170,255,.25));border-radius:10px;background:rgba(6,14,36,.55);color:var(--vi-text,#e8f0ff);font-size:12px;pointer-events:none;z-index:5}
+  .team-hud{position:absolute;left:12px;right:12px;top:max(96px,calc(env(safe-area-inset-top) + 84px));margin:0;padding:8px 10px;border:1px solid var(--vi-line,rgba(120,170,255,.25));border-radius:10px;background:rgba(6,14,36,.72);color:var(--vi-text,#e8f0ff);font-size:12px;pointer-events:none;z-index:6}
   .team-hud .nm{display:flex;justify-content:space-between;gap:8px;margin-bottom:4px}
   .team-hud .bar{height:5px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden}
   .team-hud .bar i{display:block;height:100%;background:var(--vi-primary,#00c7fd);width:0}
